@@ -87,8 +87,7 @@ namespace DefenseShields
         private const int HeatingStep = 600;
         private const int CoolingStep = 1200;
         private const int FallBackStep = 10;
-        private const double MagicEllipsoidRatio = 1000;
-        private const float MagicPowerRatio = 2500;
+        private const float MagicRatio = 1000;
         private const float ChargeRatio = 1.25f;
         private const int SyncCount = 60;
 
@@ -218,7 +217,7 @@ namespace DefenseShields
         private bool _readyToSync;
         private bool _firstSync;
         private bool _adjustShape;
-
+        private bool _updateCap;
         private string _modelActive = "\\Models\\Cubes\\ShieldActiveBase.mwm";
         private string _modelPassive = string.Empty;
 

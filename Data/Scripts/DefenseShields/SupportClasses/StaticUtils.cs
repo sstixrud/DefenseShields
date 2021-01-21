@@ -24,7 +24,7 @@ namespace DefenseShields.Support
     {
         public static void PrepConfigFile()
         {
-            const int BaseScaler = 10;
+            const int BaseScaler = 100;
             const float HeatScaler = 0.0065f;
             const float Unused = 0f;
             const int StationRatio = 1;
@@ -74,9 +74,11 @@ namespace DefenseShields.Support
                 Session.Enforced.MaintenanceCost = !unPackedData.MaintenanceCost.Equals(-1f) ? unPackedData.MaintenanceCost : MaintenanceCost;
                 Session.Enforced.DisableBlockDamage = !unPackedData.DisableBlockDamage.Equals(-1) ? unPackedData.DisableBlockDamage : DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
-                if (unPackedData.Version <= 72)
+                if (unPackedData.Version <= 73)
                 {
                     Session.Enforced.CapScaler = 1f;
+                    Session.Enforced.BaseScaler = 100;
+                    Session.Enforced.HpsEfficiency = 0.25f;
                 }
                 Session.Enforced.Version = Version;
                 UpdateConfigFile(unPackCfg);

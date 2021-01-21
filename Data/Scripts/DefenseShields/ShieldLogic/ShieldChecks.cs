@@ -78,7 +78,7 @@ namespace DefenseShields
         }
 
         private readonly List<IMyCubeGrid> _tempSubGridList = new List<IMyCubeGrid>();
-        private void UpdateSubGrids(bool force = false)
+        private void UpdateSubGrids()
         {
             _subUpdate = false;
 
@@ -133,8 +133,13 @@ namespace DefenseShields
             }
             if (_functionalChanged) _functionalEvent = true;
 
-            _functionalAdded = false;
-            _functionalRemoved = false;
+            if (_functionalAdded || _functionalRemoved)
+            {
+                _updateCap = true;
+                _functionalAdded = false;
+                _functionalRemoved = false;
+            }
+
             _functionalChanged = false;
 
             _blockChanged = false;
@@ -142,22 +147,22 @@ namespace DefenseShields
             _blockAdded = false;
         }
 
-        private void BlockChanged(bool backGround)
+        private void BlockChanged(bool backGround, bool forceCap = false)
         {
             if (_blockEvent)
             {
                 var notReady = !FuncTask.IsComplete || DsState.State.Sleeping || DsState.State.Suspended;
                 if (notReady) return;
                 if (Session.Enforced.Debug == 3) Log.Line($"BlockChanged: functional:{_functionalEvent} - funcComplete:{FuncTask.IsComplete} - Sleeping:{DsState.State.Sleeping} - Suspend:{DsState.State.Suspended} - ShieldId [{Shield.EntityId}]");
-                if (_functionalEvent) FunctionalChanged(backGround);
+                if (_functionalEvent) FunctionalChanged(backGround, forceCap);
                 _blockEvent = false;
                 _funcTick = _tick + 60;
             }
         }
 
-        private void FunctionalChanged(bool backGround)
+        private void FunctionalChanged(bool backGround, bool forceCap)
         {
-            if (_isServer)
+            if (_isServer && (_updateCap || forceCap))
                 ComputeCap();
 
             if (backGround) FuncTask = MyAPIGateway.Parallel.StartBackground(BackGroundChecks);

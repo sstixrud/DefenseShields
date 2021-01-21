@@ -18,7 +18,7 @@ namespace DefenseShields
 
             if (newShape)
             {
-                UpdateSubGrids(true);
+                UpdateSubGrids();
                 BlockMonitor();
                 if (_shapeEvent) CheckExtents();
                 if (GridIsMobile) _updateMobileShape = true;
@@ -227,7 +227,7 @@ namespace DefenseShields
                 EllipsoidVolume = 1.333333 * Math.PI * DetectMatrixOutside.Scale.X * DetectMatrixOutside.Scale.Y * DetectMatrixOutside.Scale.Z;
                 _shieldVol = DetectMatrixOutside.Scale.Volume;
 
-                var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio);
+                var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicRatio);
                 
                 _sizeScaler = Math.Sqrt(ellipsoidMagic);
                 if (_isServer)

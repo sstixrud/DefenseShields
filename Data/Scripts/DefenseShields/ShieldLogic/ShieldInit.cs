@@ -298,7 +298,7 @@ namespace DefenseShields
             _functionalChanged = true;
             ResetShape(false);
             ResetShape(false, true);
-            if (refreshBlocks) BlockChanged(false);
+            if (refreshBlocks) BlockChanged(false, true);
             _updateRender = true;
         }
 
@@ -507,30 +507,46 @@ namespace DefenseShields
         private readonly List<MyCubeBlock> _cubeVectorsList = new List<MyCubeBlock>();
         private void ComputeCap()
         {
+            _updateCap = false;
             _cubeVectorsList.Clear();
 
-            var fatBlocks = MyGrid.GetFatBlocks();
-            var fatCount = fatBlocks.Count;
+            if (ShieldComp.SubGrids.Count == 0)
+                UpdateSubGrids();
 
-            for (int i = 0; i < fatCount; i++)
-            {
-                var cube = fatBlocks[i];
-                _cubeVectorsList.Add(cube);
+            float boxsArea = 0;
+
+            foreach (var sub in ShieldComp.SubGrids) {
+
+                var fatBlocks = sub.GetFatBlocks();
+                var fatCount = fatBlocks.Count;
+
+                for (int i = 0; i < fatCount; i++) {
+                    var cube = fatBlocks[i];
+                    _cubeVectorsList.Add(cube);
+                }
+
+                ShellSort(_cubeVectorsList);
+                var percentile95Th = (int)(fatCount * 0.1);
+                _cubeVectorsList.RemoveRange(_cubeVectorsList.Count - percentile95Th, percentile95Th);
+
+                BoundingBox newBox = new BoundingBox();
+
+                for (int i = 0; i < _cubeVectorsList.Count; i++) {
+                    var cube = _cubeVectorsList[i];
+                    newBox.Min = Vector3.Min(newBox.Min, cube.Min * cube.CubeGrid.GridSize);
+                    newBox.Max = Vector3.Max(newBox.Max, cube.Max * cube.CubeGrid.GridSize);
+                }
+
+                boxsArea += newBox.SurfaceArea();
+                if (boxsArea < 100)
+                    boxsArea = 100;
             }
 
-            ShellSort(_cubeVectorsList);
-            var percentile95Th = (int)(fatCount * 0.1);
-            _cubeVectorsList.RemoveRange(_cubeVectorsList.Count - percentile95Th, percentile95Th);
+            if (boxsArea < 100)
+                boxsArea = 100;
 
-            BoundingBox newBox = new BoundingBox();
-            for (int i = 0; i < _cubeVectorsList.Count; i++) {
-                var cube = _cubeVectorsList[i];
-                newBox.Min = Vector3.Min(newBox.Min, cube.Min);
-                newBox.Max = Vector3.Max(newBox.Max, cube.Max);
-            }
-
-            var surfaceArea = (float)Math.Sqrt(newBox.SurfaceArea());
-            DsState.State.GridIntegrity = (surfaceArea * MagicPowerRatio);
+            var surfaceArea = (float)Math.Sqrt(boxsArea);
+            DsState.State.GridIntegrity = (surfaceArea * MagicRatio);
         }
 
         static void ShellSort(List<MyCubeBlock> list)

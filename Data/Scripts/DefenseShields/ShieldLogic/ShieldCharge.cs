@@ -64,7 +64,7 @@ namespace DefenseShields
                     {
                         if (Session.Enforced.Debug >= 2) Log.Line($"NoObjects: {MyGrid?.DebugName} - Max:{MyResourceDist?.MaxAvailableResourceByType(GId)} - Status:{MyResourceDist?.SourcesEnabled} - Sources:{_powerSources.Count}");
                         FallBackPowerCalc();
-                        FunctionalChanged(true);
+                        FunctionalChanged(true, true);
                     }
                     else
                     {
@@ -239,8 +239,6 @@ namespace DefenseShields
 
             ShieldMaxCharge = ShieldHpBase * HpScaler;
 
-            if (_tick180) Log.Line($"test: _sizeScaler: {_sizeScaler} -  gridScale:{(DsState.State.GridIntegrity * MagicPowerRatio)} - bufferScaler:{bufferScaler} - [powerCap:{powerCap} / shieldBase:{ShieldHpBase}] = {HpScaler} - ShieldMaxCharge:{ShieldMaxCharge} - BlockCount:{MyGrid.BlocksCount}");
-
             var powerForShield = PowerNeeded(chargePercent, hpsEfficiency);
 
             if (!WarmedUp) return;
@@ -310,7 +308,7 @@ namespace DefenseShields
             var powerForShield = ((cleanPower * chargePercent) - _shieldMaintaintPower) * powerScaler;
             var rawMaxChargeRate = powerForShield > 0 ? powerForShield : 0f;
             _shieldMaxChargeRate = rawMaxChargeRate;
-            _shieldPeakRate = _shieldMaxChargeRate * hpsEfficiency / (float)_sizeScaler;
+            _shieldPeakRate = (_shieldMaxChargeRate * hpsEfficiency);
 
             if (DsState.State.Charge + _shieldPeakRate < ShieldMaxCharge)
             {

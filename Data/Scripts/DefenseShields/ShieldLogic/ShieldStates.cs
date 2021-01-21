@@ -148,7 +148,7 @@
             }
             if (!_isDedicated) ResetDamageEffects();
             lock (Session.Instance.ActiveShields) Session.Instance.ActiveShields.Add(this);
-            UpdateSubGrids(true);
+            UpdateSubGrids();
         }
 
         private void OfflineShield(bool clear, bool resetShape, bool keepCharge = false)
