@@ -513,7 +513,10 @@ namespace DefenseShields
             var fatCount = fatBlocks.Count;
 
             for (int i = 0; i < fatCount; i++)
-                _cubeVectorsList.Add(fatBlocks[i]);
+            {
+                var cube = fatBlocks[i];
+                _cubeVectorsList.Add(cube);
+            }
 
             ShellSort(_cubeVectorsList);
             var percentile95Th = (int)(fatCount * 0.1);
@@ -526,11 +529,8 @@ namespace DefenseShields
                 newBox.Max = Vector3.Max(newBox.Max, cube.Max);
             }
 
-            var surfaceArea = newBox.SurfaceArea();
-            var sizeMin = MyGrid.GridSizeEnum == MyCubeSize.Large ? 100f : 20f;
-            var cap = surfaceArea > sizeMin ? surfaceArea : sizeMin;
-
-            DsState.State.GridIntegrity = cap;
+            var surfaceArea = (float)Math.Sqrt(newBox.SurfaceArea());
+            DsState.State.GridIntegrity = surfaceArea;
         }
 
         static void ShellSort(List<MyCubeBlock> list)

@@ -208,7 +208,6 @@ namespace DefenseShields
 
             var chargePercent = DsSet.Settings.Rate * ConvToDec;
             var shieldMaintainPercent = maintenanceCost / percent;
-            _sizeScaler = _shieldVol / (_ellipsoidSurfaceArea * EllipsoidMagicRatio);
 
             float bufferScaler;
             if (ShieldMode == ShieldType.Station) {
@@ -223,12 +222,16 @@ namespace DefenseShields
             else if (_sizeScaler > 1 && fortify) {
                 bufferScaler = 100 / percent * baseScaler * _shieldRatio;
             }
+            else if (ShieldMode == ShieldType.SmallGrid)
+            {
+                bufferScaler = 100 / percent * (baseScaler * 1f) / (float)_sizeScaler * _shieldRatio;
+            }
             else {
                 bufferScaler = 100 / percent * baseScaler / (float)_sizeScaler * _shieldRatio;
             }
             ShieldHpBase = ShieldMaxPower * bufferScaler;
 
-            var powerCap = (float)(DsState.State.GridIntegrity * LargeReactorMagicRatio);
+            var powerCap = (float)(DsState.State.GridIntegrity * MagicPowerRatio);
             if (capScaler > 0) {
 
                 if (fortify) 
@@ -251,6 +254,9 @@ namespace DefenseShields
             _shieldMaintaintPower = ShieldMaxPower * HpScaler * shieldMaintainPercent;
 
             ShieldMaxCharge = ShieldHpBase * HpScaler;
+
+            Log.Line($"_sizeScaler: {_sizeScaler} -  gridScale:{(DsState.State.GridIntegrity * MagicPowerRatio)} - bufferScaler:{bufferScaler} - shieldBase:{ShieldHpBase} - ShieldMaxCharge:{ShieldMaxCharge} - BlockCount:{MyGrid.BlocksCount}");
+
             var powerForShield = PowerNeeded(chargePercent, hpsEfficiency);
 
             if (!WarmedUp) return;

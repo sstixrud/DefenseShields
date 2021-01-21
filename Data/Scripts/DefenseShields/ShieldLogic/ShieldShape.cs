@@ -1,4 +1,5 @@
-﻿using Sandbox.Game.Entities;
+﻿using System.Diagnostics.Eventing.Reader;
+using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
 
 namespace DefenseShields
@@ -225,6 +226,10 @@ namespace DefenseShields
                 _ellipsoidSurfaceArea = _ellipsoidSa.Surface;
                 EllipsoidVolume = 1.333333 * Math.PI * DetectMatrixOutside.Scale.X * DetectMatrixOutside.Scale.Y * DetectMatrixOutside.Scale.Z;
                 _shieldVol = DetectMatrixOutside.Scale.Volume;
+
+                var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio);
+                
+                _sizeScaler = Math.Sqrt(ellipsoidMagic);
                 if (_isServer)
                 {
                     ShieldChangeState();
