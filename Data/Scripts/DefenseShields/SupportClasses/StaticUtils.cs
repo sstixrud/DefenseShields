@@ -34,7 +34,7 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 73;
+            const int Version = 74;
             const float CapScaler = 1f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
@@ -79,6 +79,9 @@ namespace DefenseShields.Support
                     Session.Enforced.CapScaler = 1f;
                     Session.Enforced.BaseScaler = 100;
                     Session.Enforced.HpsEfficiency = 0.25f;
+                    Session.Enforced.LargeShipRatio = 100;
+                    Session.Enforced.StationRatio = 100;
+                    Session.Enforced.SmallShipRatio = 100;
                 }
                 Session.Enforced.Version = Version;
                 UpdateConfigFile(unPackCfg);

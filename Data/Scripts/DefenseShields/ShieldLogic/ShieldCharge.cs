@@ -205,15 +205,15 @@ namespace DefenseShields
             var maintenanceCost = Session.Enforced.MaintenanceCost;
             var fortify = DsSet.Settings.FortifyShield;
             var percent = DsSet.Settings.Rate * ChargeRatio;
-
+            var shieldTypeRatio = _shieldTypeRatio / 100;
             var chargePercent = DsSet.Settings.Rate * ConvToDec;
             var shieldMaintainPercent = maintenanceCost / percent;
 
             float bufferScaler;
             if (ShieldMode == ShieldType.Station && DsState.State.Enhancer) 
-                bufferScaler = 100 / percent * (baseScaler * _shieldTypeRatio);
+                bufferScaler = 100 / percent * (baseScaler * shieldTypeRatio);
             else 
-                bufferScaler = 100 / percent * (baseScaler * _shieldTypeRatio) / (float)_sizeScaler;
+                bufferScaler = 100 / percent * (baseScaler * shieldTypeRatio) / (float)_sizeScaler;
             
             ShieldHpBase = ShieldMaxPower * bufferScaler;
 
@@ -253,7 +253,7 @@ namespace DefenseShields
 
                 if (powerLost && _pLossTimer++ > 60 || serverNoPower) {
 
-                    Log.Line($"powerLoss: forShield:{powerForShield} - needed:{_powerNeeded} > Max:{ShieldMaxPower} - other:{(ShieldMaxPower - _powerNeeded)} / {Math.Abs(_powerNeeded) * 100 < 0.001}");
+                    //Log.Line($"powerLoss: forShield:{powerForShield} - needed:{_powerNeeded} > Max:{ShieldMaxPower} - other:{(ShieldMaxPower - _powerNeeded)} / {Math.Abs(_powerNeeded) * 100 < 0.001}");
 
                     if (PowerLoss(powerForShield, powerLost, serverNoPower)) {
                         _powerFail = true;

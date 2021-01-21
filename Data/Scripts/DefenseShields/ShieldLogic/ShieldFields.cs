@@ -159,7 +159,7 @@ namespace DefenseShields
         private int _empScaleTime = 1;
         private int _prevLod;
         private int _onCount;
-        private int _shieldTypeRatio = 1;
+        private int _shieldTypeRatio = 100;
         private int _expChargeReduction;
         private int _bCount;
         private int _bTime;
