@@ -94,28 +94,29 @@ namespace DefenseShields
         private void FallBackPowerCalc(bool reportOnly = false)
         {
             var batteries = !DsSet.Settings.UseBatteries;
-            if (reportOnly)
-            {
+
+            if (reportOnly) {
+
                 var gridMaxPowerReport = 0f;
                 var gridCurrentPowerReport = 0f;
                 var gridAvailablePowerReport = 0f;
                 var batteryMaxPowerReport = 0f;
                 var batteryCurrentPowerReport = 0f;
                 var batteryCurrentInputreport = 0f;
-                for (int i = 0; i < _powerSources.Count; i++)
-                {
-                    var source = _powerSources[i];
+                for (int i = 0; i < _powerSources.Count; i++) {
 
+                    var source = _powerSources[i];
                     var battery = source.Entity as IMyBatteryBlock;
-                    if (battery != null && batteries)
-                    {
-                        //Log.Line($"bMaxO:{battery.MaxOutput} - bCurrO:{battery.CurrentOutput} - bCurrI:{battery.CurrentInput} - Charging:{battery.IsCharging}");
+
+                    if (battery != null && batteries) {
+
                         if (!battery.IsWorking) continue;
                         var currentInput = battery.CurrentInput;
                         var currentOutput = battery.CurrentOutput;
                         var maxOutput = battery.MaxOutput;
-                        if (currentInput > 0)
-                        {
+
+                        if (currentInput > 0) {
+
                             batteryCurrentInputreport += currentInput;
                             if (battery.IsCharging) batteryCurrentPowerReport -= currentInput;
                             else batteryCurrentPowerReport -= currentInput;
@@ -123,8 +124,7 @@ namespace DefenseShields
                         batteryMaxPowerReport += maxOutput;
                         batteryCurrentPowerReport += currentOutput;
                     }
-                    else
-                    {
+                    else {
                         gridMaxPowerReport += source.MaxOutputByType(GId);
                         gridCurrentPowerReport += source.CurrentOutputByType(GId);
                     }
@@ -134,8 +134,7 @@ namespace DefenseShields
                 gridCurrentPowerReport += batteryCurrentPowerReport;
                 gridAvailablePowerReport = gridMaxPowerReport - gridCurrentPowerReport;
 
-                if (!DsSet.Settings.UseBatteries)
-                {
+                if (!DsSet.Settings.UseBatteries) {
                     gridCurrentPowerReport += batteryCurrentInputreport;
                     gridAvailablePowerReport -= batteryCurrentInputreport;
                 }
@@ -148,24 +147,25 @@ namespace DefenseShields
                 {
                     var source = _powerSources[i];
                     var battery = source.Entity as IMyBatteryBlock;
-                    if (battery != null && batteries)
-                    {
-                        //Log.Line($"bMaxO:{battery.MaxOutput} - bCurrO:{battery.CurrentOutput} - bCurrI:{battery.CurrentInput} - Charging:{battery.IsCharging}");
+
+                    if (battery != null && batteries) {
+
                         if (!battery.IsWorking) continue;
                         var currentInput = battery.CurrentInput;
                         var currentOutput = battery.CurrentOutput;
                         var maxOutput = battery.MaxOutput;
-                        if (currentInput > 0)
-                        {
+
+                        if (currentInput > 0) {
+
                             _batteryCurrentInput += currentInput;
                             if (battery.IsCharging) _batteryCurrentOutput -= currentInput;
                             else _batteryCurrentOutput -= currentInput;
                         }
+
                         _batteryMaxPower += maxOutput;
                         _batteryCurrentOutput += currentOutput;
                     }
-                    else
-                    {
+                    else {
                         GridMaxPower += source.MaxOutputByType(GId);
                         GridCurrentPower += source.CurrentOutputByType(GId);
                     }
@@ -177,19 +177,21 @@ namespace DefenseShields
 
         private void CalculateBatteryInput()
         {
-            for (int i = 0; i < _batteryBlocks.Count; i++)
-            {
+            for (int i = 0; i < _batteryBlocks.Count; i++) {
+
                 var battery = _batteryBlocks[i];
                 if (!battery.IsWorking) continue;
                 var currentInput = battery.CurrentInput;
                 var currentOutput = battery.CurrentOutput;
                 var maxOutput = battery.MaxOutput;
-                if (currentInput > 0)
-                {
+
+                if (currentInput > 0) {
+
                     _batteryCurrentInput += currentInput;
                     if (battery.IsCharging) _batteryCurrentOutput -= currentInput;
                     else _batteryCurrentOutput -= currentInput;
                 }
+
                 _batteryMaxPower += maxOutput;
                 _batteryCurrentOutput += currentOutput;
             }
@@ -206,81 +208,107 @@ namespace DefenseShields
 
             var chargePercent = DsSet.Settings.Rate * ConvToDec;
             var shieldMaintainPercent = maintenanceCost / percent;
-            _sizeScaler = _shieldVol / (_ellipsoidSurfaceArea * MagicRatio);
+            _sizeScaler = _shieldVol / (_ellipsoidSurfaceArea * EllipsoidMagicRatio);
 
             float bufferScaler;
-            if (ShieldMode == ShieldType.Station)
-            {
-                if (DsState.State.Enhancer) bufferScaler = 100 / percent * baseScaler * _shieldRatio;
-                else bufferScaler = 100 / percent * baseScaler / (float)_sizeScaler * _shieldRatio;
+            if (ShieldMode == ShieldType.Station) {
+
+                if (DsState.State.Enhancer) {
+                    bufferScaler = 100 / percent * baseScaler * _shieldRatio;
+                }
+                else {
+                    bufferScaler = 100 / percent * baseScaler / (float)_sizeScaler * _shieldRatio;
+                }
             }
-            else if (_sizeScaler > 1 && fortify)
-            {
+            else if (_sizeScaler > 1 && fortify) {
                 bufferScaler = 100 / percent * baseScaler * _shieldRatio;
             }
-            else bufferScaler = 100 / percent * baseScaler / (float)_sizeScaler * _shieldRatio;
-
+            else {
+                bufferScaler = 100 / percent * baseScaler / (float)_sizeScaler * _shieldRatio;
+            }
             ShieldHpBase = ShieldMaxPower * bufferScaler;
 
-            var gridIntegrity = DsState.State.GridIntegrity * ConvToDec;
-            if (capScaler > 0)
-            {
-                if (fortify) capScaler *= 1.5f;
-                else if (ShieldMode == ShieldType.Station) capScaler *= 2f;
-                gridIntegrity *= capScaler;
-            }
+            var powerCap = (float)(DsState.State.GridIntegrity * LargeReactorMagicRatio);
+            if (capScaler > 0) {
 
-            if (ShieldHpBase > gridIntegrity) HpScaler = gridIntegrity / ShieldHpBase;
-            else HpScaler = 1f;
+                if (fortify) 
+                    capScaler *= 1.5f;
+                else if (ShieldMode == ShieldType.Station) 
+                    capScaler *= 2f;
+
+                powerCap *= capScaler;
+            }
+            if (ShieldHpBase > powerCap) 
+                HpScaler = powerCap / ShieldHpBase;
+            else 
+                HpScaler = 1f;
 
             shieldMaintainPercent = shieldMaintainPercent * DsState.State.EnhancerPowerMulti * (DsState.State.ShieldPercent * ConvToDec);
-            if (DsState.State.Lowered) shieldMaintainPercent = shieldMaintainPercent * 0.25f;
+            
+            if (DsState.State.Lowered) 
+                shieldMaintainPercent *= 0.25f;
+
             _shieldMaintaintPower = ShieldMaxPower * HpScaler * shieldMaintainPercent;
 
             ShieldMaxCharge = ShieldHpBase * HpScaler;
             var powerForShield = PowerNeeded(chargePercent, hpsEfficiency);
+
             if (!WarmedUp) return;
 
-            if (DsState.State.Charge > ShieldMaxCharge) DsState.State.Charge = ShieldMaxCharge;
-            if (_isServer)
-            {
+            if (DsState.State.Charge > ShieldMaxCharge) 
+                DsState.State.Charge = ShieldMaxCharge;
+
+            if (_isServer) {
+
                 var powerLost = powerForShield <= 0 || _powerNeeded > ShieldMaxPower || MyUtils.IsZero(ShieldMaxPower - _powerNeeded);
                 var serverNoPower = DsState.State.NoPower;
-                if (powerLost && _pLossTimer++ > 60 || serverNoPower)
-                {
+
+                if (powerLost && _pLossTimer++ > 60 || serverNoPower) {
+
                     Log.Line($"powerLoss: forShield:{powerForShield} - needed:{_powerNeeded} > Max:{ShieldMaxPower} - other:{(ShieldMaxPower - _powerNeeded)} / {Math.Abs(_powerNeeded) * 100 < 0.001}");
-                    if (PowerLoss(powerForShield, powerLost, serverNoPower))
-                    {
+
+                    if (PowerLoss(powerForShield, powerLost, serverNoPower)) {
                         _powerFail = true;
                         return;
                     }
                 }
-                else
-                {
+                else {
+
                     _pLossTimer = 0;
-                    if (_capacitorLoop != 0 && _tick - _capacitorTick > CapacitorStableCount)
-                    {
+
+                    if (_capacitorLoop != 0 && _tick - _capacitorTick > CapacitorStableCount) 
                         _capacitorLoop = 0;
-                    }
+
                     _powerFail = false;
                 }
             }
 
             if (!DsState.State.Lowered) {
-                if (DsState.State.Heat != 0) UpdateHeatRate();
-                else _expChargeReduction = 0;
+
+                if (DsState.State.Heat != 0) 
+                    UpdateHeatRate();
+                else 
+                    _expChargeReduction = 0;
             }
 
-            if (_count == 29 && DsState.State.Charge < ShieldMaxCharge) DsState.State.Charge += ShieldChargeRate;
+            if (_count == 29 && DsState.State.Charge < ShieldMaxCharge) {
+                DsState.State.Charge += ShieldChargeRate;
+            }
             else if (DsState.State.Charge.Equals(ShieldMaxCharge))
             {
                 ShieldChargeRate = 0f;
                 _shieldConsumptionRate = 0f;
             }
 
-            if (DsState.State.Charge < ShieldMaxCharge) DsState.State.ShieldPercent = DsState.State.Charge / ShieldMaxCharge * 100;
-            else if (DsState.State.Charge < ShieldMaxCharge * 0.1) DsState.State.ShieldPercent = 0f;
-            else DsState.State.ShieldPercent = 100f;
+            if (DsState.State.Charge < ShieldMaxCharge) {
+                DsState.State.ShieldPercent = DsState.State.Charge / ShieldMaxCharge * 100;
+            }
+            else if (DsState.State.Charge < ShieldMaxCharge * 0.1) {
+                DsState.State.ShieldPercent = 0f;
+            }
+            else {
+                DsState.State.ShieldPercent = 100f;
+            }
         }
 
         private float PowerNeeded(float chargePercent, float hpsEfficiency)

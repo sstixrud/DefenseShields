@@ -77,23 +77,25 @@ namespace DefenseShields
             }
         }
 
+        private readonly List<IMyCubeGrid> _tempSubGridList = new List<IMyCubeGrid>();
         private void UpdateSubGrids(bool force = false)
         {
             _subUpdate = false;
 
             lock (SubLock)
             {
-                var gotGroups = MyAPIGateway.GridGroups.GetGroup(MyGrid, GridLinkTypeEnum.Physical);
+                _tempSubGridList.Clear();
+                MyAPIGateway.GridGroups.GetGroup(MyGrid, GridLinkTypeEnum.Physical, _tempSubGridList);
 
-                if (gotGroups.Count == ShieldComp.LinkedGrids.Count && !SubGridChangeDetect(gotGroups)) 
+                if (_tempSubGridList.Count == ShieldComp.LinkedGrids.Count && !SubGridChangeDetect(_tempSubGridList)) 
                     return;
 
                 foreach (var s in ShieldComp.SubGrids) Session.Instance.IdToBus.Remove(s.EntityId);
                 ShieldComp.SubGrids.Clear();
                 ShieldComp.LinkedGrids.Clear();
-                for (int i = 0; i < gotGroups.Count; i++)
+                for (int i = 0; i < _tempSubGridList.Count; i++)
                 {
-                    var sub = gotGroups[i];
+                    var sub = _tempSubGridList[i];
                     if (sub == null) continue;
                     sub.Flags |= (EntityFlags)(1 << 31);
                     if (MyAPIGateway.GridGroups.HasConnection(MyGrid, sub, GridLinkTypeEnum.Mechanical))
@@ -155,6 +157,9 @@ namespace DefenseShields
 
         private void FunctionalChanged(bool backGround)
         {
+            if (_isServer)
+                ComputeCap();
+
             if (backGround) FuncTask = MyAPIGateway.Parallel.StartBackground(BackGroundChecks);
             else BackGroundChecks();
             _functionalEvent = false;

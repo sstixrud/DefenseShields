@@ -34,8 +34,8 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 71;
-            const float CapScaler = 0.5f;
+            const int Version = 73;
+            const float CapScaler = 1f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
             const int DisableBlockDamage = 0;
@@ -54,7 +54,6 @@ namespace DefenseShields.Support
                     if (unPackedData.BaseScaler < 1) unPackedData.BaseScaler = BaseScaler;
                     if (unPackedData.MaintenanceCost <= 0) unPackedData.MaintenanceCost = MaintenanceCost;
                 }
-
                 if (unPackedData.Version == Version && !invalidValue) return;
 
                 if (!invalidValue) Log.Line($"outdated config file regenerating, file version: {unPackedData.Version} - current version: {Version}");
@@ -75,10 +74,9 @@ namespace DefenseShields.Support
                 Session.Enforced.MaintenanceCost = !unPackedData.MaintenanceCost.Equals(-1f) ? unPackedData.MaintenanceCost : MaintenanceCost;
                 Session.Enforced.DisableBlockDamage = !unPackedData.DisableBlockDamage.Equals(-1) ? unPackedData.DisableBlockDamage : DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
-                if (unPackedData.Version <= 70)
+                if (unPackedData.Version <= 72)
                 {
-                    Session.Enforced.CapScaler = 0.5f;
-                    Session.Enforced.HpsEfficiency = 0.25f;
+                    Session.Enforced.CapScaler = 1f;
                 }
                 Session.Enforced.Version = Version;
                 UpdateConfigFile(unPackCfg);

@@ -138,7 +138,10 @@
             {
                 _blockAdded = true;
                 _blockChanged = true;
-                if (_isServer) DsState.State.GridIntegrity += mySlimBlock.MaxIntegrity;
+                if (_isServer)
+                {
+                    //DsState.State.GridIntegrity += mySlimBlock.MaxIntegrity;
+                }
             }
             catch (Exception ex) { Log.Line($"Exception in Controller BlockAdded: {ex}"); }
         }
@@ -149,7 +152,10 @@
             {
                 _blockRemoved = true;
                 _blockChanged = true;
-                if (_isServer) DsState.State.GridIntegrity -= mySlimBlock.MaxIntegrity;
+                if (_isServer)
+                {
+                    //DsState.State.GridIntegrity -= mySlimBlock.MaxIntegrity;
+                }
             }
             catch (Exception ex) { Log.Line($"Exception in Controller BlockRemoved: {ex}"); }
         }

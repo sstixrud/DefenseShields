@@ -1,8 +1,11 @@
-﻿using Sandbox.Game.Entities;
-using VRage.ModAPI;
+﻿
+
+using VRage.Game.ModAPI;
 
 namespace DefenseShields
 {
+    using Sandbox.Game.Entities;
+    using VRage.ModAPI;
     using System;
     using System.Collections.Generic;
     using Support;
@@ -11,7 +14,6 @@ namespace DefenseShields
     using VRage.Game;
     using VRage.Game.Components;
     using VRage.Game.Entity;
-    using VRage.Game.ModAPI;
     using VRage.Utils;
     using VRageMath;
 
@@ -263,7 +265,7 @@ namespace DefenseShields
 
             if (_isServer)
             {
-                GridIntegrity();
+                ComputeCap();
                 ShieldChangeState();
             }
             if (Session.Enforced.Debug == 3) Log.Line($"ResetEntity: ShieldId [{Shield.EntityId}]");
@@ -502,34 +504,57 @@ namespace DefenseShields
             if (Session.Enforced.Debug == 3) Log.Line($"InitEntities: mode: {ShieldMode}, spawn complete - ShieldId [{Shield.EntityId}]");
         }
 
-        private float GridIntegrity(IMyCubeGrid grid = null, bool remove = false)
+        private readonly List<MyCubeBlock> _cubeVectorsList = new List<MyCubeBlock>();
+        private void ComputeCap()
         {
-            var mainSub = false;
-            if (grid == null)
-            {
-                DsState.State.GridIntegrity = 0;
-                grid = Shield.CubeGrid;
-            }
-            else if (grid == MyGrid) mainSub = true;
+            _cubeVectorsList.Clear();
 
-            var integrityAdjustment = 0f;
+            var fatBlocks = MyGrid.GetFatBlocks();
+            var fatCount = fatBlocks.Count;
 
-            var blockList = new List<IMySlimBlock>();
-            grid.GetBlocks(blockList);
+            for (int i = 0; i < fatCount; i++)
+                _cubeVectorsList.Add(fatBlocks[i]);
 
-            for (int i = 0; i < blockList.Count; i++)
-            {
-                integrityAdjustment += blockList[i].MaxIntegrity;
-            }
+            ShellSort(_cubeVectorsList);
+            var percentile95Th = (int)(fatCount * 0.1);
+            _cubeVectorsList.RemoveRange(_cubeVectorsList.Count - percentile95Th, percentile95Th);
 
-            if (!mainSub)
-            {
-                if (!remove) DsState.State.GridIntegrity += integrityAdjustment;
-                else DsState.State.GridIntegrity -= integrityAdjustment;
+            BoundingBox newBox = new BoundingBox();
+            for (int i = 0; i < _cubeVectorsList.Count; i++) {
+                var cube = _cubeVectorsList[i];
+                newBox.Min = Vector3.Min(newBox.Min, cube.Min);
+                newBox.Max = Vector3.Max(newBox.Max, cube.Max);
             }
 
-            return integrityAdjustment;
+            var surfaceArea = newBox.SurfaceArea();
+            var sizeMin = MyGrid.GridSizeEnum == MyCubeSize.Large ? 100f : 20f;
+            var cap = surfaceArea > sizeMin ? surfaceArea : sizeMin;
+
+            DsState.State.GridIntegrity = cap;
         }
+
+        static void ShellSort(List<MyCubeBlock> list)
+        {
+            int length = list.Count;
+            Vector3 center = Vector3.Zero;
+            for (int h = length / 2; h > 0; h /= 2)
+            {
+                for (int i = h; i < length; i += 1)
+                {
+                    var tempValue = list[i];
+                    var dist = Vector3.DistanceSquared(list[i].Position, center);
+
+                    int j;
+                    for (j = i; j >= h && Vector3.DistanceSquared(list[j - h].Position, center) > dist; j -= h)
+                    {
+                        list[j] = list[j - h];
+                    }
+
+                    list[j] = tempValue;
+                }
+            }
+        }
+
         #endregion
     }
 }

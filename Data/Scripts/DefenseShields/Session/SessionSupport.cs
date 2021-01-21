@@ -117,7 +117,8 @@ namespace DefenseShields
             var warhead = myEntity as IMyWarhead;
             if (warhead != null)
             {
-                if (!warhead.IsFunctional && (warhead.IsArmed || (warhead.DetonationTime <= 0 && warhead.IsCountingDown)) && warhead.CustomData.Length != 0)
+                var grid = (MyCubeGrid)warhead.CubeGrid;
+                if (!warhead.IsFunctional && (warhead.IsArmed || (warhead.DetonationTime <= 0 && warhead.IsCountingDown)) && warhead.CustomData.Length != 0 && !GlobalProtect.ContainsKey(grid))
                 {
                     var blastRatio = warhead.CubeGrid.GridSizeEnum == MyCubeSize.Small ? 1 : 5;
                     var epicCenter = warhead.PositionComp.WorldAABB.Center;
