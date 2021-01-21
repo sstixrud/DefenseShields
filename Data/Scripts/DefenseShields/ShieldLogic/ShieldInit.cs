@@ -416,13 +416,13 @@ namespace DefenseShields
             switch (ShieldMode)
             {
                 case ShieldType.Station:
-                    if (Session.Enforced.StationRatio > 0) _shieldRatio = Session.Enforced.StationRatio;
+                    if (Session.Enforced.StationRatio > 0) _shieldTypeRatio = Session.Enforced.StationRatio;
                     break;
                 case ShieldType.LargeGrid:
-                    if (Session.Enforced.LargeShipRatio > 0) _shieldRatio = Session.Enforced.LargeShipRatio;
+                    if (Session.Enforced.LargeShipRatio > 0) _shieldTypeRatio = Session.Enforced.LargeShipRatio;
                     break;
                 case ShieldType.SmallGrid:
-                    if (Session.Enforced.SmallShipRatio > 0) _shieldRatio = Session.Enforced.SmallShipRatio;
+                    if (Session.Enforced.SmallShipRatio > 0) _shieldTypeRatio = Session.Enforced.SmallShipRatio;
                     break;
             }
 
@@ -530,7 +530,7 @@ namespace DefenseShields
             }
 
             var surfaceArea = (float)Math.Sqrt(newBox.SurfaceArea());
-            DsState.State.GridIntegrity = surfaceArea;
+            DsState.State.GridIntegrity = (surfaceArea * MagicPowerRatio);
         }
 
         static void ShellSort(List<MyCubeBlock> list)

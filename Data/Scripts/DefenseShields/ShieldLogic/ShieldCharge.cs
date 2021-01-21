@@ -210,28 +210,14 @@ namespace DefenseShields
             var shieldMaintainPercent = maintenanceCost / percent;
 
             float bufferScaler;
-            if (ShieldMode == ShieldType.Station) {
-
-                if (DsState.State.Enhancer) {
-                    bufferScaler = 100 / percent * baseScaler * _shieldRatio;
-                }
-                else {
-                    bufferScaler = 100 / percent * baseScaler / (float)_sizeScaler * _shieldRatio;
-                }
-            }
-            else if (_sizeScaler > 1 && fortify) {
-                bufferScaler = 100 / percent * baseScaler * _shieldRatio;
-            }
-            else if (ShieldMode == ShieldType.SmallGrid)
-            {
-                bufferScaler = 100 / percent * (baseScaler * 1f) / (float)_sizeScaler * _shieldRatio;
-            }
-            else {
-                bufferScaler = 100 / percent * baseScaler / (float)_sizeScaler * _shieldRatio;
-            }
+            if (ShieldMode == ShieldType.Station && DsState.State.Enhancer) 
+                bufferScaler = 100 / percent * (baseScaler * _shieldTypeRatio);
+            else 
+                bufferScaler = 100 / percent * (baseScaler * _shieldTypeRatio) / (float)_sizeScaler;
+            
             ShieldHpBase = ShieldMaxPower * bufferScaler;
 
-            var powerCap = (float)(DsState.State.GridIntegrity * MagicPowerRatio);
+            var powerCap = DsState.State.GridIntegrity;
             if (capScaler > 0) {
 
                 if (fortify) 
@@ -241,10 +227,8 @@ namespace DefenseShields
 
                 powerCap *= capScaler;
             }
-            if (ShieldHpBase > powerCap) 
-                HpScaler = powerCap / ShieldHpBase;
-            else 
-                HpScaler = 1f;
+
+            HpScaler = ShieldHpBase > powerCap ? powerCap / ShieldHpBase : 1f;
 
             shieldMaintainPercent = shieldMaintainPercent * DsState.State.EnhancerPowerMulti * (DsState.State.ShieldPercent * ConvToDec);
             
@@ -255,7 +239,7 @@ namespace DefenseShields
 
             ShieldMaxCharge = ShieldHpBase * HpScaler;
 
-            Log.Line($"_sizeScaler: {_sizeScaler} -  gridScale:{(DsState.State.GridIntegrity * MagicPowerRatio)} - bufferScaler:{bufferScaler} - shieldBase:{ShieldHpBase} - ShieldMaxCharge:{ShieldMaxCharge} - BlockCount:{MyGrid.BlocksCount}");
+            if (_tick180) Log.Line($"test: _sizeScaler: {_sizeScaler} -  gridScale:{(DsState.State.GridIntegrity * MagicPowerRatio)} - bufferScaler:{bufferScaler} - [powerCap:{powerCap} / shieldBase:{ShieldHpBase}] = {HpScaler} - ShieldMaxCharge:{ShieldMaxCharge} - BlockCount:{MyGrid.BlocksCount}");
 
             var powerForShield = PowerNeeded(chargePercent, hpsEfficiency);
 

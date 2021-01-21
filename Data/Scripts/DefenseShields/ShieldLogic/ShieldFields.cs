@@ -88,7 +88,7 @@ namespace DefenseShields
         private const int CoolingStep = 1200;
         private const int FallBackStep = 10;
         private const double MagicEllipsoidRatio = 1000;
-        private const double MagicPowerRatio = 10000;
+        private const float MagicPowerRatio = 10000;
         private const float ChargeRatio = 1.25f;
         private const int SyncCount = 60;
 
@@ -160,7 +160,7 @@ namespace DefenseShields
         private int _empScaleTime = 1;
         private int _prevLod;
         private int _onCount;
-        private int _shieldRatio = 1;
+        private int _shieldTypeRatio = 1;
         private int _expChargeReduction;
         private int _bCount;
         private int _bTime;
