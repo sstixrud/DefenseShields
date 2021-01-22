@@ -822,6 +822,19 @@ namespace DefenseShields.Support
 
             return distributor;
         }
+        static double AreaCuboid(double l, double h,
+            double w)
+        {
+            return (l * h * w);
+        }
+
+        public static double SurfaceAreaCuboid(double l, double h, double w)
+        {
+            return (2 * l * w + 2 * w * h + 2 * l * h);
+        }
+
+
+
 
         /*
         private static double PowerCalculation(IMyEntity breaching, IMyCubeGrid grid)
@@ -961,4 +974,4 @@ namespace DefenseShields.Support
         }
         */
     }
-}
+    }

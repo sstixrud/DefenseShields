@@ -504,55 +504,57 @@ namespace DefenseShields
             if (Session.Enforced.Debug == 3) Log.Line($"InitEntities: mode: {ShieldMode}, spawn complete - ShieldId [{Shield.EntityId}]");
         }
 
-        private readonly List<MyCubeBlock> _cubeVectorsList = new List<MyCubeBlock>();
+        private readonly List<MyCubeBlock> _cubeList = new List<MyCubeBlock>();
+
         private void ComputeCap()
         {
             _updateCap = false;
-            _cubeVectorsList.Clear();
+            _cubeList.Clear();
 
             if (ShieldComp.SubGrids.Count == 0)
                 UpdateSubGrids();
 
             float boxsArea = 0;
 
+            var totalFat = 0;
             foreach (var sub in ShieldComp.SubGrids) {
 
                 var fatBlocks = sub.GetFatBlocks();
                 var fatCount = fatBlocks.Count;
+                totalFat += fatCount;
 
                 for (int i = 0; i < fatCount; i++) {
                     var cube = fatBlocks[i];
-                    _cubeVectorsList.Add(cube);
+                    _cubeList.Add(cube);
                 }
 
-                ShellSort(_cubeVectorsList);
-                var percentile95Th = (int)(fatCount * 0.1);
-                _cubeVectorsList.RemoveRange(_cubeVectorsList.Count - percentile95Th, percentile95Th);
+                var center = GetAverage(_cubeList);
+                ShellSort(_cubeList, center);
+                var percentile95Th = (int)(fatCount * 0.10);
+                _cubeList.RemoveRange(_cubeList.Count - percentile95Th, percentile95Th);
 
-                BoundingBox newBox = new BoundingBox();
+                BoundingBox newBox = BoundingBox.Invalid;
 
-                for (int i = 0; i < _cubeVectorsList.Count; i++) {
-                    var cube = _cubeVectorsList[i];
+                for (int i = 0; i < _cubeList.Count; i++) {
+                    var cube = _cubeList[i];
                     newBox.Min = Vector3.Min(newBox.Min, cube.Min * cube.CubeGrid.GridSize);
                     newBox.Max = Vector3.Max(newBox.Max, cube.Max * cube.CubeGrid.GridSize);
                 }
 
                 boxsArea += newBox.SurfaceArea();
-                if (boxsArea < 100)
-                    boxsArea = 100;
             }
 
-            if (boxsArea < 100)
-                boxsArea = 100;
+            var unitLen = MyGrid.GridSize;
+            if (boxsArea < 1)
+                boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalFat * unitLen, unitLen, unitLen);
 
             var surfaceArea = (float)Math.Sqrt(boxsArea);
             DsState.State.GridIntegrity = (surfaceArea * MagicRatio);
         }
 
-        static void ShellSort(List<MyCubeBlock> list)
+        static void ShellSort(List<MyCubeBlock> list, Vector3I center)
         {
             int length = list.Count;
-            Vector3 center = Vector3.Zero;
             for (int h = length / 2; h > 0; h /= 2)
             {
                 for (int i = h; i < length; i += 1)
@@ -571,6 +573,50 @@ namespace DefenseShields
             }
         }
 
+        private Vector3I GetAverage(List<MyCubeBlock> blocks)
+        {
+            Vector3I vec = Vector3I.Zero;
+            for (int i = 0; i < blocks.Count; i++)
+            {
+                var cube = blocks[i];
+                vec += cube.Position;
+            }
+            return vec / blocks.Count;
+        }
+
+        private void Deviation(List<MyCubeBlock> blocks)
+        {
+            double avgX = 0;
+            double avgY = 0;
+            double avgZ = 0;
+
+            for (int i = 0; i < blocks.Count; i++) {
+
+                var cube = blocks[i];
+                avgX = (cube.Min.X + cube.Max.X) * cube.CubeGrid.GridSize / 2.0;
+                avgY = (cube.Min.Y + cube.Max.Y) * cube.CubeGrid.GridSize / 2.0;
+                avgZ = (cube.Min.Z + cube.Max.Z) * cube.CubeGrid.GridSize / 2.0;
+            }
+
+            double devX = 0;
+            double devY = 0;
+            double devZ = 0;
+
+            for (int i = 0; i < blocks.Count; i++) {
+
+                var cube = blocks[i];
+                var dx = ((cube.Min.X + cube.Max.X) * cube.CubeGrid.GridSize / 2.0) - avgX;
+                var dy = ((cube.Min.Y + cube.Max.Y) * cube.CubeGrid.GridSize / 2.0) - avgY;
+                var dz = ((cube.Min.Z + cube.Max.Z) * cube.CubeGrid.GridSize / 2.0) - avgY;
+                devX += dx * dx;
+                devY += dy * dy;
+                devZ += dz * dz;
+            }
+            devX = Math.Sqrt(devX / blocks.Count);
+            devY = Math.Sqrt(devY / blocks.Count);
+            devZ = Math.Sqrt(devZ / blocks.Count);
+
+        }
         #endregion
     }
 }
