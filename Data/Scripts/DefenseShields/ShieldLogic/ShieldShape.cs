@@ -36,6 +36,17 @@ namespace DefenseShields
         public void MobileUpdate()
         {
             var checkForNewCenter = MyGrid.PositionComp.WorldAABB.Center;
+            if (ShieldComp == null)
+            {
+                Log.Line($"ShieldComp null");
+                return;
+            }
+
+            if (DsState?.State == null)
+            {
+                Log.Line($"DsState.State null");
+                return;
+            }
             if (!checkForNewCenter.Equals(MyGridCenter, 1e-4))
             {
                 ShieldComp.GridIsMoving = true;

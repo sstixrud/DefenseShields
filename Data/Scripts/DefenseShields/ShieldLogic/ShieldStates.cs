@@ -209,7 +209,7 @@ namespace DefenseShields
             TerminalRefresh(false);
             CleanWebEnts();
             byte ignore;
-            Session.Instance.ActiveShields.TryGetValue(this, out ignore);
+            Session.Instance.ActiveShields.TryRemove(this, out ignore);
         }
 
         private bool ShieldRaised()

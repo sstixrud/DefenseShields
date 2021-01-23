@@ -1,4 +1,5 @@
-﻿using VRage.Audio;
+﻿using System.Collections.Concurrent;
+using VRage.Audio;
 
 namespace DefenseShields.Support
 {
@@ -409,7 +410,7 @@ namespace DefenseShields.Support
 
     public class MyProtectors
     {
-        public readonly MyConcurrentDictionary<DefenseShields, byte> Shields = new MyConcurrentDictionary<DefenseShields, byte>();
+        public readonly ConcurrentDictionary<DefenseShields, byte> Shields = new ConcurrentDictionary<DefenseShields, byte>();
         public int RefreshSlot;
         public uint CreationTick;
         public uint BlockingTick;
