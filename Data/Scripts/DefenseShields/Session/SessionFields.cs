@@ -73,10 +73,10 @@ namespace DefenseShields
         internal readonly ConcurrentDictionary<MyEntity, MyProtectors> GlobalProtect = new ConcurrentDictionary<MyEntity, MyProtectors>();
         internal readonly ConcurrentDictionary<long, ShieldGridComponent> IdToBus = new ConcurrentDictionary<long, ShieldGridComponent>();
         internal readonly ConcurrentDictionary<DefenseShields, bool> FunctionalShields = new ConcurrentDictionary<DefenseShields, bool>();
+        internal readonly ConcurrentDictionary<DefenseShields, byte> ActiveShields = new ConcurrentDictionary<DefenseShields, byte>();
         internal readonly Dictionary<MyCubeGrid, uint> CheckForSplits = new Dictionary<MyCubeGrid, uint>();
         internal readonly CachingDictionary<MyCubeGrid, ParentGrid> GetParentGrid = new CachingDictionary<MyCubeGrid, ParentGrid>();
 
-        internal readonly HashSet<DefenseShields> ActiveShields = new HashSet<DefenseShields>();
         internal readonly HashSet<MyCubeGrid> WatchForSplits = new HashSet<MyCubeGrid>();
 
         internal readonly List<PlanetShields> PlanetShields = new List<PlanetShields>();
@@ -93,6 +93,7 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<List<CubeAccel>> ListCubeAccelPool = new MyConcurrentPool<List<CubeAccel>>(100);
         internal readonly MyConcurrentPool<EntIntersectInfo> EntIntersectInfoPool = new MyConcurrentPool<EntIntersectInfo>(100, info => info.Clean());
 
+        internal readonly MyConcurrentPool<ProtectCache> ProtectCachePool = new MyConcurrentPool<ProtectCache>(100, info => info.Clean());
         internal readonly MyConcurrentPool<ShieldVsShieldThreadEvent> ShieldEventPool = new MyConcurrentPool<ShieldVsShieldThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<FloaterThreadEvent> FloaterPool = new MyConcurrentPool<FloaterThreadEvent>(100, info => info.Clean());
         internal readonly MyConcurrentPool<MissileThreadEvent> MissilePool = new MyConcurrentPool<MissileThreadEvent>(100, info => info.Clean());

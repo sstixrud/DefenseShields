@@ -58,8 +58,8 @@ namespace DefenseShields
             return true;
         }
 
-        public HashSet<MyCubeGrid> SubGrids { get; set; } = new HashSet<MyCubeGrid>();
-        public ConcurrentDictionary<MyCubeGrid, SubGridInfo> LinkedGrids = new ConcurrentDictionary<MyCubeGrid, SubGridInfo>();
+        public ConcurrentDictionary<MyCubeGrid, byte> SubGrids = new ConcurrentDictionary<MyCubeGrid, byte>();
+        public ConcurrentDictionary<MyCubeGrid, byte> LinkedGrids = new ConcurrentDictionary<MyCubeGrid, byte>();
 
         public Vector3D[] PhysicsOutside { get; set; } = new Vector3D[642];
 

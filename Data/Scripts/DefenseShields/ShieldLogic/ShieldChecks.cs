@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DefenseShields.Support;
 using Sandbox.Game.Entities;
 using Sandbox.Game.EntityComponents;
@@ -33,8 +34,7 @@ namespace DefenseShields
 
         private void UserDebug()
         {
-            var active = false;
-            lock (Session.Instance.ActiveShields) active = Session.Instance.ActiveShields.Contains(this);
+            var active = Session.Instance.ActiveShields.ContainsKey(this);
             var message = $"User({MyAPIGateway.Multiplayer.Players.TryGetSteamId(Shield.OwnerId)}) Debugging\n" +
                           $"On:{DsState.State.Online} - Sus:{DsState.State.Suspended} - Act:{active}\n" +
                           $"Sleep:{Asleep} - Tick/Woke:{_tick}/{LastWokenTick}\n" +
@@ -98,23 +98,25 @@ namespace DefenseShields
             _subUpdatedTick = _tick;
             ShieldComp.LinkedGrids.Clear();
 
-            lock (SubLock)
-            {
-                foreach (var s in ShieldComp.SubGrids) Session.Instance.IdToBus.Remove(s.EntityId);
-                ShieldComp.SubGrids.Clear();
-                for (int i = 0; i < _tempSubGridList.Count; i++)
-                {
-                    var sub = _tempSubGridList[i];
-                    if (sub == null) continue;
-                    sub.Flags |= (EntityFlags)(1 << 31);
-                    if (MyAPIGateway.GridGroups.HasConnection(MyGrid, sub, GridLinkTypeEnum.Mechanical))
-                    {
-                        ShieldComp.SubGrids.Add((MyCubeGrid)sub);
-                        Session.Instance.IdToBus[sub.EntityId] = ShieldComp;
-                    }
-                    ShieldComp.LinkedGrids.TryAdd((MyCubeGrid)sub, new SubGridInfo(sub as MyCubeGrid, sub == MyGrid, false));
+            foreach (var s in ShieldComp.SubGrids.Keys) 
+                Session.Instance.IdToBus.Remove(s.EntityId);
+
+            ShieldComp.SubGrids.Clear();
+
+            for (int i = 0; i < _tempSubGridList.Count; i++) {
+
+                var sub = _tempSubGridList[i];
+                if (sub == null) continue;
+                sub.Flags |= (EntityFlags)(1 << 31);
+
+                if (MyGrid.IsSameConstructAs(sub)) {
+                    ShieldComp.SubGrids[(MyCubeGrid)sub] = byte.MaxValue;
+                    Session.Instance.IdToBus[sub.EntityId] = ShieldComp;
                 }
+
+                ShieldComp.LinkedGrids.TryAdd((MyCubeGrid)sub, byte.MaxValue);
             }
+
             _linkedGridCount = ShieldComp.LinkedGrids.Count;
             _blockChanged = true;
             _functionalChanged = true;
@@ -184,7 +186,7 @@ namespace DefenseShields
 
                 foreach (var grid in ShieldComp.LinkedGrids.Keys)
                 {
-                    var mechanical = ShieldComp.SubGrids.Contains(grid);
+                    var mechanical = ShieldComp.SubGrids.ContainsKey(grid);
                     foreach (var block in grid.GetFatBlocks())
                     {
                         if (mechanical)

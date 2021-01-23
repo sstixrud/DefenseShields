@@ -33,7 +33,7 @@ namespace DefenseShields
             LastWokenTick = _tick;
             Asleep = false;
             PlayerByShield = true;
-            lock (Session.Instance.ActiveShields) Session.Instance.ActiveShields.Add(this);
+            Session.Instance.ActiveShields[this] = byte.MaxValue;
             WasPaused = false;
         }
 
@@ -232,12 +232,9 @@ namespace DefenseShields
 
         private void UpdateEntity()
         {
-            lock (SubLock)
-            {
-                ShieldComp.LinkedGrids.Clear();
-                ShieldComp.SubGrids.Clear();
-                _linkedGridCount = -1;
-            }
+            ShieldComp.LinkedGrids.Clear();
+            ShieldComp.SubGrids.Clear();
+            _linkedGridCount = -1;
             _blockChanged = true;
             _functionalChanged = true;
             ResetShape(false, true);
@@ -520,7 +517,7 @@ namespace DefenseShields
             float boxsArea = 0;
 
             var totalFat = 0;
-            foreach (var sub in ShieldComp.SubGrids) {
+            foreach (var sub in ShieldComp.SubGrids.Keys) {
 
                 var fatBlocks = sub.GetFatBlocks();
                 var fatCount = fatBlocks.Count;

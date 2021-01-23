@@ -422,9 +422,9 @@ namespace DefenseShields
 
             if (Session.Instance.GlobalProtect.TryGetValue(myGrid, out protectors))
             {
-                foreach (var s in protectors.Shields)
+                foreach (var s in protectors.Shields.Keys)
                 {
-                    lock (s.SubLock) if (s.ShieldComp.SubGrids.Contains(myGrid)) return true;
+                    if (s.ShieldComp.SubGrids.ContainsKey(myGrid)) return true;
                 }
             }
             return false;
@@ -438,9 +438,9 @@ namespace DefenseShields
             var myGrid = (MyCubeGrid)grid;
             if (Session.Instance.GlobalProtect.TryGetValue(myGrid, out protectors))
             {
-                foreach (var s in protectors.Shields)
+                foreach (var s in protectors.Shields.Keys)
                 {
-                    lock (s.SubLock) if (s.ShieldComp.SubGrids.Contains(myGrid) && s.DsState.State.Online && !s.DsState.State.Lowered) return true;
+                    if (s.ShieldComp.SubGrids.ContainsKey(myGrid) && s.DsState.State.Online && !s.DsState.State.Lowered) return true;
                 }
             }
             return false;
@@ -456,7 +456,7 @@ namespace DefenseShields
             {
                 if (protectors?.Shields == null) return false;
 
-                foreach (var s in protectors.Shields)
+                foreach (var s in protectors.Shields.Keys)
                 {
                     if (s?.DsState?.State == null) continue;
                     if (s.DsState.State.Online && !s.DsState.State.Lowered) return true;
@@ -475,12 +475,14 @@ namespace DefenseShields
             {
                 DefenseShields firstShield = null;
                 var grid = ent as MyCubeGrid;
-                foreach (var s in protectors.Shields)
+                foreach (var s in protectors.Shields.Keys)
                 {
                     if (s == null) continue;
 
                     if (firstShield == null) firstShield = s;
-                    lock (s.SubLock) if (grid != null && s.ShieldComp?.SubGrids != null && s.ShieldComp.SubGrids.Contains(grid)) return s.MyCube as IMyTerminalBlock;
+
+                    if (grid != null && s.ShieldComp?.SubGrids != null && s.ShieldComp.SubGrids.ContainsKey(grid)) 
+                       return s.MyCube as IMyTerminalBlock;
                 }
                 if (firstShield != null) return firstShield.MyCube as IMyTerminalBlock;
             }
@@ -697,18 +699,15 @@ namespace DefenseShields
         {
             MyCubeBlock cloestSBlock = null;
             var closestDist = double.MaxValue;
-            lock (Session.Instance.ActiveShields)
+            foreach (var s in Session.Instance.ActiveShields.Keys)
             {
-                foreach (var s in Session.Instance.ActiveShields)
-                {
-                    if (Vector3D.DistanceSquared(s.DetectionCenter, pos) > Session.Instance.SyncDistSqr) continue;
+                if (Vector3D.DistanceSquared(s.DetectionCenter, pos) > Session.Instance.SyncDistSqr) continue;
 
-                    var sDist = CustomCollision.EllipsoidDistanceToPos(s.DetectMatrixOutsideInv, s.DetectMatrixOutside, pos);
-                    if (sDist > 0 && sDist < closestDist)
-                    {
-                        cloestSBlock = s.MyCube;
-                        closestDist = sDist;
-                    }
+                var sDist = CustomCollision.EllipsoidDistanceToPos(s.DetectMatrixOutsideInv, s.DetectMatrixOutside, pos);
+                if (sDist > 0 && sDist < closestDist)
+                {
+                    cloestSBlock = s.MyCube;
+                    closestDist = sDist;
                 }
             }
             return cloestSBlock as IMyTerminalBlock;

@@ -78,10 +78,8 @@ namespace DefenseShields
         public BoundingBoxD GetMechnicalGroupAabb()
         {
             BoundingBoxD worldAabb = new BoundingBoxD();
-            lock (SubLock) {
-                foreach (var sub in ShieldComp.SubGrids)
-                    worldAabb.Include(sub.PositionComp.WorldAABB);
-            }
+            foreach (var sub in ShieldComp.SubGrids.Keys)
+                worldAabb.Include(sub.PositionComp.WorldAABB);
 
             return worldAabb;
         }

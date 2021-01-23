@@ -32,7 +32,7 @@ namespace DefenseShields
                     {
                         if (reInforce != s.ReInforcedShield)
                         {
-                            lock (s.SubLock) foreach (var sub in s.ShieldComp.SubGrids) EntRefreshQueue.Enqueue(sub);
+                            foreach (var sub in s.ShieldComp.SubGrids) EntRefreshQueue.Enqueue(sub.Key);
                             s.ReInforcedShield = reInforce;
                         }
 
@@ -54,15 +54,16 @@ namespace DefenseShields
                         return;
                     }
 
-                    bool shieldActive;
-                    lock (ActiveShields) shieldActive = ActiveShields.Contains(s);
+                    var shieldActive = ActiveShields.ContainsKey(s);
 
                     if (s.LostPings > 59)
                     {
                         if (shieldActive)
                         {
                             if (Enforced.Debug >= 2) Log.Line("Logic Paused by lost pings");
-                            lock (ActiveShields) ActiveShields.Remove(s);
+
+                            byte ignore;
+                            ActiveShields.TryRemove(s, out ignore);
                             s.WasPaused = true;
                         }
                         s.Asleep = false;
@@ -112,7 +113,8 @@ namespace DefenseShields
                         if (shieldActive && !s.WasPaused && Tick > 1200)
                         {
                             if (Enforced.Debug >= 2) Log.Line($"Logic Paused by monitor");
-                            lock (ActiveShields) ActiveShields.Remove(s);
+                            byte ignore;
+                            ActiveShields.TryRemove(s, out ignore);
                             s.WasPaused = true;
                             s.Asleep = false;
                             s.TicksWithNoActivity = 0;
@@ -176,20 +178,12 @@ namespace DefenseShields
                 var newMode = !s.ReInforcedShield;
                 if (!newMode) return;
 
-                HashSet<MyCubeGrid> subs;
-                lock (s.SubLock)
-                {
-                    subs = SetMyCubeGridPool.Get();
-                    subs.UnionWith(s.ShieldComp.SubGrids);
-                }
-                foreach (var sub in subs)
-                {
+                foreach (var sub in s.ShieldComp.SubGrids.Keys) {
+
                     if (!_globalEntTmp.ContainsKey(sub)) newSub = true;
                     EntRefreshQueue.Enqueue(sub);
                     if (!s.WasPaused) _globalEntTmp[sub] = Tick;
                 }
-                subs.Clear();
-                SetMyCubeGridPool.Return(subs);
 
                 s.ReInforcedShield = true;
                 s.TicksWithNoActivity = 0;
@@ -201,19 +195,11 @@ namespace DefenseShields
                 var newMode = false;
                 if (s.ReInforcedShield)
                 {
-                    HashSet<MyCubeGrid> subs;
-                    lock (s.SubLock)
-                    {
-                        subs = SetMyCubeGridPool.Get();
-                        subs.UnionWith(s.ShieldComp.SubGrids);
-                    } 
-                    foreach (var sub in subs)
-                    {
+
+                    foreach (var sub in s.ShieldComp.SubGrids.Keys) {
                         EntRefreshQueue.Enqueue(sub);
                         if (!s.WasPaused) _globalEntTmp[sub] = Tick;
                     }
-                    subs.Clear();
-                    SetMyCubeGridPool.Return(subs);
 
                     s.ReInforcedShield = false;
                     s.TicksWithNoActivity = 0;
@@ -470,23 +456,22 @@ namespace DefenseShields
                 DefenseShields iShield = null;
                 var removeIShield = false;
 
-                foreach (var s in entShields)
+                foreach (var s in entShields.Keys)
                 {
                     if (s.WasPaused) continue;
-                    lock (s.SubLock)
+
+                    var grid = ent as MyCubeGrid;
+                    if (grid != null && s.DsState.State.ReInforce && s.ShieldComp.SubGrids.ContainsKey(grid))
                     {
-                        if (s.DsState.State.ReInforce && s.ShieldComp.SubGrids.Contains(ent))
-                        {
-                            iShield = s;
-                            refreshCount++;
-                        }
-                        else if (!ent.InScene || ent.MarkedForClose || !s.ResetEnts(ent, Tick))
-                        {
-                            myProtector.Shields.Remove(s);
-                            entsLostShield++;
-                        }
-                        else refreshCount++;
+                        iShield = s;
+                        refreshCount++;
                     }
+                    else if (!ent.InScene || ent.MarkedForClose || !s.ResetEnts(ent, Tick))
+                    {
+                        myProtector.Shields.Remove(s);
+                        entsLostShield++;
+                    }
+                    else refreshCount++;
 
                     if (iShield == null && myProtector.IntegrityShield == s)
                     {
@@ -507,8 +492,6 @@ namespace DefenseShields
                     myProtector.Shields.Remove(iShield);
                     myProtector.IntegrityShield = iShield;
                 }
-
-                myProtector.Shields.ApplyChanges();
 
                 if (refreshCount == 0)
                 {
@@ -533,22 +516,19 @@ namespace DefenseShields
         {
             if (!Dispatched)
             {
-                lock (ActiveShields)
+                foreach (var s in ActiveShields.Keys)
                 {
-                    foreach (var s in ActiveShields)
+                    if (s.Asleep) continue;
+                    if (s.DsState.State.ReInforce)
                     {
-                        if (s.Asleep) continue;
-                        if (s.DsState.State.ReInforce)
-                        {
-                            s.DeformEnabled = true;
-                            s.ProtectSubs(Tick);
-                            continue;
-                        }
-
-                        if (!DedicatedServer && Tick20 && s.EffectsDirty) s.ResetDamageEffects();
-                        if (Tick600) s.CleanWebEnts();
-                        s.WebEntities();
+                        s.DeformEnabled = true;
+                        s.ProtectSubs(Tick);
+                        continue;
                     }
+
+                    if (!DedicatedServer && Tick20 && s.EffectsDirty) s.ResetDamageEffects();
+                    if (Tick600) s.CleanWebEnts();
+                    s.WebEntities();
                 }
                 if (WebWrapperOn)
                 {

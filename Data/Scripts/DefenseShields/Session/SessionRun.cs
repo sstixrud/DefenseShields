@@ -113,11 +113,8 @@
         {
             
             SplitMonitor();
-            lock (ActiveShields)
-            {
-                foreach (var s in ActiveShields)
-                    if (s.GridIsMobile && !s.Asleep) s.MobileUpdate();
-            }
+            foreach (var s in ActiveShields.Keys)
+                if (s.GridIsMobile && !s.Asleep) s.MobileUpdate();
 
             WebMonitor();
         }

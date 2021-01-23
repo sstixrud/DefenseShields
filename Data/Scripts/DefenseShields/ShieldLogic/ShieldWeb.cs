@@ -22,8 +22,12 @@ namespace DefenseShields
 
             foreach (var info in ProtectedEntCache) {
 
-                if (_tick - info.Value.LastTick > 180)
-                    ProtectedEntCache.Remove(info.Key);
+                if (_tick - info.Value.LastTick > 180) {
+
+                    ProtectCache cache;
+                    if (ProtectedEntCache.TryRemove(info.Key, out cache))
+                        Session.Instance.ProtectCachePool.Return(cache);
+                }
             }
 
             foreach (var webent in WebEnts) {
@@ -42,20 +46,17 @@ namespace DefenseShields
 
         public void ProtectSubs(uint tick)
         {
-            lock (SubLock)
+            foreach (var sub in ShieldComp.SubGrids.Keys)
             {
-                foreach (var sub in ShieldComp.SubGrids)
-                {
-                    MyProtectors protectors;
-                    Session.Instance.GlobalProtect.TryGetValue(sub, out protectors);
+                MyProtectors protectors;
+                Session.Instance.GlobalProtect.TryGetValue(sub, out protectors);
 
-                    if (protectors == null)
-                    {
-                        protectors = Session.Instance.GlobalProtect[sub] = Session.ProtSets.Get();
-                        protectors.Init(LogicSlot, tick);
-                    }
-                    protectors.IntegrityShield = this;
+                if (protectors == null)
+                {
+                    protectors = Session.Instance.GlobalProtect[sub] = Session.ProtSets.Get();
+                    protectors.Init(LogicSlot, tick);
                 }
+                protectors.IntegrityShield = this;
             }
         }
 
@@ -74,12 +75,12 @@ namespace DefenseShields
             {
                 if (CustomCollision.CornerOrCenterInShield(grid, DetectMatrixOutsideInv, _resetEntCorners, true) == 0) return false;
 
-                protectors.Shields.Add(this);
+                protectors.Shields[this] = byte.MaxValue;
                 return true;
             }
 
             if (!CustomCollision.PointInShield(ent.PositionComp.WorldAABB.Center, DetectMatrixOutsideInv)) return false;
-            protectors.Shields.Add(this);
+            protectors.Shields[this] = byte.MaxValue;
             return true;
         }
 
@@ -180,9 +181,16 @@ namespace DefenseShields
                     case Ent.Ignore:
                     case Ent.Friendly:
                     case Ent.Protected:
-                        if (relation == Ent.Protected)
+                        if (relation == Ent.Protected) 
                         {
-                            if (protectedEnt == null) ProtectedEntCache[ent] = new ProtectCache(tick, tick, tick, relation, relation);
+
+                            if (protectedEnt == null) {
+
+                                var pCache = Session.Instance.ProtectCachePool.Get();
+                                pCache.Init(tick, tick, tick, relation, relation);
+                                ProtectedEntCache[ent] = pCache;
+                            }
+
                             MyProtectors protectors;
                             Session.Instance.GlobalProtect.TryGetValue(ent, out protectors);
                             if (protectors == null)
@@ -190,10 +198,10 @@ namespace DefenseShields
                                 protectors = Session.Instance.GlobalProtect[ent] = Session.ProtSets.Get();
                                 protectors.Init(LogicSlot, tick);
                             }
-                            if (protectors.Shields.Contains(this)) continue;
+                            if (protectors.Shields.ContainsKey(this)) continue;
 
-                            protectors.Shields.Add(this);
-                            protectors.Shields.ApplyAdditions();
+                            protectors.Shields[this] = byte.MaxValue;
+
                             continue;
                         }
                         IgnoreCache.Add(ent);
@@ -201,6 +209,7 @@ namespace DefenseShields
                         if (grid != null && ProtectedEntCache.TryRemove(ent, out cache))
                         {
                             Session.Instance.EntRefreshQueue.Enqueue(ent);
+                            Session.Instance.ProtectCachePool.Return(cache);
                             Session.Instance.FastRefresh = true;
                         }
                         continue;
@@ -245,7 +254,11 @@ namespace DefenseShields
                         }
                         entChanged = true;
                         _enablePhysics = true;
-                        ProtectedEntCache.Remove(ent);
+
+                        ProtectCache protect;
+                        if (ProtectedEntCache.TryRemove(ent, out protect))
+                            Session.Instance.ProtectCachePool.Return(protect);
+
                         var entIntersectInfo = Session.Instance.EntIntersectInfoPool.Get();
                         entIntersectInfo.Init(false, ent.PositionComp.LocalAABB, tick, tick, tick, relation);
                         WebEnts.TryAdd(ent, entIntersectInfo);
@@ -342,17 +355,14 @@ namespace DefenseShields
                     var modShield = modComp.Modulator?.ShieldComp?.DefenseShields;
                     if (modShield != null)
                     {
-                        lock (modShield.SubLock)
+                        foreach (var subGrid in modShield.ShieldComp.SubGrids.Keys)
                         {
-                            foreach (var subGrid in modShield.ShieldComp.SubGrids)
+                            if (ShieldEnt.PositionComp.WorldVolume.Intersects(grid.PositionComp.WorldVolume))
                             {
-                                if (ShieldEnt.PositionComp.WorldVolume.Intersects(grid.PositionComp.WorldVolume))
-                                {
-                                    if (CustomCollision.CornerOrCenterInShield(grid, DetectMatrixOutsideInv, _resetEntCorners) > 0) return Ent.Protected;
-                                    AuthenticatedCache.Add(subGrid);
-                                }
-                                else AuthenticatedCache.Add(subGrid);
+                                if (CustomCollision.CornerOrCenterInShield(grid, DetectMatrixOutsideInv, _resetEntCorners) > 0) return Ent.Protected;
+                                AuthenticatedCache.Add(subGrid);
                             }
+                            else AuthenticatedCache.Add(subGrid);
                         }
                         return Ent.Authenticated;
                     }
@@ -389,7 +399,10 @@ namespace DefenseShields
                 var enemy = !ModulateGrids && GridEnemy(grid, bigOwners);
                 if (!enemy)
                 {
-                    lock (SubLock) if (ShieldComp.SubGrids.Contains(grid)) return Ent.Protected;
+
+                    if (ShieldComp.SubGrids.ContainsKey(grid)) 
+                        return Ent.Protected;
+
                     var pointsInShield = CustomCollision.NewObbPointsInShield(grid, DetectMatrixOutsideInv, _obbPoints);
                     return pointsInShield > 0 ? Ent.Protected : Ent.Friendly;
                 }

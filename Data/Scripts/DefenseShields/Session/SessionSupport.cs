@@ -119,9 +119,11 @@ namespace DefenseShields
                 MyProtectors protector;
                 if (GlobalProtect.TryGetValue(myEntity, out protector)) {
 
-                    foreach (var s in protector.Shields) {
+                    foreach (var s in protector.Shields.Keys) {
+
                         ProtectCache cache;
-                        s.ProtectedEntCache.TryRemove(myEntity, out cache);
+                        if (s.ProtectedEntCache.TryRemove(myEntity, out cache))
+                            ProtectCachePool.Return(cache);
                     }
                     EntRefreshQueue.Enqueue(myEntity);
                 }

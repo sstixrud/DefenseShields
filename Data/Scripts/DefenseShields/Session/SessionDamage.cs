@@ -73,7 +73,7 @@ namespace DefenseShields
                             var testDir = Vector3D.Normalize(line.From - line.To);
                             var ray = new RayD(line.From, -testDir);
                             var hitDist = double.MaxValue;
-                            foreach (var shield in protectors.Shields)
+                            foreach (var shield in protectors.Shields.Keys)
                             {
                                 shield.Asleep = false;
                                 shield.LastWokenTick = Tick;
@@ -221,7 +221,7 @@ namespace DefenseShields
             GlobalProtect.TryGetValue(myEntity, out protectors);
             if (protectors == null) return false;
 
-            foreach (var shield in protectors.Shields)
+            foreach (var shield in protectors.Shields.Keys)
             {
                 var shieldActive = shield.DsState.State.Online && !shield.DsState.State.Lowered;
                 if (!shieldActive) continue;

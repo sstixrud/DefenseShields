@@ -95,7 +95,6 @@ namespace DefenseShields.Support
         public readonly MyCubeGrid Grid;
         public readonly bool MainGrid;
         public readonly bool MechSub;
-        public float Integrity;
         public SubGridInfo(MyCubeGrid grid, bool mainGrid, bool mechSub)
         {
             Grid = grid;
@@ -104,36 +103,6 @@ namespace DefenseShields.Support
         }
     }
 
-    public struct BatteryInfo
-    {
-        public readonly MyResourceSourceComponent Source;
-        public readonly MyResourceSinkComponent Sink;
-        public readonly MyCubeBlock CubeBlock;
-        public BatteryInfo(MyResourceSourceComponent source)
-        {
-            Source = source;
-            Sink = Source.Entity.Components.Get<MyResourceSinkComponent>();
-            CubeBlock = source.Entity as MyCubeBlock;
-        }
-    }
-
-    public class BlockSets
-    {
-        public readonly HashSet<MyResourceSourceComponent> Sources = new HashSet<MyResourceSourceComponent>();
-        public readonly HashSet<MyShipController> ShipControllers = new HashSet<MyShipController>();
-        public readonly HashSet<BatteryInfo> Batteries = new HashSet<BatteryInfo>();
-    }
-
-    public struct SubGridComputedInfo
-    {
-        public readonly MyCubeGrid Grid;
-        public readonly float Integrity;
-        public SubGridComputedInfo(MyCubeGrid grid, float integrity)
-        {
-            Grid = grid;
-            Integrity = integrity;
-        }
-    }
 
     public struct MoverInfo
     {
@@ -274,17 +243,26 @@ namespace DefenseShields.Support
     {
         public uint LastTick;
         public uint RefreshTick;
-        public readonly uint FirstTick;
+        public uint FirstTick;
         public DefenseShields.Ent Relation;
         public DefenseShields.Ent PreviousRelation;
 
-        public ProtectCache(uint firstTick, uint lastTick, uint refreshTick, DefenseShields.Ent relation, DefenseShields.Ent previousRelation)
+        public void Init(uint firstTick, uint lastTick, uint refreshTick, DefenseShields.Ent relation, DefenseShields.Ent previousRelation)
         {
             FirstTick = firstTick;
             LastTick = lastTick;
             RefreshTick = refreshTick;
             Relation = relation;
             PreviousRelation = previousRelation;
+        }
+
+        public void Clean()
+        {
+            LastTick = 0;
+            RefreshTick = 0;
+            FirstTick = 0;
+            Relation = DefenseShields.Ent.Ignore;
+            PreviousRelation = DefenseShields.Ent.Ignore;
         }
     }
 
@@ -328,20 +306,6 @@ namespace DefenseShields.Support
             LastCollision = 0;
             ConsecutiveCollisions = 0;
             LastTick = 0;
-        }
-    }
-
-    public struct MyImpulseData
-    {
-        public MyEntity Entity;
-        public Vector3D Direction;
-        public Vector3D Position;
-
-        public MyImpulseData(MyEntity entity, Vector3D direction, Vector3D position)
-        {
-            Entity = entity;
-            Direction = direction;
-            Position = position;
         }
     }
 
@@ -445,7 +409,7 @@ namespace DefenseShields.Support
 
     public class MyProtectors
     {
-        public readonly CachingHashSet<DefenseShields> Shields = new CachingHashSet<DefenseShields>();
+        public readonly MyConcurrentDictionary<DefenseShields, byte> Shields = new MyConcurrentDictionary<DefenseShields, byte>();
         public int RefreshSlot;
         public uint CreationTick;
         public uint BlockingTick;

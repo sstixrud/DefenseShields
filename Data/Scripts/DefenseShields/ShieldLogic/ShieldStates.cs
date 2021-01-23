@@ -1,4 +1,6 @@
-﻿namespace DefenseShields
+﻿using System;
+
+namespace DefenseShields
 {
     using Support;
     using VRageMath;
@@ -147,7 +149,7 @@
                 if (Session.Enforced.Debug == 3) Log.Line($"StateUpdate: ComingOnlineSetup - ShieldId [{Shield.EntityId}]");
             }
             if (!_isDedicated) ResetDamageEffects();
-            lock (Session.Instance.ActiveShields) Session.Instance.ActiveShields.Add(this);
+            Session.Instance.ActiveShields[this] = byte.MaxValue;
             UpdateSubGrids();
         }
 
@@ -206,7 +208,8 @@
 
             TerminalRefresh(false);
             CleanWebEnts();
-            lock (Session.Instance.ActiveShields) Session.Instance.ActiveShields.Remove(this);
+            byte ignore;
+            Session.Instance.ActiveShields.TryGetValue(this, out ignore);
         }
 
         private bool ShieldRaised()

@@ -298,7 +298,7 @@ namespace DefenseShields
 
         internal IMyUpgradeModule Shield { get; set; }
         internal ShieldType ShieldMode { get; set; }
-        internal MyCubeGrid MyGrid { get; set; }
+        internal MyCubeGrid MyGrid;
         internal MyCubeBlock MyCube { get; set; }
         internal MyEntity ShieldEnt { get; set; }
 

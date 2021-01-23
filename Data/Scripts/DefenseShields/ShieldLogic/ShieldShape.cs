@@ -78,21 +78,19 @@ namespace DefenseShields
             var myAabb = MyGrid.PositionComp.LocalAABB;
             var shieldGrid = MyGrid;
             var expandedAabb = myAabb;
-            lock (SubLock)
+
+            if (ShieldComp.SubGrids.Count > 1)
             {
-                if (ShieldComp.SubGrids.Count > 1)
+                foreach (var grid in ShieldComp.SubGrids.Keys)
                 {
-                    foreach (var grid in ShieldComp.SubGrids)
+                    using (grid.Pin())
                     {
-                        using (grid.Pin())
-                        {
-                            if (grid == shieldGrid || grid.MarkedForClose) continue;
-                            var shieldMatrix = shieldGrid.PositionComp.WorldMatrixNormalizedInv;
-                            var gQuaternion = Quaternion.CreateFromRotationMatrix(grid.WorldMatrix);
-                            var gOriBBoxD = new MyOrientedBoundingBox(grid.PositionComp.WorldAABB.Center, grid.PositionComp.LocalAABB.HalfExtents, gQuaternion);
-                            gOriBBoxD.Transform(shieldMatrix);
-                            expandedAabb.Include(gOriBBoxD.GetAABB());
-                        }
+                        if (grid == shieldGrid || grid.MarkedForClose) continue;
+                        var shieldMatrix = shieldGrid.PositionComp.WorldMatrixNormalizedInv;
+                        var gQuaternion = Quaternion.CreateFromRotationMatrix(grid.WorldMatrix);
+                        var gOriBBoxD = new MyOrientedBoundingBox(grid.PositionComp.WorldAABB.Center, grid.PositionComp.LocalAABB.HalfExtents, gQuaternion);
+                        gOriBBoxD.Transform(shieldMatrix);
+                        expandedAabb.Include(gOriBBoxD.GetAABB());
                     }
                 }
             }

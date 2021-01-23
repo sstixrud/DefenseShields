@@ -4,31 +4,9 @@
     using Support;
     using Sandbox.ModAPI;
     using VRageMath;
-    using System.ComponentModel;
 
     public partial class Session
     {
-        [DefaultValue("API:IntersectShield1")]
-        public void IntersectShield1()
-        {
-        }
-
-        [DefaultValue("API:IntersectShield2")]
-        public Vector3D? IntersectShield2()
-        {
-            return Vector3D.Zero;
-        }
-
-        [DefaultValue("API:IntersectShield3")]
-        public void IntersectShield3(float damage)
-        {
-        }
-
-        [DefaultValue("API:IntersectShield4")]
-        public Vector3D? IntersectShield4(float damage)
-        {
-            return Vector3D.Zero;
-        }
         #region Network sync
         internal void RequestEnforcement(ulong requestorId)
         {
