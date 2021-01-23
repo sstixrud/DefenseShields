@@ -63,36 +63,45 @@ namespace DefenseShields
             MyAPIGateway.Utilities.ShowNotification(message, 6720);
         }
 
-        private void HierarchyUpdate()
+        private readonly List<IMyCubeGrid> _tempSubGridList = new List<IMyCubeGrid>();
+
+
+        private bool SubGridUpdateSkip()
         {
-            var serverRequired = MyCube.IsWorking && MyCube.IsFunctional && _isServer;
-            var invalidStates = DsState.State.Suspended;
-            var checkGroups = !invalidStates && !_isServer || !invalidStates && serverRequired;
-            if (Session.Enforced.Debug == 3) Log.Line($"SubCheckGroups: check:{checkGroups} - SW:{Shield.IsWorking} - SF:{Shield.IsFunctional} - Online:{DsState.State.Online} - Power:{!DsState.State.NoPower} - Sleep:{DsState.State.Sleeping} - Wake:{DsState.State.Waking} - ShieldId [{Shield.EntityId}]");
-            if (checkGroups)
-            {
-                _subTick = _tick + 10;
-                UpdateSubGrids();
-                if (Session.Enforced.Debug >= 3) Log.Line($"HierarchyWasDelayed: this:{_tick} - delayedTick: {_subTick} - ShieldId [{Shield.EntityId}]");
+            _tempSubGridList.Clear();
+            MyAPIGateway.GridGroups.GetGroup(MyGrid, GridLinkTypeEnum.Physical, _tempSubGridList);
+            var newCount = _tempSubGridList.Count;
+            var sameCount = newCount == _linkedGridCount;
+            var oneAndSame = newCount == 1 && sameCount;
+
+            if (oneAndSame && ShieldComp.LinkedGrids.ContainsKey(MyGrid))
+                return true;
+
+            if (sameCount) {
+
+                for (int i = 0; i < _tempSubGridList.Count; i++) {
+                    if (!ShieldComp.LinkedGrids.ContainsKey((MyCubeGrid)_tempSubGridList[i]))
+                        return false;
+                }
             }
+            else return false;
+
+            return true;
         }
 
-        private readonly List<IMyCubeGrid> _tempSubGridList = new List<IMyCubeGrid>();
         private void UpdateSubGrids()
         {
             _subUpdate = false;
+            if (_subUpdatedTick  == _tick || SubGridUpdateSkip())
+                return;
+
+            _subUpdatedTick = _tick;
+            ShieldComp.LinkedGrids.Clear();
 
             lock (SubLock)
             {
-                _tempSubGridList.Clear();
-                MyAPIGateway.GridGroups.GetGroup(MyGrid, GridLinkTypeEnum.Physical, _tempSubGridList);
-
-                if (_tempSubGridList.Count == ShieldComp.LinkedGrids.Count && !SubGridChangeDetect(_tempSubGridList)) 
-                    return;
-
                 foreach (var s in ShieldComp.SubGrids) Session.Instance.IdToBus.Remove(s.EntityId);
                 ShieldComp.SubGrids.Clear();
-                ShieldComp.LinkedGrids.Clear();
                 for (int i = 0; i < _tempSubGridList.Count; i++)
                 {
                     var sub = _tempSubGridList[i];
@@ -103,22 +112,14 @@ namespace DefenseShields
                         ShieldComp.SubGrids.Add((MyCubeGrid)sub);
                         Session.Instance.IdToBus[sub.EntityId] = ShieldComp;
                     }
-                    ShieldComp.LinkedGrids.Add((MyCubeGrid)sub, new SubGridInfo(sub as MyCubeGrid, sub == MyGrid, false));
+                    ShieldComp.LinkedGrids.TryAdd((MyCubeGrid)sub, new SubGridInfo(sub as MyCubeGrid, sub == MyGrid, false));
                 }
             }
+            _linkedGridCount = ShieldComp.LinkedGrids.Count;
             _blockChanged = true;
             _functionalChanged = true;
             _updateGridDistributor = true;
-        }
-
-        private bool SubGridChangeDetect(List<IMyCubeGrid> linkedGrids)
-        {
-            for (int i = 0; i < linkedGrids.Count; i++) {
-                var link = (MyCubeGrid)linkedGrids[i];
-                if (!ShieldComp.LinkedGrids.ContainsKey(link))
-                    return false;
-            }
-            return true;
+            _subTick = _tick;
         }
 
         private void BlockMonitor()
@@ -266,34 +267,37 @@ namespace DefenseShields
             DsState.State.ControllerGridAccess = true;
         }
 
-        private bool SlaveControllerLink()
+        private bool SubGridSlaveControllerLink()
         {
-            var notTime = _tick % 120 != 0 && _subTick < _tick + 10;
-            if (notTime && _slaveLink) return true;
+            var notTime = !_tick60 && _subTick + 10 < _tick;
+            if (notTime && _slavedToGrid != null) return true;
             if (IsStatic || (notTime && !_firstLoop)) return false;
-            var mySize = MyGrid.PositionComp.WorldAABB.Size.Volume;
+
+            var mySize = MyGrid.PositionComp.LocalAABB.Size.Volume;
             var myEntityId = MyGrid.EntityId;
-            lock (SubLock)
+            foreach (var grid in ShieldComp.LinkedGrids.Keys)
             {
-                foreach (var grid in ShieldComp.LinkedGrids.Keys)
-                {
-                    if (grid == MyGrid) continue;
-                    ShieldGridComponent shieldComponent;
-                    grid.Components.TryGet(out shieldComponent);
-                    var ds = shieldComponent?.DefenseShields;
-                    if (ds?.ShieldComp != null && ds.DsState.State.Online && ds.IsWorking)
+                if (grid == MyGrid) continue;
+                ShieldGridComponent shieldComponent;
+                if (grid.Components.TryGet(out shieldComponent) && shieldComponent?.DefenseShields != null && shieldComponent.DefenseShields.DsState.State.Online && shieldComponent.DefenseShields.IsWorking) {
+
+                    var ds = shieldComponent.DefenseShields;
+                    var otherSize = ds.MyGrid.PositionComp.LocalAABB.Size.Volume;
+                    var otherEntityId = ds.MyGrid.EntityId;
+                    if ((!IsStatic && ds.IsStatic) || mySize < otherSize || (mySize.Equals(otherEntityId) && myEntityId < otherEntityId))
                     {
-                        var otherSize = ds.MyGrid.PositionComp.WorldAABB.Size.Volume;
-                        var otherEntityId = ds.MyGrid.EntityId;
-                        if ((!IsStatic && ds.IsStatic) || mySize < otherSize || (mySize.Equals(otherEntityId) && myEntityId < otherEntityId))
-                        {
-                            _slaveLink = true;
-                            return true;
-                        }
+                        _slavedToGrid = ds.MyGrid;
+                        if (_slavedToGrid != null) return true;
                     }
                 }
             }
-            _slaveLink = false;
+
+            if (_slavedToGrid != null) {
+
+                if (_slavedToGrid.IsInSameLogicalGroupAs(MyGrid))
+                    ResetEntityTick = _tick + 1800;
+            }
+            _slavedToGrid = null;
             return false;
         }
 

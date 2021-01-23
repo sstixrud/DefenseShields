@@ -70,6 +70,7 @@ namespace DefenseShields
         {
             try
             {
+
                 if (!EntityAlive()) return;
                 var shield = ShieldOn();
                 if (shield != State.Active)

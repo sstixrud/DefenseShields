@@ -37,7 +37,7 @@
 
             if (!Warming) WarmUpSequence();
 
-            if (_subUpdate && _tick >= _subTick) HierarchyUpdate();
+            if (_subUpdate && !DsState.State.Suspended) UpdateSubGrids();
             if (_blockEvent && _tick >= _funcTick) BlockChanged(true);
             if (_blockChanged) BlockMonitor();
             if (ClientUiUpdate || SettingsUpdated) UpdateSettings();
@@ -242,7 +242,7 @@
 
         private bool ShieldSleeping()
         {
-            if (ShieldComp.EmittersSuspended || SlaveControllerLink())
+            if (ShieldComp.EmittersSuspended || (_linkedGridCount > 1 || DsState.State.Sleeping) && SubGridSlaveControllerLink())
             {
                 if (!DsState.State.Sleeping)
                 {
@@ -308,7 +308,11 @@
 
         private void UnSuspend()
         {
-			if (_tick > ResetEntityTick && DsState.State.Suspended) ResetEntityTick = _tick + 1800;
+            if (_tick > ResetEntityTick && DsState.State.Suspended)
+            {
+                ResetEntityTick = _tick + 1800;
+            }
+
             DsState.State.Suspended = false;
             ShieldComp.DefenseShields = this;
             Session.Instance.BlockTagActive(Shield);

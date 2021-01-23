@@ -13,7 +13,6 @@ namespace DefenseShields
     using VRage.Game;
     using VRage.Game.Components;
     using VRage.Game.Entity;
-    using VRage.Collections;
     using VRageMath;
     using ParallelTasks;
 
@@ -124,6 +123,7 @@ namespace DefenseShields
         private uint _capacitorTick;
         private uint _heatVentingTick = uint.MaxValue;
         private uint _lastSendDamageTick = uint.MaxValue;
+        private uint _subUpdatedTick;
 
         private float _power = 0.001f;
         private float _powerNeeded;
@@ -147,6 +147,7 @@ namespace DefenseShields
         private double _shieldVol;
         private double _sizeScaler;
 
+        private int _linkedGridCount = -1;
         private int _count = -1;
         private int _powerNoticeLoop;
         private int _capacitorLoop;
@@ -189,7 +190,6 @@ namespace DefenseShields
         private bool _mpActive;
         private bool _isServer;
         private bool _shieldPowered;
-        private bool _slaveLink;
         private bool _subUpdate;
         private bool _updateGridDistributor;
         private bool _hideShield;
@@ -231,6 +231,7 @@ namespace DefenseShields
         private MyResourceSinkInfo _resourceInfo;
         private MyResourceSinkComponent _sink;
 
+        private MyCubeGrid _slavedToGrid;
         private MyEntity _shellPassive;
         private MyEntity _shellActive;
         private MyParticleEffect _effect1 = new MyParticleEffect();

@@ -278,13 +278,13 @@ namespace DefenseShields.Support
             if (Session.Instance.MpActive)
             {
                 Shield.AddShieldHit(CollisionData.Entity1.EntityId, 1, Session.Instance.MPKinetic, null, false, CollisionData.CollisionAvg);
-                character?.DoDamage(1f, Session.Instance.MpIgnoreDamage, Session.Instance.MpActive, null, Shield.MyCube.EntityId);
+                character?.DoDamage(51f, Session.Instance.MpIgnoreDamage, Session.Instance.MpActive, null, Shield.MyCube.EntityId);
             }
             else
             {
                 Shield.ImpactSize = 1;
                 Shield.WorldImpactPosition = CollisionData.CollisionAvg;
-                character?.DoDamage(1f, Session.Instance.MpIgnoreDamage, Session.Instance.MpActive, null, Shield.MyCube.EntityId);
+                character?.DoDamage(51f, Session.Instance.MpIgnoreDamage, Session.Instance.MpActive, null, Shield.MyCube.EntityId);
             }
             Session.Instance.PlayerCollisionPool.Return(this);
         }

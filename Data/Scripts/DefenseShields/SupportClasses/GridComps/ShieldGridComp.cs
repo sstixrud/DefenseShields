@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using DefenseShields.Support;
 using Sandbox.Game.Entities;
 using VRage.Game.Components;
@@ -58,7 +59,7 @@ namespace DefenseShields
         }
 
         public HashSet<MyCubeGrid> SubGrids { get; set; } = new HashSet<MyCubeGrid>();
-        public Dictionary<MyCubeGrid, SubGridInfo> LinkedGrids { get; set; } = new Dictionary<MyCubeGrid, SubGridInfo>();
+        public ConcurrentDictionary<MyCubeGrid, SubGridInfo> LinkedGrids = new ConcurrentDictionary<MyCubeGrid, SubGridInfo>();
 
         public Vector3D[] PhysicsOutside { get; set; } = new Vector3D[642];
 
@@ -67,7 +68,6 @@ namespace DefenseShields
         public Enhancers Enhancer { get; set; }
 
         public Modulators Modulator { get; set; }
-
         public int EmitterMode { get; set; } = -1;
         public long ActiveEmitterId { get; set; }
 

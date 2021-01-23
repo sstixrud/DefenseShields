@@ -236,6 +236,7 @@ namespace DefenseShields
             {
                 ShieldComp.LinkedGrids.Clear();
                 ShieldComp.SubGrids.Clear();
+                _linkedGridCount = -1;
             }
             _blockChanged = true;
             _functionalChanged = true;
@@ -255,7 +256,9 @@ namespace DefenseShields
 
         private void ResetEntity()
         {
-            if (_allInited) ResetEntityTick = _tick + 1800;
+            if (_allInited)
+                ResetEntityTick = _tick + 1800;
+            
             _allInited = false;
             Warming = false;
             WarmedUp = false;

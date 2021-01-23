@@ -391,6 +391,10 @@ namespace DefenseShields
             if (newSettings.MId > ModSet.Settings.MId)
             {
                 SettingsUpdated = true;
+                if (ModSet.Settings.ModulateDamage != newSettings.ModulateDamage)
+                {
+                    ModUi.ComputeDamage(this, newSettings.ModulateDamage);
+                }
                 ModSet.Settings = newSettings;
                 if (Session.Enforced.Debug == 3) Log.Line("UpdateSettings for modulator");
             }

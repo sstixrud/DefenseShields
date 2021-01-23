@@ -125,11 +125,7 @@
 
         private void HierarchyChanged(MyCubeGrid myCubeGrid = null)
         {
-            try
-            {
-                _subUpdate = true;
-            }
-            catch (Exception ex) { Log.Line($"Exception in Controller HierarchyChanged: {ex}"); }
+            _subUpdate = true;
         }
 
         private void BlockAdded(IMySlimBlock mySlimBlock)
@@ -138,10 +134,6 @@
             {
                 _blockAdded = true;
                 _blockChanged = true;
-                if (_isServer)
-                {
-                    //DsState.State.GridIntegrity += mySlimBlock.MaxIntegrity;
-                }
             }
             catch (Exception ex) { Log.Line($"Exception in Controller BlockAdded: {ex}"); }
         }
@@ -152,10 +144,6 @@
             {
                 _blockRemoved = true;
                 _blockChanged = true;
-                if (_isServer)
-                {
-                    //DsState.State.GridIntegrity -= mySlimBlock.MaxIntegrity;
-                }
             }
             catch (Exception ex) { Log.Line($"Exception in Controller BlockRemoved: {ex}"); }
         }

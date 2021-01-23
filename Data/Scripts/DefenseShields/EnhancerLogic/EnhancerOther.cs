@@ -219,8 +219,7 @@ namespace DefenseShields
         {
             stringBuilder.Append("[Controller Link]: False");
         }
-        else if (!EnhState.State.Backup && ShieldComp.DefenseShields.ShieldMode ==
-                 global::DefenseShields.DefenseShields.ShieldType.Station)
+        else if (!EnhState.State.Backup && ShieldComp.DefenseShields.ShieldMode == DefenseShields.ShieldType.Station)
         {
             stringBuilder.Append("[Online]: " + EnhState.State.Online +
                                  "\n" +

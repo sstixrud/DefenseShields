@@ -301,11 +301,9 @@ namespace DefenseShields
 
         private float PowerNeeded(float chargePercent, float hpsEfficiency)
         {
-            var powerScaler = 1f;
-            if (HpScaler < 1) powerScaler = HpScaler;
             var cleanPower = ShieldAvailablePower + ShieldCurrentPower;
             _otherPower = ShieldMaxPower - cleanPower;
-            var powerForShield = ((cleanPower * chargePercent) - _shieldMaintaintPower) * powerScaler;
+            var powerForShield = ((cleanPower * chargePercent) - _shieldMaintaintPower);
             var rawMaxChargeRate = powerForShield > 0 ? powerForShield : 0f;
             _shieldMaxChargeRate = rawMaxChargeRate;
             _shieldPeakRate = (_shieldMaxChargeRate * hpsEfficiency);

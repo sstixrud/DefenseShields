@@ -42,7 +42,9 @@
             var comp = block?.GameLogic?.GetAs<Modulators>();
             if (comp == null) return;
 
-            ComputeDamage(comp, newValue);
+            if (Session.Instance.IsServer) 
+                ComputeDamage(comp, newValue);
+            
             comp.ModSet.Settings.ModulateDamage = (int)newValue;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;

@@ -26,6 +26,7 @@ namespace DefenseShields
         private readonly Func<IMyTerminalBlock, bool> _isShieldUp;
         private readonly Func<IMyTerminalBlock, string> _shieldStatus;
         private readonly Func<IMyTerminalBlock, IMyEntity, bool, bool> _entityBypass;
+        private readonly Func<IMyTerminalBlock, long, bool, bool> _entityBypassPb;
         // Fields below do not require SetActiveShield to be defined first.
         private readonly Func<IMyCubeGrid, bool> _gridHasShield;
         private readonly Func<IMyCubeGrid, bool> _gridShieldOnline;
@@ -59,6 +60,7 @@ namespace DefenseShields
             _isShieldUp = (Func<IMyTerminalBlock, bool>)delegates["IsShieldUp"];
             _shieldStatus = (Func<IMyTerminalBlock, string>)delegates["ShieldStatus"];
             _entityBypass = (Func<IMyTerminalBlock, IMyEntity, bool, bool>)delegates["EntityBypass"];
+            _entityBypassPb = (Func<IMyTerminalBlock, long, bool, bool>)delegates["EntityBypassPb"];
             _gridHasShield = (Func<IMyCubeGrid, bool>)delegates["GridHasShield"];
             _gridShieldOnline = (Func<IMyCubeGrid, bool>)delegates["GridShieldOnline"];
             _protectedByShield = (Func<IMyEntity, bool>)delegates["ProtectedByShield"];
@@ -85,6 +87,7 @@ namespace DefenseShields
         public bool IsShieldUp() => _isShieldUp?.Invoke(_block) ?? false;
         public string ShieldStatus() => _shieldStatus?.Invoke(_block) ?? string.Empty;
         public bool EntityBypass(IMyEntity entity, bool remove = false) => _entityBypass?.Invoke(_block, entity, remove) ?? false;
+        public bool EntityBypassPb(long entity, bool remove = false) => _entityBypassPb?.Invoke(_block, entity, remove) ?? false;
         public bool GridHasShield(IMyCubeGrid grid) => _gridHasShield?.Invoke(grid) ?? false;
         public bool GridShieldOnline(IMyCubeGrid grid) => _gridShieldOnline?.Invoke(grid) ?? false;
         public bool ProtectedByShield(IMyEntity entity) => _protectedByShield?.Invoke(entity) ?? false;

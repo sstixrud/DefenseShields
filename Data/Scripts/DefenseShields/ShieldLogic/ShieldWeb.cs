@@ -6,6 +6,7 @@ using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
 using Sandbox.ModAPI.Weapons;
 using VRage.Game;
+using VRage.Game.Components;
 using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRageMath;
@@ -167,6 +168,7 @@ namespace DefenseShields
                 }
 
                 var grid = ent as MyCubeGrid;
+                
                 switch (relation)
                 {
                     case Ent.Authenticated:
@@ -289,21 +291,34 @@ namespace DefenseShields
             var character = ent as IMyCharacter;
             if (character != null)
             {
-                var dude = MyAPIGateway.Players.GetPlayerControllingEntity(ent)?.IdentityId;
-                if (dude == null) return Ent.Ignore;
-                var playerrelationship = MyCube.GetUserRelationToOwner((long)dude);
+
+                var getComponentOwner = ent as IMyComponentOwner<MyIDModule>;
+
+                long playerId;
+                MyIDModule targetIdModule;
+                if (getComponentOwner != null && getComponentOwner.GetComponent(out targetIdModule))
+                    playerId = targetIdModule.Owner;
+                else
+                {
+                    var controllingId = character.ControllerInfo?.ControllingIdentityId;
+                    playerId = controllingId ?? 0;
+                }
+
+                if (playerId == 0 || character.IsDead || character.Integrity <= 0) return Ent.Ignore;
+
+                var playerrelationship = MyIDModule.GetRelationPlayerBlock(MyCube.IDModule.Owner, playerId, MyOwnershipShareModeEnum.Faction);
+
                 if (playerrelationship == MyRelationsBetweenPlayerAndBlock.Owner || playerrelationship == MyRelationsBetweenPlayerAndBlock.FactionShare)
                 {
                     var playerInShield = CustomCollision.PointInShield(ent.PositionComp.WorldAABB.Center, DetectMatrixOutsideInv);
                     return playerInShield ? Ent.Protected : Ent.Friendly;
                 }
 
-                if (character.IsDead) return Ent.Ignore;
-
                 if (CustomCollision.NewObbPointsInShield(ent, DetectMatrixOutsideInv, _obbPoints) == 9)
                 {
                     return Ent.EnemyInside;
                 }
+
                 return Ent.EnemyPlayer;
             }
             var grid = ent as MyCubeGrid;
