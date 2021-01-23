@@ -504,10 +504,123 @@ namespace DefenseShields
             if (Session.Enforced.Debug == 3) Log.Line($"InitEntities: mode: {ShieldMode}, spawn complete - ShieldId [{Shield.EntityId}]");
         }
 
+        private void ComputeCap2()
+        {
+            _updateCap = false;
+
+            var xPlus = Session.Instance.CubeDominantDirectionPool.Get();
+            var xMinus = Session.Instance.CubeDominantDirectionPool.Get();
+            var yPlus = Session.Instance.CubeDominantDirectionPool.Get();
+            var yMinus = Session.Instance.CubeDominantDirectionPool.Get();
+            var zPlus = Session.Instance.CubeDominantDirectionPool.Get();
+            var zMinus = Session.Instance.CubeDominantDirectionPool.Get();
+
+            if (ShieldComp.SubGrids.Count == 0)
+                UpdateSubGrids();
+
+            float boxsArea = 0;
+
+            var totalFat = 0;
+            foreach (var sub in ShieldComp.SubGrids.Keys) {
+
+                var fatBlocks = sub.GetFatBlocks();
+                var fatCount = fatBlocks.Count;
+                totalFat += fatCount;
+                var percentile95Th = (int)(fatCount * 0.10);
+                
+                Vector3I center = Vector3I.Zero;
+                BoundingBox newBox = BoundingBox.Invalid;
+
+                for (int i = 0; i < fatCount; i++) {
+
+                    var cube = fatBlocks[i];
+                    var pos = cube.Position;
+                    center += pos;
+                    if (Math.Abs(pos.X) > Math.Abs(pos.Y)) {
+
+                        if (Math.Abs(pos.X) > Math.Abs(pos.Z)) {
+
+                            if (pos.X > 0)
+                                xPlus.Add(cube);
+                            else xMinus.Add(cube);
+                        }
+                        else {
+
+                            if (pos.Z > 0)
+                                zPlus.Add(cube);
+                            else zMinus.Add(cube);
+                        }
+                    }
+                    else if (Math.Abs(pos.Y) > Math.Abs(pos.Z)) {
+
+                        if (pos.Y > 0)
+                            yPlus.Add(cube);
+                        else yMinus.Add(cube);
+                    }
+                    else {
+
+                        if (pos.Z > 0)
+                            zPlus.Add(cube);
+                        else zMinus.Add(cube);
+                    }
+                }
+
+                int removed = 0;
+                for (int x = 0; x < 6; x++) {
+
+                    var collection = x == 0 ? xPlus : x == 1 ? xMinus : x == 2 ? yPlus : x == 3 ? yMinus : x == 4 ? yPlus : zMinus;
+                    if (collection.Count == 0)
+                        continue;
+
+                    ShellSort(collection, center);
+
+                    var scale = fatCount / collection.Count;
+
+                    if (scale > 0) {
+
+                        var scaledPercentile = percentile95Th / scale;
+
+                        if (scaledPercentile > 0) {
+                            Log.Line($"startOfRemove: {collection.Count - scaledPercentile} - endofremove:{collection.Count} - totalremoved:{scaledPercentile}");
+                            collection.RemoveRange(collection.Count - scaledPercentile, scaledPercentile);
+                            removed += scaledPercentile;
+                        }
+
+                    }
+
+                    for (int i = 0; i < collection.Count; i++) {
+                        var cube = collection[i];
+                        newBox.Min = Vector3.Min(newBox.Min, cube.Min * cube.CubeGrid.GridSize);
+                        newBox.Max = Vector3.Max(newBox.Max, cube.Max * cube.CubeGrid.GridSize);
+                    }
+                }
+                Log.Line($"removed: {removed} - outOf:{percentile95Th}");
+
+                boxsArea += newBox.SurfaceArea();
+            }
+
+            Session.Instance.CubeDominantDirectionPool.Return(xPlus);
+            Session.Instance.CubeDominantDirectionPool.Return(xMinus);
+            Session.Instance.CubeDominantDirectionPool.Return(yPlus);
+            Session.Instance.CubeDominantDirectionPool.Return(yMinus);
+            Session.Instance.CubeDominantDirectionPool.Return(zPlus);
+            Session.Instance.CubeDominantDirectionPool.Return(zMinus);
+
+            var unitLen = MyGrid.GridSize;
+            if (boxsArea < 1)
+                boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalFat * unitLen, unitLen, unitLen);
+
+            var surfaceArea = (float)Math.Sqrt(boxsArea);
+            DsState.State.GridIntegrity = (surfaceArea * MagicRatio);
+        }
+
+
         private readonly List<MyCubeBlock> _cubeList = new List<MyCubeBlock>();
 
         private void ComputeCap()
         {
+            ComputeCap2();
+            return;
             _updateCap = false;
             _cubeList.Clear();
 

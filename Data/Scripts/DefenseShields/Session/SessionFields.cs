@@ -93,6 +93,7 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<List<CubeAccel>> ListCubeAccelPool = new MyConcurrentPool<List<CubeAccel>>(100);
         internal readonly MyConcurrentPool<EntIntersectInfo> EntIntersectInfoPool = new MyConcurrentPool<EntIntersectInfo>(100, info => info.Clean());
 
+        internal readonly MyConcurrentPool<List<MyCubeBlock>> CubeDominantDirectionPool = new MyConcurrentPool<List<MyCubeBlock>>(25, info => info.Clear());
         internal readonly MyConcurrentPool<ProtectCache> ProtectCachePool = new MyConcurrentPool<ProtectCache>(100, info => info.Clean());
         internal readonly MyConcurrentPool<ShieldVsShieldThreadEvent> ShieldEventPool = new MyConcurrentPool<ShieldVsShieldThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<FloaterThreadEvent> FloaterPool = new MyConcurrentPool<FloaterThreadEvent>(100, info => info.Clean());
