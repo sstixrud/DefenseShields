@@ -504,6 +504,7 @@ namespace DefenseShields
             if (Session.Enforced.Debug == 3) Log.Line($"InitEntities: mode: {ShieldMode}, spawn complete - ShieldId [{Shield.EntityId}]");
         }
 
+        private List<MyCubeBlock> _testRemoves = new List<MyCubeBlock>();
         private void ComputeCap2()
         {
             _updateCap = false;
@@ -525,9 +526,9 @@ namespace DefenseShields
 
                 var fatBlocks = sub.GetFatBlocks();
                 var fatCount = fatBlocks.Count;
-                totalFat += fatCount;
                 var percentile95Th = (int)(fatCount * 0.10);
-                
+                totalFat += fatCount;
+
                 Vector3I center = Vector3I.Zero;
                 BoundingBox newBox = BoundingBox.Invalid;
 
@@ -581,7 +582,7 @@ namespace DefenseShields
                         var scaledPercentile = percentile95Th / scale;
 
                         if (scaledPercentile > 0) {
-                            Log.Line($"startOfRemove: {collection.Count - scaledPercentile} - endofremove:{collection.Count} - totalremoved:{scaledPercentile}");
+                            //Log.Line($"startOfRemove: {collection.Count - scaledPercentile} - endofremove:{collection.Count} - totalremoved:{scaledPercentile}");
                             collection.RemoveRange(collection.Count - scaledPercentile, scaledPercentile);
                             removed += scaledPercentile;
                         }
