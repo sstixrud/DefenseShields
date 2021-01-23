@@ -537,7 +537,6 @@ namespace DefenseShields
                 {
                     foreach (var s in ActiveShields)
                     {
-                        if (Tick60) s.CleanWebEnts();
                         if (s.Asleep) continue;
                         if (s.DsState.State.ReInforce)
                         {
@@ -547,6 +546,7 @@ namespace DefenseShields
                         }
 
                         if (!DedicatedServer && Tick20 && s.EffectsDirty) s.ResetDamageEffects();
+                        if (Tick600) s.CleanWebEnts();
                         s.WebEntities();
                     }
                 }
