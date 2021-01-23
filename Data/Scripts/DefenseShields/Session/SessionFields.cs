@@ -105,7 +105,6 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<VoxelCollisionDmgThreadEvent> VoxelCollisionDmgPool = new MyConcurrentPool<VoxelCollisionDmgThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<VoxelCollisionPhysicsThreadEvent> VoxelCollisionPhysicsPool = new MyConcurrentPool<VoxelCollisionPhysicsThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<ForceDataThreadEvent> ForceDataPool = new MyConcurrentPool<ForceDataThreadEvent>(100, info => info.Clean());
-
         internal readonly HashSet<string> DsActions = new HashSet<string>()
         {
             "DS-C_ToggleShield_Toggle",
@@ -217,18 +216,16 @@ namespace DefenseShields
         private const int EntCleanCycle = 3600;
         private const int EntMaxTickAge = 36000;
 
-        private static volatile int _entSlotAssigner;
+        private static int _entSlotAssigner;
 
-        private readonly MonitorWork _workData = new MonitorWork();
         internal readonly ApiBackend Api = new ApiBackend();
         private readonly List<MyCubeGrid> _tmpWatchGridsToRemove = new List<MyCubeGrid>();
         private readonly List<MyCubeBlock> _warHeadCubeHits = new List<MyCubeBlock>();
         private readonly List<MyCubeGrid> _warHeadGridHits = new List<MyCubeGrid>();
         private readonly List<MyEntity> _pruneWarGrids = new List<MyEntity>();
-        private readonly List<KeyValuePair<MyEntity, uint>> _entRefreshTmpList = new List<KeyValuePair<MyEntity, uint>>();
         private readonly Dictionary<MyCubeGrid, WarHeadHit> _warHeadGridShapes = new Dictionary<MyCubeGrid, WarHeadHit>();
         private readonly Queue<long> _warEffectPurge = new Queue<long>();
-        private readonly ConcurrentQueue<MyEntity> _entRefreshQueue = new ConcurrentQueue<MyEntity>();
+        internal readonly ConcurrentQueue<MyEntity> EntRefreshQueue = new ConcurrentQueue<MyEntity>();
         private readonly ConcurrentDictionary<MyEntity, uint> _globalEntTmp = new ConcurrentDictionary<MyEntity, uint>();
         private readonly ConcurrentDictionary<long, BlockState> _warEffectCubes = new ConcurrentDictionary<long, BlockState>();
 
@@ -298,7 +295,7 @@ namespace DefenseShields
         internal bool CreativeWarn { get; set; }
         internal bool ThyaImages { get; set; }
         internal bool SessionReady { get; set; }
-
+        internal bool FastRefresh { get; set; }
         internal DefenseShields HudComp { get; set; }
         internal DSUtils Dsutil1 { get; set; } = new DSUtils();
 

@@ -106,8 +106,6 @@ namespace DefenseShields
         private readonly List<MyCubeBlock> _functionalBlocks = new List<MyCubeBlock>();
         private readonly List<IMyBatteryBlock> _batteryBlocks = new List<IMyBatteryBlock>();
         private readonly List<IMyTextPanel> _displayBlocks = new List<IMyTextPanel>();
-        private readonly List<KeyValuePair<MyEntity, EntIntersectInfo>> _webEntsTmp = new List<KeyValuePair<MyEntity, EntIntersectInfo>>();
-        private readonly List<KeyValuePair<MyEntity, ProtectCache>> _protectEntsTmp = new List<KeyValuePair<MyEntity, ProtectCache>>();
         private readonly RunningAverage _dpsAvg = new RunningAverage(2);
         private readonly RunningAverage _hpsAvg = new RunningAverage(2);
         private readonly EllipsoidOxygenProvider _ellipsoidOxyProvider = new EllipsoidOxygenProvider(Matrix.Zero);

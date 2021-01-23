@@ -114,6 +114,19 @@ namespace DefenseShields
 
         private void OnEntityRemove(MyEntity myEntity)
         {
+            if (Environment.CurrentManagedThreadId == 1) {
+
+                MyProtectors protector;
+                if (GlobalProtect.TryGetValue(myEntity, out protector)) {
+
+                    foreach (var s in protector.Shields) {
+                        ProtectCache cache;
+                        s.ProtectedEntCache.TryRemove(myEntity, out cache);
+                    }
+                    EntRefreshQueue.Enqueue(myEntity);
+                }
+            }
+
             var warhead = myEntity as IMyWarhead;
             if (warhead != null)
             {

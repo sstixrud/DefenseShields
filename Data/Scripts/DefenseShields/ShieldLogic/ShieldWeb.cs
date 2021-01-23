@@ -20,18 +20,23 @@ namespace DefenseShields
             AuthenticatedCache.Clear();
             IgnoreCache.Clear();
 
-            _protectEntsTmp.Clear();
-            _protectEntsTmp.AddRange(ProtectedEntCache.Where(info => _tick - info.Value.LastTick > 180));
-            foreach (var protectedEnt in _protectEntsTmp) ProtectedEntCache.Remove(protectedEnt.Key);
+            foreach (var info in ProtectedEntCache) {
 
-            _webEntsTmp.Clear();
-            _webEntsTmp.AddRange(WebEnts.Where(info => _tick - info.Value.LastTick > 180));
-            foreach (var webent in _webEntsTmp)
-            {
-                EntIntersectInfo removedEnt;
-                WebEnts.TryRemove(webent.Key, out removedEnt);
-                Session.Instance.EntIntersectInfoPool.Return(removedEnt);
-                EnemyShields.Remove(webent.Key);
+                if (_tick - info.Value.LastTick > 180)
+                    ProtectedEntCache.Remove(info.Key);
+            }
+
+            foreach (var webent in WebEnts) {
+
+                if (_tick - webent.Value.LastTick > 180) {
+
+                    EntIntersectInfo removedEnt;
+                    WebEnts.TryRemove(webent.Key, out removedEnt);
+
+                    Session.Instance.EntIntersectInfoPool.Return(removedEnt);
+                    EnemyShields.Remove(webent.Key);
+                }
+
             }
         }
 
@@ -134,7 +139,6 @@ namespace DefenseShields
                 var refreshInfo = false;
                 if (protectedEnt == null)
                 {
-                    WebEnts.TryGetValue(ent, out entInfo);
                     if (entInfo != null)
                     {
                         var last = entInfo.LastTick;
@@ -147,6 +151,7 @@ namespace DefenseShields
                             entInfo.Relation = EntType(ent);
                         }
                         relation = entInfo.Relation;
+                        
                         entInfo.LastTick = tick;
                     }
                     else relation = EntType(ent);
@@ -168,7 +173,6 @@ namespace DefenseShields
                 }
 
                 var grid = ent as MyCubeGrid;
-                
                 switch (relation)
                 {
                     case Ent.Authenticated:
@@ -193,6 +197,12 @@ namespace DefenseShields
                             continue;
                         }
                         IgnoreCache.Add(ent);
+                        ProtectCache cache;
+                        if (grid != null && ProtectedEntCache.TryRemove(ent, out cache))
+                        {
+                            Session.Instance.EntRefreshQueue.Enqueue(ent);
+                            Session.Instance.FastRefresh = true;
+                        }
                         continue;
                 }
 

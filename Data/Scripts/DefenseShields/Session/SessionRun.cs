@@ -120,6 +120,19 @@
             }
 
             WebMonitor();
+            foreach (var pair in GlobalProtect)
+            {
+                var c = 0;
+                foreach (var s in pair.Value.Shields)
+                {
+                    if (s.ProtectedEntCache.ContainsKey(pair.Key))
+                        c++;
+                }
+                if (c == 0)
+                {
+                    Log.Line($"{pair.Key.DebugName} not protected");
+                }
+            }
         }
         #endregion
 
