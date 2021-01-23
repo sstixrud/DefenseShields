@@ -508,15 +508,6 @@ namespace DefenseShields
         }
 
         private List<MyCubeBlock> _testRemoves = new List<MyCubeBlock>();
-        private enum LocalDir
-        {
-            Xp,
-            Xm,
-            Yp,
-            Ym,
-            Zp,
-            Zm
-        }
 
         private void ComputeCap2()
         {
@@ -531,9 +522,12 @@ namespace DefenseShields
             var subGridId = 0;
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
+                if (sub != MyGrid)
+                    continue;
                 var fatBlocks = sub.GetFatBlocks();
                 var fatCount = fatBlocks.Count;
                 totalFat += fatCount;
+                var removeTarget = fatCount * 0.05;
 
                 Vector3I center = Vector3I.Zero;
                 BoundingBox newBox = BoundingBox.Invalid;
@@ -584,13 +578,12 @@ namespace DefenseShields
                     ShellSort(collection, center);
 
 
-                    var numToRemove = (int)(collection.Count * 0.05);
+                    var numToRemove = (int)Math.Round(collection.Count * 0.05);
 
                     if (numToRemove > 0) {
 
                         collection.RemoveRange(collection.Count - numToRemove, numToRemove);
                         removed += numToRemove;
-
                     }
 
                     for (int i = 0; i < collection.Count; i++) {
@@ -602,6 +595,9 @@ namespace DefenseShields
                     Log.CleanLine($"subGridId:{subGridId} - collection{x}: - collectionCount:{collection.Count} - removedSoFar:{removed} - percentile95th:{(int)(collection.Count * 0.05)} - targetToRemove:{fatCount * 0.05}");
 
                     _tmpCapLists[x].Clear();
+                    
+                    if (removed >= removeTarget)
+                        break;
                 }
 
                 boxsArea += newBox.SurfaceArea();
