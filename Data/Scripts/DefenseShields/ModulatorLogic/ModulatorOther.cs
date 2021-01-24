@@ -200,12 +200,16 @@ namespace DefenseShields
             }
             else if (_tock34)
             {
-                if (ClientUiUpdate)
+                if (!SettingsUpdated && ClientUiUpdate)
                 {
                     ClientUiUpdate = false;
                     MyCube.UpdateTerminal();
                     Modulator.RefreshCustomInfo();
-                    if (!_isServer) ModSet.NetworkUpdate();
+                    if (!_isServer)
+                    {
+                        Log.Line($"client sending modulator update");
+                        ModSet.NetworkUpdate();
+                    }
                 }
             }
 
@@ -393,6 +397,7 @@ namespace DefenseShields
                 SettingsUpdated = true;
                 if (ModSet.Settings.ModulateDamage != newSettings.ModulateDamage)
                 {
+                    Log.Line($"MOdulate Damage Changed");
                     ModUi.ComputeDamage(this, newSettings.ModulateDamage);
                 }
                 ModSet.Settings = newSettings;

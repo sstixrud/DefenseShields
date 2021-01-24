@@ -144,10 +144,7 @@ namespace DefenseShields
         private void GetShapeAdjust()
         {
             if (DsSet.Settings.SphereFit || DsSet.Settings.FortifyShield) DsState.State.EllipsoidAdjust = 1f;
-            //else if (!DsSet.Settings.ExtendFit) DsState.State.EllipsoidAdjust = UtilsStatic.CreateNormalFit((MyCubeBlock)Shield, DsState.State.GridHalfExtents, FitBlocks, FitBlockPoints);
-            //else DsState.State.EllipsoidAdjust = UtilsStatic.CreateExtendedFit((MyCubeBlock)Shield, DsState.State.GridHalfExtents, FitBlocks, FitBlockPoints);
             else DsState.State.EllipsoidAdjust = UtilsStatic.GetFit(DsSet.Settings.Fit);
-            FitBlocks.Clear();
         }
 
         private void CheckExtents()
@@ -234,11 +231,10 @@ namespace DefenseShields
 
                 _ellipsoidSurfaceArea = _ellipsoidSa.Surface;
                 EllipsoidVolume = 1.333333 * Math.PI * DetectMatrixOutside.Scale.X * DetectMatrixOutside.Scale.Y * DetectMatrixOutside.Scale.Z;
-                _shieldVol = DetectMatrixOutside.Scale.Volume;
 
-                var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicRatio);
-                
-                _sizeScaler = Math.Sqrt(ellipsoidMagic);
+                var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio);
+                _sizeScaler = (float)Math.Sqrt(ellipsoidMagic);
+
                 if (_isServer)
                 {
                     ShieldChangeState();

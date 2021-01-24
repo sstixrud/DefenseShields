@@ -381,8 +381,8 @@ namespace DefenseShields
                     {
                         DsState.State.Overload = false;
                         _overLoadLoop = -1;
-                        var recharged = ShieldChargeRate * ShieldDownCount / 60;
-                        DsState.State.Charge = MathHelper.Clamp(recharged, ShieldMaxCharge * 0.10f, ShieldMaxCharge * 0.25f);
+                        var recharged = (_shieldPeakRate * ShieldDownCount) / 60;
+                        DsState.State.Charge = MathHelper.Clamp(recharged, ShieldMaxCharge * 0.05f, ShieldMaxCharge * 0.30f);
                     }
                 }
             }

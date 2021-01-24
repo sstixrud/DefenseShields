@@ -42,8 +42,6 @@ namespace DefenseShields
         internal readonly ConcurrentDictionary<MyEntity, EntIntersectInfo> WebEnts = new ConcurrentDictionary<MyEntity, EntIntersectInfo>();
         internal readonly ConcurrentDictionary<MyEntity, MoverInfo> EntsByMe = new ConcurrentDictionary<MyEntity, MoverInfo>();
         internal readonly ConcurrentDictionary<MyVoxelBase, int> VoxelsToIntersect = new ConcurrentDictionary<MyVoxelBase, int>();
-        internal readonly Vector3D[] FitBlockPoints = new Vector3D[8];
-        internal readonly List<IMySlimBlock> FitBlocks = new List<IMySlimBlock>();
 
         internal readonly object MatrixLock = new object();
 
@@ -86,7 +84,9 @@ namespace DefenseShields
         private const int HeatingStep = 600;
         private const int CoolingStep = 1200;
         private const int FallBackStep = 10;
-        private const float MagicRatio = 1000;
+        private const float MagicCapRatio = 1000;
+        private const float MagicEllipsoidRatio = 1000;
+
         private const float ChargeRatio = 1.25f;
         private const int SyncCount = 60;
 
@@ -139,11 +139,11 @@ namespace DefenseShields
         private float _empScaleHp = 1f;
         private float _runningDamage;
         private float _runningHeal;
+        private float _sizeScaler;
+        private float _shieldTypeRatio = 100f;
 
         private double _oldEllipsoidAdjust;
         private double _ellipsoidSurfaceArea;
-        private double _shieldVol;
-        private double _sizeScaler;
 
         private int _linkedGridCount = -1;
         private int _count = -1;
@@ -158,7 +158,6 @@ namespace DefenseShields
         private int _empScaleTime = 1;
         private int _prevLod;
         private int _onCount;
-        private int _shieldTypeRatio = 100;
         private int _expChargeReduction;
         private int _bCount;
         private int _bTime;

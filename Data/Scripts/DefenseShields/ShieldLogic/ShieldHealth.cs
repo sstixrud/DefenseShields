@@ -58,17 +58,17 @@
                 _empScaleHp = 1f;
                 _empScaleTime = 1;
             }
-
-            var hpLoss = Session.Enforced.HeatScaler * _empScaleHp;
-            var nextThreshold = hp * hpLoss * (_currentHeatStep + 1);
-            var currentThreshold = hp * hpLoss * _currentHeatStep;
+            var heatScale = ShieldMode == ShieldType.Station && DsState.State.Enhancer ? Session.Enforced.HeatScaler * 2f : Session.Enforced.HeatScaler * 1f;
+            var thresholdAmount = heatScale * _empScaleHp;
+            var nextThreshold = hp * thresholdAmount * (_currentHeatStep + 1);
+            var currentThreshold = hp * thresholdAmount * _currentHeatStep;
             var scaledOverHeat = OverHeat / _empScaleTime;
             var lastStep = _currentHeatStep == 10;
             var overloadStep = _heatCycle == scaledOverHeat;
             var scaledHeatingSteps = HeatingStep / _empScaleTime;
             var afterOverload = _heatCycle > scaledOverHeat;
             var nextCycle = _heatCycle == (_currentHeatStep * scaledHeatingSteps) + scaledOverHeat;
-            var overload = _accumulatedHeat > hp * hpLoss * 2;
+            var overload = _accumulatedHeat > hp * thresholdAmount * 2;
             var pastThreshold = _accumulatedHeat > nextThreshold;
             var metThreshold = _accumulatedHeat > currentThreshold;
             var underThreshold = !pastThreshold && !metThreshold;
@@ -81,7 +81,7 @@
             {
                 if (overload)
                 {
-                    if (Session.Enforced.Debug == 3) Log.Line($"overh - stage:{_currentHeatStep + 1} - cycle:{_heatCycle} - resetCycle:xxxx - heat:{_accumulatedHeat} - threshold:{hp * hpLoss * 2}[{hp / hp * hpLoss * (_currentHeatStep + 1)}] - nThreshold:{hp * hpLoss * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
+                    if (Session.Enforced.Debug == 3) Log.Line($"overh - stage:{_currentHeatStep + 1} - cycle:{_heatCycle} - resetCycle:xxxx - heat:{_accumulatedHeat} - threshold:{hp * thresholdAmount * 2}[{hp / hp * thresholdAmount * (_currentHeatStep + 1)}] - nThreshold:{hp * thresholdAmount * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
                     _currentHeatStep = 1;
                     DsState.State.Heat = _currentHeatStep * 10;
                     _accumulatedHeat = 0;
@@ -109,7 +109,7 @@
 
                 if (pastThreshold)
                 {
-                    if (Session.Enforced.Debug == 4) Log.Line($"incre - stage:{_currentHeatStep + 1} - cycle:{_heatCycle} - resetCycle:xxxx - heat:{_accumulatedHeat} - threshold:{nextThreshold}[{hp / hp * hpLoss * (_currentHeatStep + 1)}] - nThreshold:{hp * hpLoss * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
+                    if (Session.Enforced.Debug == 4) Log.Line($"incre - stage:{_currentHeatStep + 1} - cycle:{_heatCycle} - resetCycle:xxxx - heat:{_accumulatedHeat} - threshold:{nextThreshold}[{hp / hp * thresholdAmount * (_currentHeatStep + 1)}] - nThreshold:{hp * thresholdAmount * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
                     _currentHeatStep++;
                     DsState.State.Heat = _currentHeatStep * 10;
                     _accumulatedHeat = 0;
@@ -117,7 +117,7 @@
                 }
                 else if (metThreshold)
                 {
-                    if (Session.Enforced.Debug == 4) Log.Line($"uncha - stage:{_currentHeatStep} - cycle:{_heatCycle} - resetCycle:{backOneCycles} - heat:{_accumulatedHeat} - threshold:{nextThreshold} - nThreshold:{hp * hpLoss * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
+                    if (Session.Enforced.Debug == 4) Log.Line($"uncha - stage:{_currentHeatStep} - cycle:{_heatCycle} - resetCycle:{backOneCycles} - heat:{_accumulatedHeat} - threshold:{nextThreshold} - nThreshold:{hp * thresholdAmount * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
                     DsState.State.Heat = _currentHeatStep * 10;
                     _heatCycle = backOneCycles;
                     _accumulatedHeat = 0;
@@ -155,7 +155,7 @@
             else if (leftCritical)
             {
                 if (_currentHeatStep >= 10) _currentHeatStep--;
-                if (Session.Enforced.Debug == 4) Log.Line($"leftc - stage:{_currentHeatStep} - cycle:{_heatCycle} - resetCycle:{backTwoCycles} - heat:{_accumulatedHeat} - threshold:{nextThreshold}[{hp / hp * hpLoss * (_currentHeatStep + 1)}] - nThreshold:{hp * hpLoss * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
+                if (Session.Enforced.Debug == 4) Log.Line($"leftc - stage:{_currentHeatStep} - cycle:{_heatCycle} - resetCycle:{backTwoCycles} - heat:{_accumulatedHeat} - threshold:{nextThreshold}[{hp / hp * thresholdAmount * (_currentHeatStep + 1)}] - nThreshold:{hp * thresholdAmount * (_currentHeatStep + 2)} - ShieldId [{Shield.EntityId}]");
                 DsState.State.Heat = _currentHeatStep * 10;
                 _heatCycle = backTwoCycles;
                 _heatVentingTick = uint.MaxValue;

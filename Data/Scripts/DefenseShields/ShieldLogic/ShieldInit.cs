@@ -505,7 +505,6 @@ namespace DefenseShields
             if (Session.Enforced.Debug == 3) Log.Line($"InitEntities: mode: {ShieldMode}, spawn complete - ShieldId [{Shield.EntityId}]");
         }
 
-        private readonly List<MyCubeBlock> _cubeList = new List<MyCubeBlock>();
         private readonly List<CapCube> _capcubeBoxList = new List<CapCube>(4096);
 
         private struct CapCube
@@ -517,8 +516,14 @@ namespace DefenseShields
         {
             _updateCap = false;
 
-            if (ShieldComp.SubGrids.Count == 0)
+            if (ShieldComp.SubGrids.Count == 0) {
+
                 UpdateSubGrids();
+                if (ShieldComp.SubGrids.Count == 0) {
+                    Log.Line($"SubGrids remained 0 in ComputeCap");
+                    return;
+                }
+            }
 
             Vector3I center = Vector3I.Zero;
 
@@ -553,7 +558,20 @@ namespace DefenseShields
                 }
             }
 
+            BoundingBox newBox = BoundingBox.Invalid;
+
             var totalBlockCnt = _capcubeBoxList.Count;
+            var unitLen = MyGrid.GridSize;
+
+            if (totalBlockCnt <= 0) {
+
+                var failSize = (float)UtilsStatic.SurfaceAreaCuboid(1 * unitLen, unitLen, unitLen);
+                var failArea = (float)Math.Sqrt(failSize);
+
+                DsState.State.GridIntegrity = (failArea * MagicCapRatio);
+                Log.Line($"ComputeCap had no blocks to computed, using failsize: myGridFatCount:{MyGrid.GetFatBlocks().Count} - gridMarked:{MyGrid.MarkedForClose} - shieldMarked:{MyCube.MarkedForClose}");
+                return;
+            }
 
             center /= totalBlockCnt;
             var percentile95Th = (int)(totalBlockCnt * 0.10);
@@ -561,9 +579,9 @@ namespace DefenseShields
             ShellSort(_capcubeBoxList, center);
             _capcubeBoxList.RemoveRange(totalBlockCnt - percentile95Th, percentile95Th);
 
-            BoundingBox newBox = BoundingBox.Invalid;
+            for (int i = 0; i < _capcubeBoxList.Count; i++)
+            {
 
-            for (int i = 0; i < _capcubeBoxList.Count; i++) {
                 var cap = _capcubeBoxList[i];
                 newBox.Min = Vector3.Min(newBox.Min, cap.Cube.Min);
                 newBox.Max = Vector3.Max(newBox.Max, cap.Cube.Max);
@@ -575,13 +593,12 @@ namespace DefenseShields
             _capcubeBoxList.Clear();
 
             var boxsArea = newBox.SurfaceArea();
-
-            var unitLen = MyGrid.GridSize;
+            
             if (boxsArea < 1)
                 boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalBlockCnt * unitLen, unitLen, unitLen);
 
             var surfaceArea = (float)Math.Sqrt(boxsArea);
-            DsState.State.GridIntegrity = (surfaceArea * MagicRatio);
+            DsState.State.GridIntegrity = (surfaceArea * MagicCapRatio);
 
         }
 
