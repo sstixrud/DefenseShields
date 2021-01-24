@@ -44,7 +44,6 @@ namespace DefenseShields
         internal readonly ConcurrentDictionary<MyVoxelBase, int> VoxelsToIntersect = new ConcurrentDictionary<MyVoxelBase, int>();
         internal readonly Vector3D[] FitBlockPoints = new Vector3D[8];
         internal readonly List<IMySlimBlock> FitBlocks = new List<IMySlimBlock>();
-        private readonly List<MyCubeBlock>[] _tmpCapLists = new List<MyCubeBlock>[6];
 
         internal readonly object MatrixLock = new object();
 

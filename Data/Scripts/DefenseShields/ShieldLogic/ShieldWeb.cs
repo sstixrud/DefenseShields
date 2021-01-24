@@ -136,10 +136,10 @@ namespace DefenseShields
                 ProtectCache protectedEnt;
                 EntIntersectInfo entInfo = null;
                 ProtectedEntCache.TryGetValue(ent, out protectedEnt);
-
                 var refreshInfo = false;
                 if (protectedEnt == null)
                 {
+                    WebEnts.TryGetValue(ent, out entInfo);
                     if (entInfo != null)
                     {
                         var last = entInfo.LastTick;
@@ -273,7 +273,6 @@ namespace DefenseShields
             {
                 return;
             }
-
             ShieldMatrix = ShieldEnt.PositionComp.WorldMatrixRef;
             if ((_needPhysics && shieldFound) || !ShieldMatrix.EqualsFast(ref OldShieldMatrix))
             {

@@ -1,5 +1,6 @@
 ﻿
 
+using VRage.Collections;
 using VRage.Game.ModAPI;
 
 namespace DefenseShields
@@ -163,9 +164,6 @@ namespace DefenseShields
             _isServer = Session.Instance.IsServer;
             _isDedicated = Session.Instance.DedicatedServer;
             _mpActive = Session.Instance.MpActive;
-            
-            for (int i = 0; i < _tmpCapLists.Length; i++)
-                _tmpCapLists[i] = new List<MyCubeBlock>();
             
             PowerInit();
             MyAPIGateway.Session.OxygenProviderSystem.AddOxygenGenerator(_ellipsoidOxyProvider);
@@ -507,172 +505,87 @@ namespace DefenseShields
             if (Session.Enforced.Debug == 3) Log.Line($"InitEntities: mode: {ShieldMode}, spawn complete - ShieldId [{Shield.EntityId}]");
         }
 
-        private List<MyCubeBlock> _testRemoves = new List<MyCubeBlock>();
-
-        private void ComputeCap2()
-        {
-            _updateCap = false;
-
-            if (ShieldComp.SubGrids.Count == 0)
-                UpdateSubGrids();
-
-            float boxsArea = 0;
-
-            var totalFat = 0;
-            var subGridId = 0;
-            foreach (var sub in ShieldComp.SubGrids.Keys) {
-
-                if (sub != MyGrid)
-                    continue;
-                var fatBlocks = sub.GetFatBlocks();
-                var fatCount = fatBlocks.Count;
-                totalFat += fatCount;
-                var removeTarget = fatCount * 0.05;
-
-                Vector3I center = Vector3I.Zero;
-                BoundingBox newBox = BoundingBox.Invalid;
-
-                for (int i = 0; i < fatCount; i++) {
-
-                    var cube = fatBlocks[i];
-                    var pos = cube.Position;
-                    center += pos;
-                    if (Math.Abs(pos.X) > Math.Abs(pos.Y)) {
-
-                        if (Math.Abs(pos.X) > Math.Abs(pos.Z)) {
-
-                            if (pos.X > 0)
-                                _tmpCapLists[0].Add(cube);
-                            else _tmpCapLists[1].Add(cube);
-                        }
-                        else {
-
-                            if (pos.Z > 0)
-                                _tmpCapLists[4].Add(cube);
-                            else _tmpCapLists[5].Add(cube);
-                        }
-                    }
-                    else if (Math.Abs(pos.Y) > Math.Abs(pos.Z)) {
-
-                        if (pos.Y > 0)
-                            _tmpCapLists[2].Add(cube);
-                        else _tmpCapLists[3].Add(cube);
-                    }
-                    else {
-
-                        if (pos.Z > 0)
-                            _tmpCapLists[4].Add(cube);
-                        else _tmpCapLists[5].Add(cube);
-                    }
-                }
-
-                Array.Sort(_tmpCapLists, Comparison);
-
-                int removed = 0;
-                for (int x = 0; x < 6; x++) {
-
-                    var collection = _tmpCapLists[x];
-                    if (collection.Count == 0)
-                        continue;
-
-                    ShellSort(collection, center);
-
-
-                    var numToRemove = (int)Math.Round(collection.Count * 0.05);
-
-                    if (numToRemove > 0) {
-
-                        collection.RemoveRange(collection.Count - numToRemove, numToRemove);
-                        removed += numToRemove;
-                    }
-
-                    for (int i = 0; i < collection.Count; i++) {
-                        var cube = collection[i];
-                        newBox.Min = Vector3.Min(newBox.Min, cube.Min * cube.CubeGrid.GridSize);
-                        newBox.Max = Vector3.Max(newBox.Max, cube.Max * cube.CubeGrid.GridSize);
-                    }
-
-                    Log.CleanLine($"subGridId:{subGridId} - collection{x}: - collectionCount:{collection.Count} - removedSoFar:{removed} - percentile95th:{(int)(collection.Count * 0.05)} - targetToRemove:{fatCount * 0.05}");
-
-                    _tmpCapLists[x].Clear();
-                    
-                    if (removed >= removeTarget)
-                        break;
-                }
-
-                boxsArea += newBox.SurfaceArea();
-                subGridId++;
-            }
-
-            Log.Line($"boxsArea:{boxsArea}");
-
-            var unitLen = MyGrid.GridSize;
-            if (boxsArea < 1)
-                boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalFat * unitLen, unitLen, unitLen);
-
-            var surfaceArea = (float)Math.Sqrt(boxsArea);
-            DsState.State.GridIntegrity = (surfaceArea * MagicRatio);
-        }
-
-        private int Comparison(List<MyCubeBlock> x, List<MyCubeBlock> y)
-        {
-            return -x.Count.CompareTo(y.Count);
-        }
-
-
         private readonly List<MyCubeBlock> _cubeList = new List<MyCubeBlock>();
+        private readonly List<CapCube> _capcubeBoxList = new List<CapCube>(4096);
 
+        private struct CapCube
+        {
+            internal MyCubeBlock Cube;
+            internal Vector3I Position;
+        }
         private void ComputeCap()
         {
-            ComputeCap2();
-            return;
             _updateCap = false;
 
             if (ShieldComp.SubGrids.Count == 0)
                 UpdateSubGrids();
 
-            float boxsArea = 0;
+            Vector3I center = Vector3I.Zero;
 
-            var totalFat = 0;
+            var matrixInv = MyGrid.PositionComp.WorldMatrixNormalizedInv;
+            var matrix = MyGrid.PositionComp.WorldMatrixRef;
+            var gridSizeR = MyGrid.GridSizeR;
+            var gridSize = MyGrid.GridSize;
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
-                _cubeList.Clear();
+                var isRootGrid = sub == MyGrid;
+
                 var fatBlocks = sub.GetFatBlocks();
-                var fatCount = fatBlocks.Count;
-                totalFat += fatCount;
+                for (int i = 0; i < fatBlocks.Count; i++) {
 
-                for (int i = 0; i < fatCount; i++) {
                     var cube = fatBlocks[i];
-                    _cubeList.Add(cube);
+                    Vector3I translatedPos;
+
+                    if (isRootGrid)
+                        translatedPos = cube.Position;
+                    else {
+
+                        var subPos = Vector3D.Transform(cube.Position * gridSize, ref matrix);
+                        var wToInt = Vector3D.Transform(subPos, ref matrixInv) * gridSizeR;
+                        Vector3I t;
+                        Vector3I.Round(ref wToInt, out t);
+                        translatedPos = t;
+                    }
+                    
+                    center += translatedPos;
+
+                    _capcubeBoxList.Add(new CapCube {Cube = cube, Position = translatedPos});
                 }
-
-                var center = GetAverage(_cubeList);
-                ShellSort(_cubeList, center);
-                var percentile95Th = (int)(fatCount * 0.10);
-                _cubeList.RemoveRange(_cubeList.Count - percentile95Th, percentile95Th);
-
-                BoundingBox newBox = BoundingBox.Invalid;
-
-                for (int i = 0; i < _cubeList.Count; i++) {
-                    var cube = _cubeList[i];
-                    newBox.Min = Vector3.Min(newBox.Min, cube.Min * cube.CubeGrid.GridSize);
-                    newBox.Max = Vector3.Max(newBox.Max, cube.Max * cube.CubeGrid.GridSize);
-                }
-
-                boxsArea += newBox.SurfaceArea();
-                Log.Line($"{boxsArea}");
-
             }
+
+            var totalBlockCnt = _capcubeBoxList.Count;
+
+            center /= totalBlockCnt;
+            var percentile95Th = (int)(totalBlockCnt * 0.10);
+
+            ShellSort(_capcubeBoxList, center);
+            _capcubeBoxList.RemoveRange(totalBlockCnt - percentile95Th, percentile95Th);
+
+            BoundingBox newBox = BoundingBox.Invalid;
+
+            for (int i = 0; i < _capcubeBoxList.Count; i++) {
+                var cap = _capcubeBoxList[i];
+                newBox.Min = Vector3.Min(newBox.Min, cap.Cube.Min);
+                newBox.Max = Vector3.Max(newBox.Max, cap.Cube.Max);
+            }
+
+            newBox.Min *= MyGrid.GridSize;
+            newBox.Max *= MyGrid.GridSize;
+
+            _capcubeBoxList.Clear();
+
+            var boxsArea = newBox.SurfaceArea();
 
             var unitLen = MyGrid.GridSize;
             if (boxsArea < 1)
-                boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalFat * unitLen, unitLen, unitLen);
+                boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalBlockCnt * unitLen, unitLen, unitLen);
 
             var surfaceArea = (float)Math.Sqrt(boxsArea);
             DsState.State.GridIntegrity = (surfaceArea * MagicRatio);
+
         }
 
-        static void ShellSort(List<MyCubeBlock> list, Vector3I center)
+        static void ShellSort(List<CapCube> list, Vector3I center)
         {
             int length = list.Count;
             for (int h = length / 2; h > 0; h /= 2)
@@ -691,17 +604,6 @@ namespace DefenseShields
                     list[j] = tempValue;
                 }
             }
-        }
-
-        private Vector3I GetAverage(List<MyCubeBlock> blocks)
-        {
-            Vector3I vec = Vector3I.Zero;
-            for (int i = 0; i < blocks.Count; i++)
-            {
-                var cube = blocks[i];
-                vec += cube.Position;
-            }
-            return vec / blocks.Count;
         }
 
         private void Deviation(List<MyCubeBlock> blocks)

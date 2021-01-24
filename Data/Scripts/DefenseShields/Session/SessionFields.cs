@@ -79,21 +79,17 @@ namespace DefenseShields
 
         internal readonly HashSet<MyCubeGrid> WatchForSplits = new HashSet<MyCubeGrid>();
 
-        internal readonly List<PlanetShields> PlanetShields = new List<PlanetShields>();
         internal readonly List<Emitters> Emitters = new List<Emitters>();
         internal readonly List<Enhancers> Enhancers = new List<Enhancers>();
         internal readonly List<O2Generators> O2Generators = new List<O2Generators>();
         internal readonly List<Modulators> Modulators = new List<Modulators>();
         internal readonly List<DefenseShields> Controllers = new List<DefenseShields>();
         internal readonly MyConcurrentPool<List<MyEntity>> ListMyEntityPool = new MyConcurrentPool<List<MyEntity>>(100);
-        internal readonly MyConcurrentPool<List<DefenseShields>> ListShieldPool = new MyConcurrentPool<List<DefenseShields>>(100);
-        internal readonly MyConcurrentPool<HashSet<MyCubeGrid>> SetMyCubeGridPool = new MyConcurrentPool<HashSet<MyCubeGrid>>(100);
 
         internal readonly MyConcurrentPool<HashSet<CubeAccel>> SetCubeAccelPool = new MyConcurrentPool<HashSet<CubeAccel>>(100);
         internal readonly MyConcurrentPool<List<CubeAccel>> ListCubeAccelPool = new MyConcurrentPool<List<CubeAccel>>(100);
         internal readonly MyConcurrentPool<EntIntersectInfo> EntIntersectInfoPool = new MyConcurrentPool<EntIntersectInfo>(100, info => info.Clean());
 
-        internal readonly MyConcurrentPool<List<MyCubeBlock>> CubeDominantDirectionPool = new MyConcurrentPool<List<MyCubeBlock>>(25, info => info.Clear());
         internal readonly MyConcurrentPool<ProtectCache> ProtectCachePool = new MyConcurrentPool<ProtectCache>(100, info => info.Clean());
         internal readonly MyConcurrentPool<ShieldVsShieldThreadEvent> ShieldEventPool = new MyConcurrentPool<ShieldVsShieldThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<FloaterThreadEvent> FloaterPool = new MyConcurrentPool<FloaterThreadEvent>(100, info => info.Clean());

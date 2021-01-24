@@ -121,6 +121,7 @@
         private void GridSplit(MyCubeGrid oldGrid, MyCubeGrid newGrid)
         {
             newGrid.RecalculateOwners();
+            _subUpdate = true;
         }
 
         private void HierarchyChanged(MyCubeGrid myCubeGrid = null)
