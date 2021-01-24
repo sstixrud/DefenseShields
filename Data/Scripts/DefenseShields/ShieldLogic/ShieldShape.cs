@@ -204,7 +204,7 @@ namespace DefenseShields
 
                 DetectionCenter = OffsetEmitterWMatrix.Translation;
 
-                var halfDistToCenter = 600 - Vector3D.Distance(DetectionCenter, emitterCenter);
+                var halfDistToCenter = 1000 - Vector3D.Distance(DetectionCenter, emitterCenter);
                 var vectorScale = new Vector3D(MathHelper.Clamp(width, 30, halfDistToCenter), MathHelper.Clamp(height, 30, halfDistToCenter), MathHelper.Clamp(depth, 30, halfDistToCenter));
 
                 DetectionMatrix = MatrixD.Rescale(OffsetEmitterWMatrix, vectorScale);
