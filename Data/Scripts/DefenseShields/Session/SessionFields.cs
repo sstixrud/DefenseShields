@@ -367,6 +367,11 @@ namespace DefenseShields
 
         internal GetFitSeq[] Fits = new GetFitSeq[]
         {
+            new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.1f),
+            new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.2f),
+            new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.3f),
+            new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.4f),
+            new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.5f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.6f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.7f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.8f),
