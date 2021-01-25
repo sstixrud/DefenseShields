@@ -94,7 +94,7 @@ namespace DefenseShields
 
         _firstLoop = false;
         var ds = ShieldComp.DefenseShields;
-        if (!EnhState.State.Backup && ShieldComp.Enhancer == this && (ds.NotFailed || ds.DsState.State.Lowered || ds.DsState.State.Overload || ds.DsState.State.EmpOverLoad))
+        if (!EnhState.State.Backup && ShieldComp.Enhancer == this && (ds.NotFailed || ds.DsState.State.Lowered || ds.DsState.State.Overload || ds.DsState.State.EmpOverLoad || !ds.WarmedUp))
         {
             NeedUpdate(EnhState.State.Online, true);
             return true;

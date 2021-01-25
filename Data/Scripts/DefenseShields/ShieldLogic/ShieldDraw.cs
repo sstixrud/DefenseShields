@@ -36,7 +36,7 @@ namespace DefenseShields
                 if (_isServer && WebDamage && GridIsMobile)
                 {
                     Vector3 pointVel;
-                    var gridCenter = MyGrid.PositionComp.WorldAABB.Center;
+                    var gridCenter = DetectionCenter;
                     MyGrid.Physics.GetVelocityAtPointLocal(ref gridCenter, out pointVel);
                     impactPos += (Vector3D)pointVel * Session.TwoStep;
                 }
@@ -89,7 +89,7 @@ namespace DefenseShields
         {
             WebDamage = false;
             HandlerImpact.Active = false;
-            if (HandlerImpact.HitBlock == null) return MyGrid.PositionComp.WorldAABB.Center;
+            if (HandlerImpact.HitBlock == null) return DetectionCenter;
 
             Vector3D originHit;
             HandlerImpact.HitBlock.ComputeWorldCenter(out originHit);
@@ -98,7 +98,7 @@ namespace DefenseShields
 
             var testDir = Vector3D.Normalize(line.From - line.To);
             var ray = new RayD(line.From, -testDir);
-            var matrix = ShieldShapeMatrix * MyGrid.WorldMatrix;
+            var matrix = DetectionMatrix;
             var intersectDist = CustomCollision.IntersectEllipsoid(MatrixD.Invert(matrix), matrix, ray);
             var ellipsoid = intersectDist ?? line.Length;
             var shieldHitPos = line.From + (testDir * -ellipsoid);

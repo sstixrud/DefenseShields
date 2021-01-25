@@ -172,7 +172,6 @@ namespace DefenseShields
                     relation = protectedEnt.Relation;
                     protectedEnt.LastTick = tick;
                 }
-
                 var grid = ent as MyCubeGrid;
                 switch (relation)
                 {

@@ -202,10 +202,11 @@
                 var shieldPercent = !DsState.State.Online ? 0f : 100f;
 
                 if (DsState.State.Charge < ShieldMaxCharge) shieldPercent = DsState.State.Charge / ShieldMaxCharge * 100;
-                if (ShieldChargeRate > 0)
-                {
+
+                if (ShieldChargeRate > 0) {
                     var toMax = ShieldMaxCharge - DsState.State.Charge;
                     var secs = toMax / ShieldChargeRate;
+
                     if (secs.Equals(1)) secToFull = 0;
                     else secToFull = (int)secs;
                 }
@@ -222,8 +223,8 @@
 
 
                 var status = GetShieldStatus();
-                if (status == "[Shield Up]" || status == "[Shield Down]" || status == "[Shield Offline]")
-                {
+                if (status == "[Shield Up]" || status == "[Shield Down]" || status == "[Shield Offline]") {
+
                     stringBuilder.Append(status + maxString + hpValue.ToString("N0") +
                                          "\n" +
                                          "\n[Shield HP__]: " + (DsState.State.Charge * ConvToHp).ToString("N0") + " (" + shieldPercent.ToString("0") + "%)" +
@@ -235,11 +236,8 @@
                                          "\n[Maintenance]: " + _shieldMaintaintPower.ToString("0.0") + " Mw" +
                                          "\n[Shield Power]: " + ShieldCurrentPower.ToString("0.0") + " Mw" +
                                          "\n[Power Use]: " + powerUsage.ToString("0.0") + " (" + GridMaxPower.ToString("0.0") + ")Mw");
-
                 }
-                else
-                {
-
+                else {
 
                     stringBuilder.Append("Shield Status " + status +
                                          "\n" +

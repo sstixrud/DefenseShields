@@ -157,16 +157,31 @@ namespace DefenseShields
 
         internal void CreateShieldShape()
         {
+            var width = DsSet.Settings.Width;
+            var height = DsSet.Settings.Height;
+            var depth = DsSet.Settings.Depth;
+
+            var maxOffSet = GridIsMobile ? MyGrid.PositionComp.LocalAABB.HalfExtents.AbsMax() * 0.25f : float.MaxValue;
+
+            var wOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.X, -maxOffSet, maxOffSet);
+            var hOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Y, -maxOffSet, maxOffSet);
+            var dOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Z, -maxOffSet, maxOffSet);
+
+            var localOffsetMeters = new Vector3D(wOffset, hOffset, dOffset) * MyGrid.GridSize;
+            var gridMatrix = MyGrid.PositionComp.WorldMatrixRef;
+            var worldOffset = Vector3D.TransformNormal(localOffsetMeters, gridMatrix); 
             if (GridIsMobile)
             {
-                var gridMatrix = MyGrid.PositionComp.WorldMatrixRef;
+                DetectionCenter = MyGridCenter + worldOffset;
+
                 _updateMobileShape = false;
-                if (_shapeChanged) CreateMobileShape();
+                if (_shapeChanged) CreateMobileShape(localOffsetMeters);
                 DetectionMatrix = ShieldShapeMatrix * gridMatrix;
-                DetectionCenter = MyGridCenter;
-                _sQuaternion = Quaternion.CreateFromRotationMatrix(gridMatrix);
+                SQuaternion = Quaternion.CreateFromRotationMatrix(gridMatrix);
                 ShieldSphere.Center = DetectionCenter;
                 ShieldSphere.Radius = ShieldSize.AbsMax();
+
+
             }
             else
             {
@@ -180,24 +195,15 @@ namespace DefenseShields
                     return;
                 }
 
-                var width = DsSet.Settings.Width;
-                var height = DsSet.Settings.Height;
-                var depth = DsSet.Settings.Depth;
-
-                var wOffset = DsSet.Settings.ShieldOffset.X;
-                var hOffset = DsSet.Settings.ShieldOffset.Y;
-                var dOffset = DsSet.Settings.ShieldOffset.Z;
 
                 var blockGridPosMeters = new Vector3D(emitter.Position) * MyGrid.GridSize;
-                var localOffsetMeters = new Vector3D(wOffset, hOffset, dOffset) * MyGrid.GridSize; 
                 var localOffsetPosMeters = localOffsetMeters + blockGridPosMeters; 
                 var emitterCenter = emitter.PositionComp.GetPosition();
                 var offsetLMatrix = Matrix.CreateWorld(localOffsetPosMeters, Vector3D.Forward, Vector3D.Up);
 
-                var worldOffset = Vector3D.TransformNormal(localOffsetMeters, MyGrid.WorldMatrix); 
                 var translationInWorldSpace = emitterCenter + worldOffset;
 
-                OffsetEmitterWMatrix = MatrixD.CreateWorld(translationInWorldSpace, MyGrid.WorldMatrix.Forward, MyGrid.WorldMatrix.Up);
+                OffsetEmitterWMatrix = MatrixD.CreateWorld(translationInWorldSpace, gridMatrix.Forward, gridMatrix.Up);
 
                 DetectionCenter = OffsetEmitterWMatrix.Translation;
 
@@ -208,7 +214,7 @@ namespace DefenseShields
                 ShieldShapeMatrix = MatrixD.Rescale(offsetLMatrix, vectorScale);
 
                 ShieldSize = DetectionMatrix.Scale;
-                _sQuaternion = Quaternion.CreateFromRotationMatrix(OffsetEmitterWMatrix);
+                SQuaternion = Quaternion.CreateFromRotationMatrix(OffsetEmitterWMatrix);
                 ShieldSphere.Center = DetectionCenter;
                 ShieldSphere.Radius = ShieldSize.AbsMax();
             }
@@ -217,7 +223,7 @@ namespace DefenseShields
             WebSphere.Center = DetectionCenter;
 
             SOriBBoxD.Center = DetectionCenter;
-            SOriBBoxD.Orientation = _sQuaternion;
+            SOriBBoxD.Orientation = SQuaternion;
             if (_shapeChanged)
             {
                 SOriBBoxD.HalfExtent = ShieldSize;
@@ -263,11 +269,11 @@ namespace DefenseShields
             BoundingBoxD.CreateFromSphere(ref ShieldSphere3K, out ShieldBox3K);
         }
 
-        private void CreateMobileShape()
+        private void CreateMobileShape(Vector3D localOffsetMeters)
         {
             ShieldSize = (DsState.State.GridHalfExtents * DsState.State.EllipsoidAdjust) + DsState.State.ShieldFudge;
             var mobileMatrix = MatrixD.Rescale(MatrixD.Identity, ShieldSize);
-            mobileMatrix.Translation = MyGrid.PositionComp.LocalVolume.Center;
+            mobileMatrix.Translation = MyGrid.PositionComp.LocalAABB.Center + localOffsetMeters;
             ShieldShapeMatrix = mobileMatrix;
         }
         #endregion

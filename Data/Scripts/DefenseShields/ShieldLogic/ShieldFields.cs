@@ -222,7 +222,7 @@ namespace DefenseShields
         private Vector3D _localImpactPosition;
         private Vector3D _oldGridHalfExtents;
 
-        private Quaternion _sQuaternion;
+        internal Quaternion SQuaternion;
         private Color _oldPercentColor = Color.Transparent;
 
         private MyResourceSinkInfo _resourceInfo;

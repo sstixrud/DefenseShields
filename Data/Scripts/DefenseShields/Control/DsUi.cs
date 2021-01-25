@@ -48,19 +48,25 @@ namespace DefenseShields
             Session.Instance.HeightSlider.Visible = ShowSizeSlider;
             Session.Instance.DepthSlider.Visible = ShowSizeSlider;
 
-            Session.Instance.OffsetWidthSlider.Visible = ShowSizeSlider;
-            Session.Instance.OffsetHeightSlider.Visible = ShowSizeSlider;
-            Session.Instance.OffsetDepthSlider.Visible = ShowSizeSlider;
+            Session.Instance.OffsetWidthSlider.Visible = ShowOffSetSlider;
+            Session.Instance.OffsetHeightSlider.Visible = ShowOffSetSlider; 
+            Session.Instance.OffsetDepthSlider.Visible = ShowOffSetSlider;
 
             Session.Instance.Fit.Visible = ShowReSizeCheckBoxs;
             Session.Instance.SphereFit.Visible = ShowReSizeCheckBoxs;
             Session.Instance.FortifyShield.Visible = ShowReSizeCheckBoxs;
         }
 
+        internal static bool ShowOffSetSlider(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            return comp != null;
+        }
+
         internal static bool ShowSizeSlider(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            var station = comp != null && comp.Shield.CubeGrid.IsStatic;
+            var station = comp != null && comp.IsStatic && comp.ShieldMode == DefenseShields.ShieldType.Station;
             return station;
         }
 

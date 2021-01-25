@@ -1,22 +1,14 @@
-﻿using System.Threading;
-using Sandbox;
-using Sandbox.Engine.Multiplayer;
-using Sandbox.ModAPI.Interfaces;
-using Sandbox.ModAPI.Interfaces.Terminal;
-
+﻿using System;
+using System.Collections.Generic;
+using DefenseShields.Support;
+using Sandbox.Game.Entities;
+using Sandbox.ModAPI;
+using Sandbox.ModAPI.Weapons;
+using VRage.Game.Entity;
+using VRage.Game.ModAPI;
+using VRageMath;
 namespace DefenseShields
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Support;
-    using Sandbox.Game.Entities;
-    using Sandbox.ModAPI;
-    using Sandbox.ModAPI.Weapons;
-    using VRage.Game.Entity;
-    using VRage.Game.ModAPI;
-    using VRageMath;
-
     public partial class Session
     {
         #region WebMonitor

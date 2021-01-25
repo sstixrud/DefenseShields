@@ -512,6 +512,7 @@ namespace DefenseShields
             internal MyCubeBlock Cube;
             internal Vector3I Position;
         }
+
         private void ComputeCap()
         {
             _updateCap = false;
@@ -599,40 +600,6 @@ namespace DefenseShields
                     list[j] = tempValue;
                 }
             }
-        }
-
-        private void Deviation(List<MyCubeBlock> blocks)
-        {
-            double avgX = 0;
-            double avgY = 0;
-            double avgZ = 0;
-
-            for (int i = 0; i < blocks.Count; i++) {
-
-                var cube = blocks[i];
-                avgX = (cube.Min.X + cube.Max.X) * cube.CubeGrid.GridSize / 2.0;
-                avgY = (cube.Min.Y + cube.Max.Y) * cube.CubeGrid.GridSize / 2.0;
-                avgZ = (cube.Min.Z + cube.Max.Z) * cube.CubeGrid.GridSize / 2.0;
-            }
-
-            double devX = 0;
-            double devY = 0;
-            double devZ = 0;
-
-            for (int i = 0; i < blocks.Count; i++) {
-
-                var cube = blocks[i];
-                var dx = ((cube.Min.X + cube.Max.X) * cube.CubeGrid.GridSize / 2.0) - avgX;
-                var dy = ((cube.Min.Y + cube.Max.Y) * cube.CubeGrid.GridSize / 2.0) - avgY;
-                var dz = ((cube.Min.Z + cube.Max.Z) * cube.CubeGrid.GridSize / 2.0) - avgY;
-                devX += dx * dx;
-                devY += dy * dy;
-                devZ += dz * dz;
-            }
-            devX = Math.Sqrt(devX / blocks.Count);
-            devY = Math.Sqrt(devY / blocks.Count);
-            devZ = Math.Sqrt(devZ / blocks.Count);
-
         }
         #endregion
     }

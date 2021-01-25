@@ -71,10 +71,6 @@ namespace DefenseShields
             _tempSubGridList.Clear();
             MyAPIGateway.GridGroups.GetGroup(MyGrid, GridLinkTypeEnum.Physical, _tempSubGridList);
 
-            if (_tempSubGridList.Count == 0)
-            {
-                Log.Line($"SubGridUpdateSkip because count is zero: tick:{_tick}");
-            }
             var newCount = _tempSubGridList.Count;
             var sameCount = newCount == _linkedGridCount;
             var oneAndSame = newCount == 1 && sameCount;

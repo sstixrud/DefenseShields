@@ -17,8 +17,7 @@ namespace DefenseShields
             if (notice == PlayerNotice.EmpOverLoad || notice == PlayerNotice.OverLoad) radius = 500;
             else radius = ShieldSphere.Radius * 2;
 
-            var center = GridIsMobile ? MyGrid.PositionComp.WorldVolume.Center : OffsetEmitterWMatrix.Translation;
-            var sphere = new BoundingSphereD(center, radius);
+            var sphere = new BoundingSphereD(DetectionCenter, radius);
             var sendMessage = false;
             IMyPlayer targetPlayer = null;
 
