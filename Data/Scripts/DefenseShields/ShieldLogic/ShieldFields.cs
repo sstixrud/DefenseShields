@@ -121,7 +121,7 @@ namespace DefenseShields
         private uint _capacitorTick;
         private uint _heatVentingTick = uint.MaxValue;
         private uint _lastSendDamageTick = uint.MaxValue;
-        private uint _subUpdatedTick;
+        private uint _subUpdatedTick = uint.MaxValue;
 
         private float _power = 0.001f;
         private float _powerNeeded;

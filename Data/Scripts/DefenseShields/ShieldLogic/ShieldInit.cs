@@ -527,31 +527,21 @@ namespace DefenseShields
 
             Vector3I center = Vector3I.Zero;
 
-            var matrixInv = MyGrid.PositionComp.WorldMatrixNormalizedInv;
-            var matrix = MyGrid.PositionComp.WorldMatrixRef;
-            var gridSizeR = MyGrid.GridSizeR;
-            var gridSize = MyGrid.GridSize;
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
                 var isRootGrid = sub == MyGrid;
+                var subWorldCenter = sub.GridIntegerToWorld(Vector3I.Zero);
+                var parentLocalOffset = MyGrid.WorldToGridInteger(subWorldCenter);
 
-                var fatBlocks = sub.GetFatBlocks();
-                for (int i = 0; i < fatBlocks.Count; i++) {
+                foreach (var cube in sub.GetFatBlocks()) { 
 
-                    var cube = fatBlocks[i];
                     Vector3I translatedPos;
 
-                    if (isRootGrid)
+                    if (!isRootGrid)
+                        translatedPos = cube.Position + parentLocalOffset;
+                    else 
                         translatedPos = cube.Position;
-                    else {
 
-                        var subPos = Vector3D.Transform(cube.Position * gridSize, ref matrix);
-                        var wToInt = Vector3D.Transform(subPos, ref matrixInv) * gridSizeR;
-                        Vector3I t;
-                        Vector3I.Round(ref wToInt, out t);
-                        translatedPos = t;
-                    }
-                    
                     center += translatedPos;
 
                     _capcubeBoxList.Add(new CapCube {Cube = cube, Position = translatedPos});
@@ -563,24 +553,13 @@ namespace DefenseShields
             var totalBlockCnt = _capcubeBoxList.Count;
             var unitLen = MyGrid.GridSize;
 
-            if (totalBlockCnt <= 0) {
-
-                var failSize = (float)UtilsStatic.SurfaceAreaCuboid(1 * unitLen, unitLen, unitLen);
-                var failArea = (float)Math.Sqrt(failSize);
-
-                DsState.State.GridIntegrity = (failArea * MagicCapRatio);
-                Log.Line($"ComputeCap had no blocks to computed, using failsize: myGridFatCount:{MyGrid.GetFatBlocks().Count} - gridMarked:{MyGrid.MarkedForClose} - shieldMarked:{MyCube.MarkedForClose}");
-                return;
-            }
-
             center /= totalBlockCnt;
             var percentile95Th = (int)(totalBlockCnt * 0.10);
 
             ShellSort(_capcubeBoxList, center);
             _capcubeBoxList.RemoveRange(totalBlockCnt - percentile95Th, percentile95Th);
 
-            for (int i = 0; i < _capcubeBoxList.Count; i++)
-            {
+            for (int i = 0; i < _capcubeBoxList.Count; i++) {
 
                 var cap = _capcubeBoxList[i];
                 newBox.Min = Vector3.Min(newBox.Min, cap.Cube.Min);
@@ -593,13 +572,12 @@ namespace DefenseShields
             _capcubeBoxList.Clear();
 
             var boxsArea = newBox.SurfaceArea();
-            
+
             if (boxsArea < 1)
                 boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalBlockCnt * unitLen, unitLen, unitLen);
 
             var surfaceArea = (float)Math.Sqrt(boxsArea);
             DsState.State.GridIntegrity = (surfaceArea * MagicCapRatio);
-
         }
 
         static void ShellSort(List<CapCube> list, Vector3I center)

@@ -10,7 +10,6 @@ namespace DefenseShields
 {
     public class ShieldGridComponent : MyEntityComponentBase
     {
-        private static List<ShieldGridComponent> gridShield = new List<ShieldGridComponent>();
         public DefenseShields DefenseShields;
 
         public ShieldGridComponent(DefenseShields defenseShields)
@@ -21,35 +20,20 @@ namespace DefenseShields
         public override void OnAddedToContainer()
         {
             base.OnAddedToContainer();
-
-            if (Container.Entity.InScene)
-            {
-                gridShield.Add(this);
-            }
         }
 
         public override void OnBeforeRemovedFromContainer()
         {
-
-            if (Container.Entity.InScene)
-            {
-                gridShield.Remove(this);
-            }
-
             base.OnBeforeRemovedFromContainer();
         }
 
         public override void OnAddedToScene()
         {
             base.OnAddedToScene();
-
-            gridShield.Add(this);
         }
 
         public override void OnRemovedFromScene()
         {
-            gridShield.Remove(this);
-
             base.OnRemovedFromScene();
         }
 

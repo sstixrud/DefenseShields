@@ -70,6 +70,11 @@ namespace DefenseShields
         {
             _tempSubGridList.Clear();
             MyAPIGateway.GridGroups.GetGroup(MyGrid, GridLinkTypeEnum.Physical, _tempSubGridList);
+
+            if (_tempSubGridList.Count == 0)
+            {
+                Log.Line($"SubGridUpdateSkip because count is zero: tick:{_tick}");
+            }
             var newCount = _tempSubGridList.Count;
             var sameCount = newCount == _linkedGridCount;
             var oneAndSame = newCount == 1 && sameCount;
@@ -403,8 +408,8 @@ namespace DefenseShields
                         DsState.State.EmpOverLoad = false;
                         _empOverLoadLoop = -1;
                         _empOverLoad = false;
-                        var recharged = ShieldChargeRate * EmpDownCount / 60;
-                        DsState.State.Charge = MathHelper.Clamp(recharged, ShieldMaxCharge * 0.25f, ShieldMaxCharge * 0.62f);
+                        var recharged = _shieldPeakRate * EmpDownCount / 60;
+                        DsState.State.Charge = MathHelper.Clamp(recharged, ShieldMaxCharge * 0.05f, ShieldMaxCharge * 0.62f);
                     }
                 }
             }

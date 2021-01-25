@@ -75,7 +75,7 @@ namespace DefenseShields
             {
                 _tick = Session.Instance.Tick;
                 _tock33 = _tick % 33 == 0;
-                _tock34 = _tick % 33 == 0;
+                _tock34 = _tick % 34 == 0;
                 if (_count++ == 59)
                 {
                     _count = 0;

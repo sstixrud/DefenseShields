@@ -29,7 +29,10 @@
                 {
                     var id = p.SteamUserId;
                     if (id != localSteamId && id != packet.SenderId && Vector3D.DistanceSquared(p.GetPosition(), block.PositionComp.WorldAABB.Center) <= SyncBufferedDistSqr)
+                    {
                         MyAPIGateway.Multiplayer.SendMessageTo(PACKET_ID, bytes, p.SteamUserId);
+                        //Log.Line($"packet for: {packet.Entity.DebugName} - CSet:{packet is DataControllerSettings} = CState:{packet is DataControllerState} - MSet:{packet is DataModulatorSettings} - MState:{packet is DataModulatorState} - EmState:{packet is DataEmitterState} - EhSet:{packet is DataEnhancerSettings} - EhState:{packet is DataEnhancerState}");
+                    }
                 }
             }
             catch (Exception ex) { Log.Line($"Exception in PacketizeToClientsInRange: {ex}"); }

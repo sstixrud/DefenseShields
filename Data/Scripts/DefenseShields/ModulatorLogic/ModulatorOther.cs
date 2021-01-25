@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using DefenseShields.Support;
 using Sandbox.Game.Entities;
@@ -195,7 +196,6 @@ namespace DefenseShields
                     SettingsUpdated = false;
                     ModSet.SaveSettings();
                     ModState.SaveState();
-                    if (Session.Enforced.Debug == 3) Log.Line($"SettingsUpdated: server:{_isServer} - ModulatorId [{Modulator.EntityId}]");
                 }
             }
             else if (_tock34)
@@ -207,7 +207,6 @@ namespace DefenseShields
                     Modulator.RefreshCustomInfo();
                     if (!_isServer)
                     {
-                        Log.Line($"client sending modulator update");
                         ModSet.NetworkUpdate();
                     }
                 }
@@ -336,16 +335,15 @@ namespace DefenseShields
         {
             try
             {
-                if (ModulatorComp == null || ModState.State.Backup || ShieldComp?.DefenseShields != null || (!_isDedicated && _tick == _subTick)) return;
+                if (ModulatorComp == null || ModState.State.Backup || ShieldComp?.DefenseShields != null || (!_isDedicated && _tick == _subTick) || Modulator?.CubeGrid == null) return;
                 if (!_isDedicated && _subTick > _tick - 9)
                 {
                     _subDelayed = true;
                     return;
                 }
                 _subTick = _tick;
-                var gotGroups = MyAPIGateway.GridGroups.GetGroup(Modulator?.CubeGrid, GridLinkTypeEnum.Mechanical);
                 ModulatorComp.SubGrids.Clear();
-                for (int i = 0; i < gotGroups.Count; i++) ModulatorComp.SubGrids.Add(gotGroups[i] as MyCubeGrid);
+                MyAPIGateway.GridGroups.GetGroup(Modulator.CubeGrid, GridLinkTypeEnum.Mechanical, ModulatorComp.SubGrids);
             }
             catch (Exception ex) { Log.Line($"Exception in HierarchyChanged: {ex}"); }
         }
@@ -395,11 +393,10 @@ namespace DefenseShields
             if (newSettings.MId > ModSet.Settings.MId)
             {
                 SettingsUpdated = true;
+
                 if (ModSet.Settings.ModulateDamage != newSettings.ModulateDamage)
-                {
-                    Log.Line($"MOdulate Damage Changed");
                     ModUi.ComputeDamage(this, newSettings.ModulateDamage);
-                }
+
                 ModSet.Settings = newSettings;
                 if (Session.Enforced.Debug == 3) Log.Line("UpdateSettings for modulator");
             }

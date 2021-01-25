@@ -370,9 +370,9 @@ namespace DefenseShields
                         if (ShieldEnt.PositionComp.WorldVolume.Intersects(grid.PositionComp.WorldVolume))
                         {
                             if (CustomCollision.CornerOrCenterInShield(grid, DetectMatrixOutsideInv, _resetEntCorners) > 0) return Ent.Protected;
-                            AuthenticatedCache.Add(subGrid);
+                            AuthenticatedCache.Add((MyCubeGrid)subGrid);
                         }
-                        else AuthenticatedCache.Add(subGrid);
+                        else AuthenticatedCache.Add((MyCubeGrid)subGrid);
                     }
                 }
 

@@ -2,12 +2,12 @@
 using DefenseShields.Support;
 using Sandbox.Game.Entities;
 using VRage.Game.Components;
+using VRage.Game.ModAPI;
 
 namespace DefenseShields
 {
     public class ModulatorGridComponent : MyEntityComponentBase
     {
-        private static List<ModulatorGridComponent> gridModulator = new List<ModulatorGridComponent>();
         public Modulators Modulator;
         public string Password;
 
@@ -22,7 +22,6 @@ namespace DefenseShields
 
             if (Container.Entity.InScene)
             {
-                gridModulator.Add(this);
             }
         }
 
@@ -31,7 +30,6 @@ namespace DefenseShields
 
             if (Container.Entity.InScene)
             {
-                gridModulator.Remove(this);
             }
 
             base.OnBeforeRemovedFromContainer();
@@ -41,12 +39,10 @@ namespace DefenseShields
         {
             base.OnAddedToScene();
 
-            gridModulator.Add(this);
         }
 
         public override void OnRemovedFromScene()
         {
-            gridModulator.Remove(this);
 
             base.OnRemovedFromScene();
         }
@@ -56,7 +52,7 @@ namespace DefenseShields
             return true;
         }
 
-        public HashSet<MyCubeGrid> SubGrids { get; set; } = new HashSet<MyCubeGrid>();
+        public HashSet<IMyCubeGrid> SubGrids = new HashSet<IMyCubeGrid>();
 
         public string ModulationPassword
         {
