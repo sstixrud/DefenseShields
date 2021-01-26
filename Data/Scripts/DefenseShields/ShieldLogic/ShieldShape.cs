@@ -161,11 +161,13 @@ namespace DefenseShields
             var height = DsSet.Settings.Height;
             var depth = DsSet.Settings.Depth;
 
-            var maxOffSet = GridIsMobile ? MyGrid.PositionComp.LocalAABB.HalfExtents.AbsMax() * 0.25f : float.MaxValue;
+            var xMax = GridIsMobile ? DsState.State.GridHalfExtents.X * 0.25f : float.MaxValue;
+            var yMax = GridIsMobile ? DsState.State.GridHalfExtents.Y * 0.25f : float.MaxValue;
+            var zMax = GridIsMobile ? DsState.State.GridHalfExtents.Z * 0.25f : float.MaxValue;
 
-            var wOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.X, -maxOffSet, maxOffSet);
-            var hOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Y, -maxOffSet, maxOffSet);
-            var dOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Z, -maxOffSet, maxOffSet);
+            var wOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.X, -xMax, xMax);
+            var hOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Y, -yMax, yMax);
+            var dOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Z, -zMax, zMax);
 
             var localOffsetMeters = new Vector3D(wOffset, hOffset, dOffset) * MyGrid.GridSize;
             var gridMatrix = MyGrid.PositionComp.WorldMatrixRef;
