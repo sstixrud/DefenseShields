@@ -172,8 +172,9 @@ namespace DefenseShields
             var localOffsetMeters = new Vector3D(wOffset, hOffset, dOffset) * MyGrid.GridSize;
             var gridMatrix = MyGrid.PositionComp.WorldMatrixRef;
             var worldOffset = Vector3D.TransformNormal(localOffsetMeters, gridMatrix); 
-            if (GridIsMobile)
-            {
+
+            if (GridIsMobile) {
+
                 DetectionCenter = MyGridCenter + worldOffset;
 
                 _updateMobileShape = false;
@@ -185,14 +186,15 @@ namespace DefenseShields
 
 
             }
-            else
-            {
-                IMyUpgradeModule emitter;
-                if (_isServer) emitter = ShieldComp.StationEmitter.Emitter;
-                else emitter = (IMyUpgradeModule)MyEntities.GetEntityById(DsState.State.ActiveEmitterId, true);
+            else {
 
-                if (emitter == null)
-                {
+                IMyUpgradeModule emitter;
+                if (_isServer) 
+                    emitter = ShieldComp.StationEmitter.Emitter;
+                else 
+                    emitter = (IMyUpgradeModule)MyEntities.GetEntityById(DsState.State.ActiveEmitterId, true);
+
+                if (emitter == null) {
                     UpdateDimensions = true;
                     return;
                 }
@@ -226,8 +228,9 @@ namespace DefenseShields
 
             SOriBBoxD.Center = DetectionCenter;
             SOriBBoxD.Orientation = SQuaternion;
-            if (_shapeChanged)
-            {
+
+            if (_shapeChanged) {
+
                 SOriBBoxD.HalfExtent = ShieldSize;
                 ShieldAabbScaled.Min = ShieldSize;
                 ShieldAabbScaled.Max = -ShieldSize;
@@ -240,22 +243,23 @@ namespace DefenseShields
                 _ellipsoidSurfaceArea = _ellipsoidSa.Surface;
                 EllipsoidVolume = 1.333333 * Math.PI * DetectMatrixOutside.Scale.X * DetectMatrixOutside.Scale.Y * DetectMatrixOutside.Scale.Z;
 
-                var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio);
+                var magicMod = DsState.State.Enhancer && ShieldMode == ShieldType.Station ? 100f : 1f;
+                var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio * magicMod);
                 _sizeScaler = (float)Math.Sqrt(ellipsoidMagic);
 
-                if (_isServer)
-                {
+                if (_isServer) {
                     ShieldChangeState();
                     ShieldComp.ShieldVolume = DetectMatrixOutside.Scale.Volume;
                 }
             }
 
-            if (_shapeChanged)
-            {
+            if (_shapeChanged) {
+
                 var zeroMatrix = Matrix.Zero;
                 var shieldMatrix = (Matrix)ShieldShapeMatrix;
-                if (!_isDedicated)
-                {                    
+
+                if (!_isDedicated) {                    
+
                     _shellPassive.PositionComp.SetLocalMatrix(ref zeroMatrix, null, true);  // Bug - Cannot just change X coord, so I reset first.
                     _shellActive.PositionComp.SetLocalMatrix(ref zeroMatrix, null, true);
                     _shellPassive.PositionComp.SetLocalMatrix(ref shieldMatrix, null, true);

@@ -49,7 +49,7 @@ namespace DefenseShields
             }
 
             Absorb = 0f;
-            return true;
+            return DsState.State.Charge > 0;
         }
 
         private void CalculatePowerCharge()
@@ -64,14 +64,10 @@ namespace DefenseShields
             var chargePercent = DsSet.Settings.Rate * ConvToDec;
             var shieldMaintainPercent = maintenanceCost / percent;
 
-            float bufferScaler;
             if (ShieldMode == ShieldType.Station && DsState.State.Enhancer)
-            {
-                bufferScaler = 100 / percent * (baseScaler * shieldTypeRatio);
                 hpsEfficiency *= 3.5f;
-            }
-            else 
-                bufferScaler = 100 / percent * (baseScaler * shieldTypeRatio) / _sizeScaler;
+
+            var bufferScaler = 100 / percent * (baseScaler * shieldTypeRatio) / _sizeScaler;
             
             ShieldHpBase = ShieldMaxPower * bufferScaler;
 

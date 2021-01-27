@@ -18,6 +18,7 @@ namespace DefenseShields
         private Func<List<MyEntity>, RayD, bool, bool, long, float, MyTuple<bool, float>> _intersectEntToShieldFast; // fast check of entities for shield
         private Func<IMyTerminalBlock, Vector3D, long, float, bool, bool, bool, bool> _pointAttackShield; // negative damage values heal
         private Func<IMyTerminalBlock, Vector3D, long, float, bool, bool, bool, float?> _pointAttackShieldExt; // negative damage values heal
+        private Func<IMyTerminalBlock, Vector3D, long, float, float, bool, bool, bool, float?> _pointAttackShieldCon; // negative damage values heal, conditional secondary damage
         private Action<IMyTerminalBlock, int> _setShieldHeat;
         private Action<IMyTerminalBlock> _overLoad;
         private Action<IMyTerminalBlock, float> _setCharge;
@@ -94,6 +95,7 @@ namespace DefenseShields
             _intersectEntToShieldFast = (Func<List<MyEntity>, RayD, bool, bool, long, float, MyTuple<bool, float>>)delegates["IntersectEntToShieldFast"];
             _pointAttackShield = (Func<IMyTerminalBlock, Vector3D, long, float, bool, bool, bool, bool>)delegates["PointAttackShield"];
             _pointAttackShieldExt = (Func<IMyTerminalBlock, Vector3D, long, float, bool, bool, bool, float?>)delegates["PointAttackShieldExt"];
+            _pointAttackShieldCon = (Func<IMyTerminalBlock, Vector3D, long, float, float, bool, bool, bool, float?>)delegates["PointAttackShieldCon"];
             _setShieldHeat = (Action<IMyTerminalBlock, int>)delegates["SetShieldHeat"];
             _overLoad = (Action<IMyTerminalBlock>)delegates["OverLoadShield"];
             _setCharge = (Action<IMyTerminalBlock, float>)delegates["SetCharge"];
@@ -135,6 +137,8 @@ namespace DefenseShields
             _pointAttackShield?.Invoke(block, pos, attackerId, damage, energy, drawParticle, posMustBeInside) ?? false;
         public float? PointAttackShieldExt(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, bool energy, bool drawParticle, bool posMustBeInside = false) =>
             _pointAttackShieldExt?.Invoke(block, pos, attackerId, damage, energy, drawParticle, posMustBeInside) ?? null;
+        public float? PointAttackShieldCon(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, float optionalDamage, bool energy, bool drawParticle, bool posMustBeInside = false) =>
+            _pointAttackShieldCon?.Invoke(block, pos, attackerId, damage, optionalDamage, energy, drawParticle, posMustBeInside) ?? null;
         public void SetShieldHeat(IMyTerminalBlock block, int value) => _setShieldHeat?.Invoke(block, value);
         public void OverLoadShield(IMyTerminalBlock block) => _overLoad?.Invoke(block);
         public void SetCharge(IMyTerminalBlock block, float value) => _setCharge.Invoke(block, value);

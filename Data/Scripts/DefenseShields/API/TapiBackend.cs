@@ -23,6 +23,7 @@ namespace DefenseShields
             ["IntersectEntToShieldFast"] = new Func<List<MyEntity>, RayD, bool, bool, long, float, MyTuple<bool, float>>(TAPI_IntersectEntToShieldFast),
             ["PointAttackShield"] = new Func<IMyTerminalBlock, Vector3D, long, float, bool, bool, bool, bool>(TAPI_PointAttackShield),
             ["PointAttackShieldExt"] = new Func<IMyTerminalBlock, Vector3D, long, float, bool, bool, bool, float?>(TAPI_PointAttackShieldExt),
+            ["PointAttackShieldCon"] = new Func<IMyTerminalBlock, Vector3D, long, float, float, bool, bool, bool, float?>(TAPI_PointAttackShieldCon),
             ["SetShieldHeat"] = new Action<IMyTerminalBlock, int>(TAPI_SetShieldHeat),
             ["SetSkipLos"] = new Action<IMyTerminalBlock>(TAPI_SetSkipLos),
             ["OverLoadShield"] = new Action<IMyTerminalBlock>(TAPI_OverLoadShield),
@@ -211,26 +212,22 @@ namespace DefenseShields
 
             float hpRemaining;
             var pendingDamage = logic.Absorb > 0 ? logic.Absorb : 0;
-            if (energy)
-            {
+
+            var shieldHp = logic.DsState.State.Charge * DefenseShields.ConvToHp;
+            if (energy) {
                 damage *= logic.DsState.State.ModulateKinetic;
-                hpRemaining = (((logic.DsState.State.Charge * DefenseShields.ConvToHp) - pendingDamage) - damage);
-                if (hpRemaining < 0) hpRemaining /= logic.DsState.State.ModulateEnergy;
+                hpRemaining = ((shieldHp - pendingDamage) - damage) / logic.DsState.State.ModulateEnergy;
             }
-            else
-            {
+            else {
                 damage *= logic.DsState.State.ModulateEnergy;
-                hpRemaining = (((logic.DsState.State.Charge * DefenseShields.ConvToHp) - pendingDamage) - damage);
-                if (hpRemaining < 0) hpRemaining /= logic.DsState.State.ModulateEnergy;
+                hpRemaining = ((shieldHp - pendingDamage) - damage) / logic.DsState.State.ModulateKinetic;
             }
 
-            if (Session.Instance.MpActive)
-            {
+            if (Session.Instance.MpActive) {
                 var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
                 logic.AddShieldHit(attackerId, damage, damageType, null, true, pos);
             }
-            else
-            {
+            else {
                 logic.ImpactSize = damage;
                 logic.WorldImpactPosition = pos;
             }
@@ -242,7 +239,65 @@ namespace DefenseShields
             logic.WebDamage = true;
             logic.Absorb += damage;
 
-            return hpRemaining;
+            return hpRemaining * 0.01f;
+        }
+
+        private static float? TAPI_PointAttackShieldCon(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, float secondaryDamage, bool energy, bool drawParticle, bool posMustBeInside = false)
+        {
+            var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
+            if (logic == null) return null;
+            if (posMustBeInside)
+                lock (logic.MatrixLock) if (!CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) return null;
+
+            float hpRemaining;
+            
+            var pendingDamage = logic.Absorb > 0 ? logic.Absorb : 0;
+            
+            var primaryDamage = damage;
+            var shieldHp = logic.DsState.State.Charge * DefenseShields.ConvToHp;
+
+            if (energy) {
+                primaryDamage *= logic.DsState.State.ModulateKinetic;
+                hpRemaining = ((shieldHp - pendingDamage) - primaryDamage) / logic.DsState.State.ModulateEnergy;
+            }
+            else {
+                primaryDamage *= logic.DsState.State.ModulateEnergy;
+                hpRemaining = ((shieldHp - pendingDamage) - primaryDamage) / logic.DsState.State.ModulateKinetic;
+            }
+
+            if (hpRemaining > 0) {
+
+                damage += secondaryDamage;
+                if (energy) {
+                    damage *= logic.DsState.State.ModulateKinetic;
+                    hpRemaining = ((shieldHp - pendingDamage) - damage) / logic.DsState.State.ModulateEnergy;
+                }
+                else {
+                    damage *= logic.DsState.State.ModulateEnergy;
+                    hpRemaining = ((shieldHp - pendingDamage) - damage) / logic.DsState.State.ModulateKinetic;
+                }
+            }
+            else {
+                damage = primaryDamage;
+            }
+
+            if (Session.Instance.MpActive) {
+                var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
+                logic.AddShieldHit(attackerId, damage, damageType, null, true, pos);
+            }
+            else {
+                logic.ImpactSize = damage;
+                logic.WorldImpactPosition = pos;
+            }
+
+            if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
+            else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
+            else logic.EnergyHit = DefenseShields.HitType.Kinetic;
+
+            logic.WebDamage = true;
+            logic.Absorb += damage;
+
+            return hpRemaining * 0.01f;
         }
 
         private static void TAPI_SetSkipLos(IMyTerminalBlock block)

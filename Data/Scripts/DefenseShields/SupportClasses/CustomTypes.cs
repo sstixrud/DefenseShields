@@ -43,23 +43,11 @@ namespace DefenseShields.Support
             Duration = duration;
         }
     }
-#if VERSION_188
-    public struct VoxelHit : IVoxelOperator
-    {
-        public bool HasHit;
 
-        public void Op(ref Vector3I pos, MyStorageDataTypeEnum dataType, ref byte content)
-        {
-            if (content != MyVoxelConstants.VOXEL_CONTENT_EMPTY)
-            {
-                HasHit = true;
-            }
-        }
-    }
-#else
-    public struct VoxelHit : IVoxelOperator
+    internal struct VoxelHit : IVoxelOperator
     {
-        public bool HasHit;
+        internal bool HasHit;
+
         public void Op(ref Vector3I pos, MyStorageDataTypeEnum dataType, ref byte content)
         {
             if (content != MyVoxelConstants.VOXEL_CONTENT_EMPTY)
@@ -73,7 +61,7 @@ namespace DefenseShields.Support
             get { return VoxelOperatorFlags.Read; }
         }
     }
-#endif
+
     public struct ShieldHit
     {
         public readonly MyEntity Attacker;

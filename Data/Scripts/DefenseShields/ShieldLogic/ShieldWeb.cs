@@ -329,7 +329,7 @@ namespace DefenseShields
 
                 var playerrelationship = MyIDModule.GetRelationPlayerBlock(MyCube.IDModule.Owner, playerId, MyOwnershipShareModeEnum.Faction);
 
-                if (playerrelationship == MyRelationsBetweenPlayerAndBlock.Owner || playerrelationship == MyRelationsBetweenPlayerAndBlock.FactionShare)
+                if (playerrelationship == MyRelationsBetweenPlayerAndBlock.Owner || playerrelationship == MyRelationsBetweenPlayerAndBlock.FactionShare || playerrelationship == MyRelationsBetweenPlayerAndBlock.Friends)
                 {
                     var playerInShield = CustomCollision.PointInShield(ent.PositionComp.WorldAABB.Center, DetectMatrixOutsideInv);
                     return playerInShield ? Ent.Protected : Ent.Friendly;
