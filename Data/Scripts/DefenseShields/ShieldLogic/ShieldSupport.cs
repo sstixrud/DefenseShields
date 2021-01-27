@@ -52,7 +52,11 @@ namespace DefenseShields
                 DsState.State.EnhancerPowerMulti = 2;
                 DsState.State.EnhancerProtMulti = 1000;
                 DsState.State.Enhancer = true;
-                if (update) ShieldChangeState();
+                
+                if (update) {
+                    UpdateDimensions = true;
+                    ShieldChangeState();
+                }
             }
             else if (_tick - InitTick > 30)
             {
@@ -61,7 +65,11 @@ namespace DefenseShields
                 DsState.State.EnhancerProtMulti = 1;
                 DsState.State.Enhancer = false;
                 if (!DsState.State.Overload) DsState.State.ReInforce = false;
-                if (update) ShieldChangeState();
+                
+                if (update) {
+                    UpdateDimensions = true;
+                    ShieldChangeState();
+                }
             }
         }
         #endregion
