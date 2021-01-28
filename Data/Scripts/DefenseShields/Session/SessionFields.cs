@@ -57,8 +57,6 @@ namespace DefenseShields
 
         internal readonly Type MissileObj = typeof(MyObjectBuilder_Missile);
 
-        internal readonly EmpWork EmpWork = new EmpWork();
-
         internal readonly Icosphere Icosphere = new Icosphere(5);
 
         internal readonly ConcurrentDictionary<long, IMyPlayer> Players = new ConcurrentDictionary<long, IMyPlayer>();
@@ -67,15 +65,13 @@ namespace DefenseShields
 
         internal readonly ConcurrentQueue<IThreadEvent> ThreadEvents = new ConcurrentQueue<IThreadEvent>();
 
-        internal readonly Queue<WarHeadBlast> EmpStore = new Queue<WarHeadBlast>();
-
         internal readonly Dictionary<string, AmmoInfo> AmmoCollection = new Dictionary<string, AmmoInfo>();
         internal readonly ConcurrentDictionary<MyEntity, MyProtectors> GlobalProtect = new ConcurrentDictionary<MyEntity, MyProtectors>();
         internal readonly ConcurrentDictionary<long, ShieldGridComponent> IdToBus = new ConcurrentDictionary<long, ShieldGridComponent>();
         internal readonly ConcurrentDictionary<DefenseShields, bool> FunctionalShields = new ConcurrentDictionary<DefenseShields, bool>();
         internal readonly ConcurrentDictionary<DefenseShields, byte> ActiveShields = new ConcurrentDictionary<DefenseShields, byte>();
         internal readonly Dictionary<MyCubeGrid, uint> CheckForSplits = new Dictionary<MyCubeGrid, uint>();
-        internal readonly CachingDictionary<MyCubeGrid, ParentGrid> GetParentGrid = new CachingDictionary<MyCubeGrid, ParentGrid>();
+        internal readonly ConcurrentDictionary<MyCubeGrid, ParentGrid> GetParentGrid = new ConcurrentDictionary<MyCubeGrid, ParentGrid>();
 
         internal readonly HashSet<MyCubeGrid> WatchForSplits = new HashSet<MyCubeGrid>();
 
@@ -208,8 +204,6 @@ namespace DefenseShields
 
         internal volatile bool EntSlotTick;
         internal volatile bool Dispatched;
-        internal volatile bool EmpDispatched;
-        internal volatile bool WarHeadLoaded;
 
         private const int EntCleanCycle = 3600;
         private const int EntMaxTickAge = 36000;
@@ -218,14 +212,8 @@ namespace DefenseShields
 
         internal readonly ApiBackend Api = new ApiBackend();
         private readonly List<MyCubeGrid> _tmpWatchGridsToRemove = new List<MyCubeGrid>();
-        private readonly List<MyCubeBlock> _warHeadCubeHits = new List<MyCubeBlock>();
-        private readonly List<MyCubeGrid> _warHeadGridHits = new List<MyCubeGrid>();
-        private readonly List<MyEntity> _pruneWarGrids = new List<MyEntity>();
-        private readonly Dictionary<MyCubeGrid, WarHeadHit> _warHeadGridShapes = new Dictionary<MyCubeGrid, WarHeadHit>();
-        private readonly Queue<long> _warEffectPurge = new Queue<long>();
         internal readonly ConcurrentQueue<MyEntity> EntRefreshQueue = new ConcurrentQueue<MyEntity>();
         private readonly ConcurrentDictionary<MyEntity, uint> _globalEntTmp = new ConcurrentDictionary<MyEntity, uint>();
-        private readonly ConcurrentDictionary<long, BlockState> _warEffectCubes = new ConcurrentDictionary<long, BlockState>();
 
 
 
@@ -265,7 +253,6 @@ namespace DefenseShields
         internal double SyncBufferedDistSqr { get; private set; }
         internal double SyncDist { get; private set; }
 
-        internal bool WarheadButtonAdd { get; set; }
         internal bool HudIconReset { get; set; } = true;
         internal bool OnCountThrottle { get; set; }
         internal bool GameLoaded { get; set; }

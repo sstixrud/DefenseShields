@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using ParallelTasks;
 
 namespace DefenseShields
@@ -92,10 +93,10 @@ namespace DefenseShields
 
             foreach (var parent in GetParentGrid)
             {
+                ParentGrid oldParent;
                 if (Tick - parent.Value.Age > 120)
-                    GetParentGrid.Remove(parent.Key);
+                    GetParentGrid.TryRemove(parent.Key, out oldParent);
             }
-            GetParentGrid.ApplyRemovals();
         }
 
         #region Events
@@ -108,8 +109,7 @@ namespace DefenseShields
 
         private void GridSplitWatch(MyCubeGrid parent, MyCubeGrid child)
         {
-            GetParentGrid[child] = new ParentGrid {Parent = parent, Age = Tick};
-            GetParentGrid.ApplyAdditionsAndModifications();
+            GetParentGrid.TryAdd(child, new ParentGrid { Parent = parent, Age = Tick });
         }
 
         private void OnEntityRemove(MyEntity myEntity)
@@ -126,19 +126,6 @@ namespace DefenseShields
                             ProtectCachePool.Return(cache);
                     }
                     EntRefreshQueue.Enqueue(myEntity);
-                }
-            }
-
-            var warhead = myEntity as IMyWarhead;
-            if (warhead != null)
-            {
-                var grid = (MyCubeGrid)warhead.CubeGrid;
-                if (!warhead.IsFunctional && (warhead.IsArmed || (warhead.DetonationTime <= 0 && warhead.IsCountingDown)) && warhead.CustomData.Length != 0 && !GlobalProtect.ContainsKey(grid))
-                {
-                    var blastRatio = warhead.CubeGrid.GridSizeEnum == MyCubeSize.Small ? 1 : 5;
-                    var epicCenter = warhead.PositionComp.WorldAABB.Center;
-                    if (Enforced.Debug >= 2 && EmpStore.Count == 0) Log.Line($"====================================================================== [WarHead EventStart]");
-                    EmpStore.Enqueue(new WarHeadBlast(blastRatio, epicCenter, warhead.CustomData));
                 }
             }
         }

@@ -9,7 +9,7 @@
     using VRageMath;
     using MyVisualScriptLogicProvider = Sandbox.Game.MyVisualScriptLogicProvider;
 
-    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation | MyUpdateOrder.AfterSimulation, int.MinValue)]
+    [MySessionComponentDescriptor(MyUpdateOrder.BeforeSimulation | MyUpdateOrder.Simulation, int.MaxValue - 3)]
     public partial class Session : MySessionComponentBase
     {
         #region BeforeStart
@@ -95,24 +95,13 @@
                 }
 
                 LogicUpdates();
-
-                if (EmpStore.Count != 0 && !EmpDispatched)
-                {
-                    EmpDispatched = true;   
-                    PrepEmpBlast();
-                    if (EmpWork.EventRunning) MyAPIGateway.Parallel.Start(ComputeEmpBlast, EmpCallBack);
-                    else EmpDispatched = false;
-                }
-
-                if (_warEffect && Tick20) WarEffect();
+                SplitMonitor();
             }
             catch (Exception ex) { Log.Line($"Exception in SessionBeforeSim: {ex}"); }
         }
 
-        public override void UpdateAfterSimulation()
+        public override void Simulate()
         {
-            
-            SplitMonitor();
             foreach (var s in ActiveShields.Keys)
                 if (s.GridIsMobile && !s.Asleep) s.MobileUpdate();
 

@@ -129,7 +129,7 @@
                 ModReInforce = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateReInforceProt", "Enhance structural integrity", "Enhance structural integrity, prevents damage from collisions", ModUi.GetReInforceProt, ModUi.SetReInforceProt);
                 ModVoxels = TerminalHelpers.AddCheckbox(comp?.Modulator, " DS-M_ModulateVoxels", "Terrain is ignored by shield", "Let voxels bypass shield", ModUi.GetVoxels, ModUi.SetVoxels);
                 ModGrids = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateGrids", "Entities may pass the shield", "Let grid bypass shield", ModUi.GetGrids, ModUi.SetGrids);
-                ModEmp = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateEmpProt", "Protects against EMPs", "But generates heat 10x faster", ModUi.GetEmpProt, ModUi.SetEmpProt);
+                ModEmp = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateEmpProt", "Protects against EMP damage", "But generates heat 10x faster", ModUi.GetEmpProt, ModUi.SetEmpProt);
 
                 CreateActionDamageModRate<IMyUpgradeModule>(ModDamage);
 
@@ -213,10 +213,6 @@
                     case "DSControlTable":
                         SetCustomDataToShieldFreq(myTerminalControls);
                         break;
-                    case "LargeWarhead":
-                    case "SmallWarhead":
-                        if (!WarheadButtonAdd) AddEmpButton(tBlock);
-                        break;
                     default:
                         if (!CustomDataReset) ResetCustomData(myTerminalControls);
                         break;
@@ -225,47 +221,6 @@
             catch (Exception ex) { Log.Line($"Exception in CustomControls: {ex}"); }
         }
 
-        private void AddEmpButton(IMyTerminalBlock tBlock)
-        {
-            WarheadButtonAdd = true;
-            WarTerminalReset = tBlock;
-
-            var empSep = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlSeparator, IMyWarhead>("empSep");
-            MyAPIGateway.TerminalControls.AddControl<IMyWarhead>(empSep);
-            var empProp = MyAPIGateway.TerminalControls.CreateControl<IMyTerminalControlCheckbox, IMyWarhead>("emp");
-            empProp.Title = MyStringId.GetOrCompute("EMP Mode    ");
-            empProp.Getter = WarheadGetter;
-            empProp.Setter = WarheadSetter;
-            MyAPIGateway.TerminalControls.AddControl<IMyWarhead>(empProp);
-
-            WarTerminalReset.ShowInTerminal = false;
-            GameLoaded = false;
-        }
-
-        private void WarheadSetter(IMyTerminalBlock tBlock, bool isSet)
-        {
-            var customData = tBlock.CustomData;
-            var iOf = tBlock.CustomData.IndexOf("@EMP", StringComparison.Ordinal);
-            if (isSet && iOf == -1)
-            {
-                if (customData.Length == 0) tBlock.CustomData = "@EMP";
-                else if (!customData.Contains("@EMP")) tBlock.CustomData = customData + "\n@EMP";
-                return;
-            }
-
-            if (iOf != -1)
-            {
-                if (iOf != 0)
-                {
-                    tBlock.CustomData = customData.Remove(iOf - 1, 5);
-                }
-                else
-                {
-                    if (customData.Length > 4 && customData.IndexOf("\n", StringComparison.Ordinal) == iOf + 4) tBlock.CustomData = customData.Remove(iOf, 5);
-                    else tBlock.CustomData = customData.Remove(iOf, iOf + 4);
-                }
-            }
-        }
 
         public void BlockTagActive(IMyTerminalBlock tBlock)
         {
@@ -297,11 +252,6 @@
                 customName = "[B] " + customName;
             }
             tBlock.CustomName = customName;
-        }
-
-        private bool WarheadGetter(IMyTerminalBlock tBlock)
-        {
-            return tBlock.CustomData.Contains("@EMP");
         }
 
         private void SetCustomDataToPassword(IEnumerable<IMyTerminalControl> controls)

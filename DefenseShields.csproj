@@ -67,7 +67,6 @@
     <Compile Include="Data\Scripts\DefenseShields\EnhancerLogic\EnhancerFields.cs" />
     <Compile Include="Data\Scripts\DefenseShields\EnhancerLogic\EnhancerOther.cs" />
     <Compile Include="Data\Scripts\DefenseShields\Session\SessionSupport.cs" />
-    <Compile Include="Data\Scripts\DefenseShields\Session\SessionSupWeaps.cs" />
     <Compile Include="Data\Scripts\DefenseShields\ShieldLogic\ShieldAlerts.cs" />
     <Compile Include="Data\Scripts\DefenseShields\ShieldLogic\ShieldChecks.cs" />
     <Compile Include="Data\Scripts\DefenseShields\ModulatorLogic\ModulatorFields.cs" />

@@ -66,14 +66,6 @@ namespace DefenseShields
                     if (shieldActive)
                         s.LostPings++;
 
-                    if (s.Asleep && EmpStore.Count != 0 && Vector3D.DistanceSquared(s.DetectionCenter, EmpWork.EpiCenter) <= SyncDistSqr)
-                    {
-                        s.TicksWithNoActivity = 0;
-                        s.LastWokenTick = Tick;
-                        s.Asleep = false;
-                        return;
-                    }
-
                     if (!shieldActive && s.LostPings > 59)
                     {
                         s.Asleep = true;
@@ -366,17 +358,7 @@ namespace DefenseShields
                         GameLoaded = true;
                     }
                 }
-
-                if (MiscLoaded && !WarHeadLoaded && WarTerminalReset != null)
-                {
-                    WarTerminalReset.ShowInTerminal = true;
-                    WarTerminalReset = null;
-                    WarHeadLoaded = true;
-                    GameLoaded = true;
-                }
             }
-
-            if (EmpWork.EventRunning && EmpWork.Computed) EmpWork.EventComplete();
 
             if (Tick20)
             {

@@ -16,34 +16,6 @@ namespace DefenseShields.Support
     using VRage.Voxels;
     using VRageMath;
 
-    public struct WarHeadBlast
-    {
-        public readonly int WarSize;
-        public readonly double Yield;
-        public readonly Vector3D Position;
-        public readonly string CustomData;
-
-        public WarHeadBlast(int warSize, Vector3D position, string customData)
-        {
-            WarSize = warSize;
-            Yield = WarSize * 50;
-            Position = position;
-            CustomData = customData;
-        }
-    }
-
-    public struct WarHeadHit
-    {
-        public readonly uint Duration;
-        public BoundingSphereD Sphere;
-
-        public WarHeadHit(BoundingSphereD sphere, uint duration)
-        {
-            Sphere = sphere;
-            Duration = duration;
-        }
-    }
-
     internal struct VoxelHit : IVoxelOperator
     {
         internal bool HasHit;

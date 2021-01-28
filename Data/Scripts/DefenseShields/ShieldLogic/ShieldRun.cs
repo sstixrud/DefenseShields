@@ -100,7 +100,6 @@ namespace DefenseShields
                     }
                     else if (_tick180) ShieldChangeState();
                 }
-                if (Session.Instance.EmpWork.EventRunning) AbsorbEmp();
             }
             catch (Exception ex) { Log.Line($"Exception in UpdateBeforeSimulation: {ex}"); }
         }

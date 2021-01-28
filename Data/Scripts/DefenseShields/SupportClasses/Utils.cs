@@ -19,54 +19,6 @@ namespace DefenseShields.Support
         }
     }
 
-    internal class EmpWork
-    {
-        internal MyCubeGrid Grid;
-        internal Vector3D EpiCenter;
-        internal int WarHeadSize;
-        internal double WarHeadYield;
-        internal double DirYield;
-        internal int StackCount;
-        internal double RangeCap;
-        internal double RangeCapSqr;
-        internal bool Stored;
-        internal bool Computed;
-        internal bool Drawed;
-        internal bool EventRunning;
-
-        internal void StoreEmpBlast(Vector3D epicCenter, int warHeadSize, double warHeadYield, int stackCount, double rangeCap)
-        {
-            EpiCenter = epicCenter;
-            WarHeadSize = warHeadSize;
-            WarHeadYield = warHeadYield;
-            StackCount = stackCount;
-            RangeCap = rangeCap;
-            RangeCapSqr = rangeCap * rangeCap;
-            DirYield = (warHeadYield * stackCount) * 0.5;
-            Stored = true;
-            EventRunning = true;
-        }
-
-        internal void ComputeComplete()
-        {
-            Computed = true;
-        }
-
-        internal void EmpDrawComplete()
-        {
-            Drawed = true;
-        }
-
-        internal void EventComplete()
-        {
-            Computed = false;
-            Drawed = false;
-            Stored = false;
-            EventRunning = false;
-            if (Session.Enforced.Debug >= 2) Log.Line($"====================================================================== [WarHead EventComplete]");
-        }
-    }
-
     class FiniteFifoQueueSet<T1, T2>
     {
         private readonly T1[] _nodes;
