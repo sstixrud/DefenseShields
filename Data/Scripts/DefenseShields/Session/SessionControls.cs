@@ -129,6 +129,7 @@
                 ModReInforce = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateReInforceProt", "Enhance structural integrity", "Enhance structural integrity, prevents damage from collisions", ModUi.GetReInforceProt, ModUi.SetReInforceProt);
                 ModVoxels = TerminalHelpers.AddCheckbox(comp?.Modulator, " DS-M_ModulateVoxels", "Terrain is ignored by shield", "Let voxels bypass shield", ModUi.GetVoxels, ModUi.SetVoxels);
                 ModGrids = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateGrids", "Entities may pass the shield", "Let grid bypass shield", ModUi.GetGrids, ModUi.SetGrids);
+                ModAllies = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateAllies", "Allied players can bypass", "Let ally players bypass shield", ModUi.GetAllies, ModUi.SetAllies);
                 ModEmp = TerminalHelpers.AddCheckbox(comp?.Modulator, "DS-M_ModulateEmpProt", "Protects against EMP damage", "But generates heat 10x faster", ModUi.GetEmpProt, ModUi.SetEmpProt);
 
                 CreateActionDamageModRate<IMyUpgradeModule>(ModDamage);

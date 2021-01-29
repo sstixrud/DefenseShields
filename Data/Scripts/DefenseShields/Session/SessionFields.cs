@@ -311,6 +311,7 @@ namespace DefenseShields
         internal IMyTerminalControlSlider ModDamage { get; set; }
         internal IMyTerminalControlCheckbox ModVoxels { get; set; }
         internal IMyTerminalControlCheckbox ModGrids { get; set; }
+        internal IMyTerminalControlCheckbox ModAllies { get; set; }
         internal IMyTerminalControlCheckbox ModEmp { get; set; }
         internal IMyTerminalControlCheckbox ModReInforce { get; set; }
         internal IMyTerminalControlSeparator ModSep1 { get; set; }

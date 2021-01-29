@@ -16,6 +16,8 @@
             Session.Instance.ModVoxels.Visible = ShowVoxels;
             Session.Instance.ModGrids.Enabled = block => true;
             Session.Instance.ModGrids.Visible = ShowControl;
+            Session.Instance.ModAllies.Enabled = block => true;
+            Session.Instance.ModAllies.Visible = ShowControl;
             Session.Instance.ModEmp.Enabled = block => true;
             Session.Instance.ModEmp.Visible = ShowEMP;
             Session.Instance.ModReInforce.Enabled = block => true;
@@ -105,6 +107,21 @@
             var comp = block?.GameLogic?.GetAs<Modulators>();
             if (comp == null) return;
             comp.ModSet.Settings.ModulateGrids = newValue;
+            comp.ModSet.NetworkUpdate();
+            comp.ModSet.SaveSettings();
+        }
+
+        internal static bool GetAllies(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<Modulators>();
+            return comp?.ModSet.Settings.AllowAllies ?? false;
+        }
+
+        internal static void SetAllies(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<Modulators>();
+            if (comp == null) return;
+            comp.ModSet.Settings.AllowAllies = newValue;
             comp.ModSet.NetworkUpdate();
             comp.ModSet.SaveSettings();
         }

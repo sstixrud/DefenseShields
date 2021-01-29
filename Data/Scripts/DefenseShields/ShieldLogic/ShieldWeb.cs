@@ -329,7 +329,8 @@ namespace DefenseShields
 
                 var playerrelationship = MyIDModule.GetRelationPlayerBlock(MyCube.IDModule.Owner, playerId, MyOwnershipShareModeEnum.Faction);
 
-                if (playerrelationship == MyRelationsBetweenPlayerAndBlock.Owner || playerrelationship == MyRelationsBetweenPlayerAndBlock.FactionShare || playerrelationship == MyRelationsBetweenPlayerAndBlock.Friends)
+                var modulateAllies = (ShieldComp.Modulator != null && ShieldComp.Modulator.ModSet.Settings.AllowAllies);
+                if (playerrelationship == MyRelationsBetweenPlayerAndBlock.Owner || playerrelationship == MyRelationsBetweenPlayerAndBlock.FactionShare || modulateAllies && playerrelationship == MyRelationsBetweenPlayerAndBlock.Friends)
                 {
                     var playerInShield = CustomCollision.PointInShield(ent.PositionComp.WorldAABB.Center, DetectMatrixOutsideInv);
                     return playerInShield ? Ent.Protected : Ent.Friendly;
@@ -345,7 +346,8 @@ namespace DefenseShields
             var grid = ent as MyCubeGrid;
             if (grid != null)
             {
-                ModulateGrids = (ShieldComp.Modulator != null && ShieldComp.Modulator.ModSet.Settings.ModulateGrids) || Session.Enforced.DisableEntityBarrier == 1;
+                var modulateGrids = (ShieldComp.Modulator != null && ShieldComp.Modulator.ModSet.Settings.ModulateGrids) || Session.Enforced.DisableEntityBarrier == 1;
+
                 ModulatorGridComponent modComp;
                 grid.Components.TryGet(out modComp);
                 if (!string.IsNullOrEmpty(modComp?.ModulationPassword) && modComp.ModulationPassword == Shield.CustomData)
@@ -393,8 +395,8 @@ namespace DefenseShields
 
 
                 if (CustomCollision.AllAabbInShield(ent.PositionComp.WorldAABB, DetectMatrixOutsideInv, _obbCorners)) return Ent.Protected;
-                if (!ModulateGrids && bigOwnersCnt == 0) return Ent.NobodyGrid;
-                var enemy = !ModulateGrids && GridEnemy(grid, bigOwners);
+                if (!modulateGrids && bigOwnersCnt == 0) return Ent.NobodyGrid;
+                var enemy = !modulateGrids && GridEnemy(grid, bigOwners);
                 if (!enemy)
                 {
 

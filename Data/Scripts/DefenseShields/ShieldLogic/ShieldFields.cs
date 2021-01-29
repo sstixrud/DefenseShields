@@ -345,7 +345,6 @@ namespace DefenseShields
         internal bool IsFunctional { get; set; }
         internal bool IsWorking { get; set; }
         internal bool EntCleanUpTime { get; set; }
-        internal bool ModulateGrids { get; set; }
         internal HitType EnergyHit { get; set; }
         internal bool EffectsDirty { get; set; }
         internal bool ShieldActive { get; set; }

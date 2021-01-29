@@ -129,6 +129,7 @@
         [ProtoMember(4), DefaultValue(-1)] public int ModulateDamage = 100;
         [ProtoMember(5)] public bool ReInforceEnabled = false;
         [ProtoMember(6)] public uint MId;
+        [ProtoMember(7)] public bool AllowAllies = false;
     }
 
     [ProtoContract]
