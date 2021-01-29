@@ -318,14 +318,15 @@ namespace DefenseShields
 
         internal float ShieldChargeRate { get; set; }
         internal float ShieldMaxCharge { get; set; }
+        internal float ShieldMinMaxCharge { get; set; }
         internal float GridMaxPower { get; set; }
         internal float GridCurrentPower { get; set; }
         internal float GridAvailablePower { get; set; }
         internal float ShieldCurrentPower { get; set; }
         internal float ShieldAvailablePower { get; set; }
         internal float ShieldMaxPower { get; set; }
-        internal float ShieldHpBase { get; set; }
-        internal float HpScaler { get; set; } = 1f;
+        internal float ShieldMaxHpBase { get; set; }
+        internal float ShieldMinMaxHpBase { get; set; }
 
         internal double BoundingRange { get; set; }
         internal double EllipsoidVolume { get; set; }

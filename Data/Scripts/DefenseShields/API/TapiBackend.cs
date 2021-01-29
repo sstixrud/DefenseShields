@@ -245,7 +245,11 @@ namespace DefenseShields
         private static float? TAPI_PointAttackShieldCon(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, float secondaryDamage, bool energy, bool drawParticle, bool posMustBeInside = false)
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
-            if (logic == null) return null;
+            if (logic == null)
+            {
+                Log.Line($"TAPI_PointAttackShieldCon shield logic was null");
+                return null;
+            }
             if (posMustBeInside)
                 lock (logic.MatrixLock) if (!CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) return null;
 
@@ -438,7 +442,7 @@ namespace DefenseShields
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
             if (logic == null) return -1;
 
-            return logic.ShieldHpBase * DefenseShields.ConvToDec;
+            return logic.ShieldMaxHpBase * DefenseShields.ConvToDec;
         }
 
         private static bool TAPI_IsShieldUp(IMyTerminalBlock block)

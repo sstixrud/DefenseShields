@@ -67,9 +67,12 @@ namespace DefenseShields
             if (ShieldMode == ShieldType.Station && DsState.State.Enhancer)
                 hpsEfficiency *= 3.5f;
 
-            var bufferScaler = 100 / percent * (baseScaler * shieldTypeRatio) / _sizeScaler;
+            var bufferMaxScaler = 100 / percent * (baseScaler * shieldTypeRatio) / _sizeScaler;
+            var bufferMinScaler = 100 / (95f * ChargeRatio) * (baseScaler * shieldTypeRatio) / _sizeScaler;
             
-            ShieldHpBase = ShieldMaxPower * bufferScaler;
+
+            ShieldMaxHpBase = ShieldMaxPower * bufferMaxScaler;
+            ShieldMinMaxHpBase = ShieldMaxPower * bufferMinScaler;
 
             var powerCap = DsState.State.GridIntegrity;
             if (capScaler > 0) {
@@ -82,16 +85,18 @@ namespace DefenseShields
                 powerCap *= capScaler;
             }
 
-            HpScaler = ShieldHpBase > powerCap ? powerCap / ShieldHpBase : 1f;
-
             shieldMaintainPercent = shieldMaintainPercent * DsState.State.EnhancerPowerMulti * (DsState.State.ShieldPercent * ConvToDec);
             
             if (DsState.State.Lowered) 
                 shieldMaintainPercent *= 0.25f;
 
-            _shieldMaintaintPower = ShieldMaxPower * HpScaler * shieldMaintainPercent;
+            var maxHpScaler = ShieldMaxHpBase > powerCap ? powerCap / ShieldMaxHpBase : 1f;
+            var minMaxHpScaler = ShieldMinMaxHpBase > powerCap ? powerCap / ShieldMinMaxHpBase : 1f;
 
-            ShieldMaxCharge = ShieldHpBase * HpScaler;
+            _shieldMaintaintPower = ShieldMaxPower * maxHpScaler * shieldMaintainPercent;
+
+            ShieldMaxCharge = ShieldMaxHpBase * maxHpScaler;
+            ShieldMinMaxCharge = ShieldMinMaxHpBase * minMaxHpScaler;
 
             var powerForShield = PowerNeeded(chargePercent, hpsEfficiency);
 

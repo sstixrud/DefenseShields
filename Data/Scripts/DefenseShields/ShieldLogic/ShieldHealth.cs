@@ -34,7 +34,7 @@
 
         private void Heating()
         {
-            var hp = ShieldMaxCharge * ConvToHp;
+            var hp = ShieldMinMaxCharge * ConvToHp;
             var oldHeat = DsState.State.Heat;
             if (_tick30 && _damageReadOut > 0 && _heatCycle == -1)
             {
