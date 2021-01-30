@@ -145,14 +145,17 @@ namespace DefenseShields
                 _shieldConsumptionRate = 0f;
             }
 
-            if (DsState.State.Charge < ShieldMaxCharge) {
-                DsState.State.ShieldPercent = DsState.State.Charge / ShieldMaxCharge * 100;
-            }
-            else if (DsState.State.Charge < ShieldMaxCharge * 0.1) {
-                DsState.State.ShieldPercent = 0f;
-            }
-            else {
-                DsState.State.ShieldPercent = 100f;
+            if (_isServer) {
+
+                if (DsState.State.Charge < ShieldMaxCharge) {
+                    DsState.State.ShieldPercent = DsState.State.Charge / ShieldMaxCharge * 100;
+                }
+                else if (DsState.State.Charge < ShieldMaxCharge * 0.1) {
+                    DsState.State.ShieldPercent = 0f;
+                }
+                else {
+                    DsState.State.ShieldPercent = 100f;
+                }
             }
         }
 
@@ -204,10 +207,10 @@ namespace DefenseShields
                 _capacitorLoop++;
                 if (_capacitorLoop > CapacitorDrainCount) {
 
-                    if (!DsState.State.NoPower) {
+                    if (_isServer && !DsState.State.NoPower) {
 
                         DsState.State.NoPower = true;
-                        DsState.State.Message = true;
+                        _sendMessage = true;
                         ShieldChangeState();
                     }
 
@@ -215,9 +218,11 @@ namespace DefenseShields
                     DsState.State.Charge = DsState.State.Charge - shieldLoss;
                     if (DsState.State.Charge < 0.01f) DsState.State.Charge = 0.01f;
 
-                    if (DsState.State.Charge < ShieldMaxCharge) DsState.State.ShieldPercent = DsState.State.Charge / ShieldMaxCharge * 100;
-                    else if (DsState.State.Charge < ShieldMaxCharge * 0.1) DsState.State.ShieldPercent = 0f;
-                    else DsState.State.ShieldPercent = 100f;
+                    if (_isServer) {
+                        if (DsState.State.Charge < ShieldMaxCharge) DsState.State.ShieldPercent = DsState.State.Charge / ShieldMaxCharge * 100;
+                        else if (DsState.State.Charge < ShieldMaxCharge * 0.1) DsState.State.ShieldPercent = 0f;
+                        else DsState.State.ShieldPercent = 100f;
+                    }
 
                     ShieldChargeRate = 0f;
                     _shieldConsumptionRate = 0f;

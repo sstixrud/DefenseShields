@@ -140,7 +140,7 @@
                         if (s.EnergyCoolDown == 9) s.EnergyCoolDown = -1;
                     }
 
-                    if (!s.WarmedUp || s.DsState.State.Lowered || s.DsState.State.Sleeping || s.DsState.State.Suspended || !s.DsState.State.EmitterLos) continue;
+                    if (!s.WarmedUp || !IsServer && !s.ClientInitPacket || s.DsState.State.Lowered || s.DsState.State.Sleeping || s.DsState.State.Suspended || !s.DsState.State.EmitterLos) continue;
 
                     var sp = new BoundingSphereD(s.DetectionCenter, s.BoundingRange);
                     if (!MyAPIGateway.Session.Camera.IsInFrustum(ref sp))
@@ -162,7 +162,7 @@
                 for (int i = 0; i < compCount; i++)
                 {
                     var s = Controllers[i];
-                    var drawSuspended = !s.WarmedUp || s.DsState.State.Lowered || s.DsState.State.Sleeping || s.DsState.State.Suspended || !s.DsState.State.EmitterLos;
+                    var drawSuspended = !s.WarmedUp || !IsServer && !s.ClientInitPacket || s.DsState.State.Lowered || s.DsState.State.Sleeping || s.DsState.State.Suspended || !s.DsState.State.EmitterLos;
 
                     if (drawSuspended) continue;
 

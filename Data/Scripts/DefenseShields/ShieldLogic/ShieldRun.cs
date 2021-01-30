@@ -71,7 +71,11 @@ namespace DefenseShields
             try
             {
 
-                if (!EntityAlive()) return;
+                if (!EntityAlive() || !_isServer && !ClientInitPacket) return;
+
+                if (!_isDedicated && _clientMessageCount < DsState.State.MessageCount)
+                    BroadcastMessage();
+
                 var shield = ShieldOn();
                 if (shield != State.Active)
                 {
@@ -83,13 +87,20 @@ namespace DefenseShields
                         var clear = up && awake;
                         OfflineShield(clear, up);
                     }
-                    else if (DsState.State.Message) ShieldChangeState();
+                    else if (_isServer && _sendMessage) 
+                        ShieldChangeState();
                     return;
                 }
 
-                if (!_isServer || !DsState.State.Online) return;
+                if (!_isServer) return;
+
+                if (!DsState.State.Online && DsState.State.ActiveEmitterId != 0 && _tick600) {
+                    ShieldChangeState();
+                    return;
+                }
+
                 if (_comingOnline) ComingOnlineSetup();
-                if (_mpActive && (_forceBufferSync || _count == 29))
+                if (_mpActive && (_forceBufferSync || _count == 29 || _tick180))
                 {
                     var newPercentColor = UtilsStatic.GetShieldColorFromFloat(DsState.State.ShieldPercent);
                     if (_forceBufferSync || newPercentColor != _oldPercentColor)
@@ -137,8 +148,6 @@ namespace DefenseShields
 
                 RegisterEvents(false);
                 InitEntities(false);
-                IsWorking = false;
-                IsFunctional = false;
                 _shellPassive?.Render?.RemoveRenderObjects();
                 _shellActive?.Render?.RemoveRenderObjects();
                 ShieldEnt?.Render?.RemoveRenderObjects();

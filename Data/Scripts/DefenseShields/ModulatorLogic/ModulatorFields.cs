@@ -57,8 +57,6 @@ namespace DefenseShields
         internal bool SettingsUpdated { get; set; }
         internal bool ClientUiUpdate { get; set; }
         internal bool ContainerInited { get; set; }
-        internal bool IsFunctional { get; set; }
-        internal bool IsWorking { get; set; }
         internal bool EnhancerLink { get; set; }
 
         internal ModulatorSettings ModSet { get; set; }

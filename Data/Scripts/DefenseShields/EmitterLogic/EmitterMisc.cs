@@ -23,8 +23,6 @@ namespace DefenseShields
             _isDedicated = Session.Instance.DedicatedServer;
             IsStatic = Emitter.CubeGrid.IsStatic;
             _disableLos = Session.Enforced.DisableLineOfSight == 1;
-            IsWorking = MyCube.IsWorking;
-            IsFunctional = MyCube.IsFunctional;
             NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
             _bTime = _isDedicated ? 10 : 1;
             _bInit = true;
@@ -139,14 +137,11 @@ namespace DefenseShields
             if (register)
             {
                 Emitter.EnabledChanged += CheckEmitter;
-                MyCube.IsWorkingChanged += IsWorkingChanged;
-                IsWorkingChanged(MyCube);
             }
             else
             {
                 Emitter.AppendingCustomInfo -= AppendingCustomInfo;
                 Emitter.EnabledChanged -= CheckEmitter;
-                MyCube.IsWorkingChanged -= IsWorkingChanged;
             }
         }
 

@@ -65,8 +65,6 @@ namespace DefenseShields
             _isServer = Session.Instance.IsServer;
             _isDedicated = Session.Instance.DedicatedServer;
             Enhancer.RefreshCustomInfo();
-            IsWorking = MyCube.IsWorking;
-            IsFunctional = MyCube.IsFunctional;
             NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
             _bTime = _isDedicated ? 10 : 1;
             _bInit = true;
@@ -142,8 +140,6 @@ namespace DefenseShields
                 }
                 RegisterEvents(false);
 
-                IsWorking = false;
-                IsFunctional = false;
             }
             catch (Exception ex) { Log.Line($"Exception in OnRemovedFromScene: {ex}"); }
         }

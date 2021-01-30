@@ -282,7 +282,7 @@ namespace DefenseShields
             {
                 if (grid == MyGrid) continue;
                 ShieldGridComponent shieldComponent;
-                if (grid.Components.TryGet(out shieldComponent) && shieldComponent?.DefenseShields != null && shieldComponent.DefenseShields.DsState.State.Online && shieldComponent.DefenseShields.IsWorking) {
+                if (grid.Components.TryGet(out shieldComponent) && shieldComponent?.DefenseShields != null && shieldComponent.DefenseShields.DsState.State.Online && shieldComponent.DefenseShields.MyCube.IsWorking) {
 
                     var ds = shieldComponent.DefenseShields;
                     var otherSize = ds.MyGrid.PositionComp.LocalAABB.Size.Volume;
@@ -323,7 +323,7 @@ namespace DefenseShields
 
                 Shield.Enabled = false;
                 DsState.State.FieldBlocked = true;
-                DsState.State.Message = true;
+                _sendMessage = true;
                 if (Session.Enforced.Debug == 3) Log.Line($"Field blocked: - ShieldId [{Shield.EntityId}]");
                 return true;
             }
@@ -340,19 +340,19 @@ namespace DefenseShields
                     if (_overLoadLoop != -1)
                     {
                         DsState.State.Overload = true;
-                        DsState.State.Message = true;
+                        _sendMessage = true;
                     }
 
                     if (_empOverLoadLoop != -1)
                     {
                         DsState.State.EmpOverLoad = true;
-                        DsState.State.Message = true;
+                        _sendMessage = true;
                     }
 
                     if (_reModulationLoop != -1)
                     {
                         DsState.State.Remodulate = true;
-                        DsState.State.Message = true;
+                        _sendMessage = true;
                     }
                 }
             }

@@ -63,6 +63,7 @@
         [ProtoMember(31)] public bool ReInforce = false;
         [ProtoMember(32)] public long ActiveEmitterId;
         [ProtoMember(33)] public uint MId;
+        [ProtoMember(34)] public int MessageCount;
     }
 
     [ProtoContract]

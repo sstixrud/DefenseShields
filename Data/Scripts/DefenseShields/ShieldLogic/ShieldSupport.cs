@@ -29,7 +29,7 @@ namespace DefenseShields
                     DsState.State.ReInforce = ShieldComp.Modulator.ModSet.Settings.ReInforceEnabled;
                 }
 
-                if (update) ShieldChangeState();
+                if (_isServer && update) ShieldChangeState();
             }
             else if (_tick - InitTick > 30)
             {
@@ -38,7 +38,7 @@ namespace DefenseShields
                 DsState.State.ModulateKinetic = 1f;
                 DsState.State.EmpProtection = false;
                 DsState.State.ReInforce = false;
-                if (update) ShieldChangeState();
+                if (_isServer && update) ShieldChangeState();
 
             }
         }

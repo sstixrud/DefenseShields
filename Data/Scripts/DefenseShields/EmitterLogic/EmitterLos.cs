@@ -19,7 +19,7 @@ namespace DefenseShields
             }
 
             var controller = ShieldComp.DefenseShields;
-            var controllerReady = controller != null && controller.Warming && controller.IsWorking && controller.IsFunctional && !controller.DsState.State.Suspended && controller.DsState.State.ControllerGridAccess;
+            var controllerReady = controller != null && controller.Warming && controller.MyCube.IsWorking && !controller.DsState.State.Suspended && controller.DsState.State.ControllerGridAccess;
             var emitterActive = EmiState.State.ActiveEmitterId == MyCube.EntityId;
             var controllerLinked = emitterActive && controllerReady;
             if (!controllerLinked) return;

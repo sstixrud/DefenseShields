@@ -126,8 +126,6 @@ namespace DefenseShields
                 if (ShieldComp?.StationEmitter == this) ShieldComp.StationEmitter = null;
                 if (ShieldComp?.ShipEmitter == this) ShieldComp.ShipEmitter = null;
                 RegisterEvents(false);
-                IsWorking = false;
-                IsFunctional = false;
             }
             catch (Exception ex) { Log.Line($"Exception in OnRemovedFromScene: {ex}"); }
         }

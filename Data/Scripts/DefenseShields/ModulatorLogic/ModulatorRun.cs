@@ -171,8 +171,6 @@ namespace DefenseShields
                     ModulatorComp = null;
                 }
                 RegisterEvents(false);
-                IsWorking = false;
-                IsFunctional = false;
             }
             catch (Exception ex) { Log.Line($"Exception in OnRemovedFromScene: {ex}"); }
         }

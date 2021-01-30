@@ -39,8 +39,6 @@ namespace DefenseShields
                 Session.AppendConditionToAction<IMyUpgradeModule>((a) => Session.Instance.ModActions.Contains(a.Id), (a, b) => b.GameLogic.GetAs<Modulators>() != null && Session.Instance.ModActions.Contains(a.Id));
             }
             MainInit = true;
-            IsWorking = MyCube.IsWorking;
-            IsFunctional = MyCube.IsFunctional;
             NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
             _bTime = _isDedicated ? 10 : 1;
             _bInit = true;
@@ -110,7 +108,7 @@ namespace DefenseShields
         private bool BlockWorking()
         {
             if (_tock60 || _firstRun) _powered = Sink.IsPowerAvailable(_gId, 0.01f);
-            if (!IsWorking || !_powered)
+            if (!MyCube.IsWorking || !_powered)
             {
                 if (!_isDedicated && _tock60)
                 {
@@ -154,7 +152,7 @@ namespace DefenseShields
             }
 
             var wasLink = EnhancerLink;
-            if (ModState.State.Link && ShieldComp.Enhancer != null && ShieldComp.Enhancer.IsWorking)
+            if (ModState.State.Link && ShieldComp.Enhancer != null && ShieldComp.Enhancer.MyCube.IsWorking)
             {
                 EnhancerLink = true;
                 if (ShieldComp.DefenseShields.IsStatic) ModSet.Settings.EmpEnabled = true;
@@ -366,7 +364,7 @@ namespace DefenseShields
 
         private bool BlockMoveAnimationReset()
         {
-            if (!IsFunctional) return false;
+            if (!MyCube.IsWorking) return false;
             if (_subpartRotor == null)
             {
                 Entity.TryGetSubpart("Rotor", out _subpartRotor);
@@ -430,21 +428,12 @@ namespace DefenseShields
             {
                 MyGrid.OnHierarchyUpdated += HierarchyChanged;
                 Modulator.AppendingCustomInfo += AppendingCustomInfo;
-                MyCube.IsWorkingChanged += IsWorkingChanged;
-                IsWorkingChanged(MyCube);
             }
             else
             {
                 MyGrid.OnHierarchyUpdated -= HierarchyChanged;
                 Modulator.AppendingCustomInfo -= AppendingCustomInfo;
-                MyCube.IsWorkingChanged -= IsWorkingChanged;
             }
-        }
-
-        private void IsWorkingChanged(MyCubeBlock myCubeBlock)
-        {
-            IsFunctional = myCubeBlock.IsFunctional;
-            IsWorking = myCubeBlock.IsWorking;
         }
     }
 }

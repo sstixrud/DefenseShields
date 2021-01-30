@@ -58,7 +58,7 @@ namespace DefenseShields
 
             if (!_compact)
             {
-                if (IsFunctional) Entity.TryGetSubpart("Rotor", out SubpartRotor);
+                if (!MyCube.IsWorking) Entity.TryGetSubpart("Rotor", out SubpartRotor);
                 if (SubpartRotor == null) return false;
             }
 
@@ -76,8 +76,7 @@ namespace DefenseShields
         private bool Suspend()
         {
             EmiState.State.ActiveEmitterId = 0;
-            var functional = IsFunctional;
-            if (!functional)
+            if (!MyCube.IsWorking)
             {
                 EmiState.State.Suspend = true;
                 if (ShieldComp?.StationEmitter == this) ShieldComp.StationEmitter = null;
@@ -101,7 +100,7 @@ namespace DefenseShields
                 return true;
             }
 
-            var working = IsWorking;
+            var working = MyCube.IsWorking;
             var stationMode = EmitterMode == EmitterType.Station;
             var shipMode = EmitterMode != EmitterType.Station;
             var modes = (IsStatic && stationMode) || (!IsStatic && shipMode);
@@ -257,12 +256,6 @@ namespace DefenseShields
                 if (myTerminalBlock.IsWorking && ShieldComp != null) ShieldComp.CheckEmitters = true;
             }
             catch (Exception ex) { Log.Line($"Exception in CheckEmitter: {ex}"); }
-        }
-
-        private void IsWorkingChanged(MyCubeBlock myCubeBlock)
-        {
-            IsFunctional = myCubeBlock.IsWorking;
-            IsWorking = myCubeBlock.IsWorking;
         }
 
         private void SetEmitterType()

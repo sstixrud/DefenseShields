@@ -28,8 +28,6 @@
                 RegisterGridEvents();
                 Shield.AppendingCustomInfo += AppendingCustomInfo;
                 _sink.CurrentInputChanged += CurrentInputChanged;
-                MyCube.IsWorkingChanged += IsWorkingChanged;
-                IsWorkingChanged(MyCube);
 
             }
             else
@@ -45,7 +43,6 @@
                 RegisterGridEvents(false);
                 Shield.AppendingCustomInfo -= AppendingCustomInfo;
                 if (_sink != null)_sink.CurrentInputChanged -= CurrentInputChanged;
-                MyCube.IsWorkingChanged -= IsWorkingChanged;
             }
         }
 
@@ -70,17 +67,11 @@
             }
         }
 
-        private void IsWorkingChanged(MyCubeBlock myCubeBlock)
-        {
-            IsWorking = myCubeBlock.IsWorking;
-            IsFunctional = myCubeBlock.IsFunctional;
-        }
-
         private void OwnerChanged(MyCubeGrid myCubeGrid)
         {
             try
             {
-                if (MyCube == null || MyGrid == null || MyCube.OwnerId == _controllerOwnerId && MyGrid.BigOwners.Count != 0 && MyGrid.BigOwners[0] == _gridOwnerId) return;
+                if (!_isServer || MyCube == null || MyGrid == null || MyCube.OwnerId == _controllerOwnerId && MyGrid.BigOwners.Count != 0 && MyGrid.BigOwners[0] == _gridOwnerId) return;
                 GridOwnsController();
             }
             catch (Exception ex) { Log.Line($"Exception in Controller OwnerChanged: {ex}"); }

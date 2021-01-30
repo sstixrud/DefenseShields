@@ -8,7 +8,7 @@ namespace DefenseShields
         #region Block Animation
         private void BlockReset(bool clearAnimation)
         {
-            if (!IsFunctional) return;
+            if (!MyCube.IsWorking) return;
 
             if (!_compact && SubpartRotor == null)
             {

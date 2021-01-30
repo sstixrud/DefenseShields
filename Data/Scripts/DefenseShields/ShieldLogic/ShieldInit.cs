@@ -60,9 +60,9 @@ namespace DefenseShields
                     ShieldChangeState();
                     return;
                 }
-                if (GridIsMobile && ShieldComp.ShipEmitter != null && !ShieldComp.ShipEmitter.EmiState.State.Los) DsState.State.Message = true;
-                else if (!GridIsMobile && ShieldComp.StationEmitter != null && !ShieldComp.StationEmitter.EmiState.State.Los) DsState.State.Message = true;
-                if (Session.Enforced.Debug >= 3) Log.Line($"EmitterEvent: no emitter is working, shield mode: {ShieldMode} - WarmedUp:{WarmedUp} - MaxPower:{ShieldMaxPower} - Radius:{ShieldSphere.Radius} - Broadcast:{DsState.State.Message} - ShieldId [{Shield.EntityId}]");
+                if (GridIsMobile && ShieldComp.ShipEmitter != null && !ShieldComp.ShipEmitter.EmiState.State.Los) _sendMessage = true;
+                else if (!GridIsMobile && ShieldComp.StationEmitter != null && !ShieldComp.StationEmitter.EmiState.State.Los) _sendMessage = true;
+                if (Session.Enforced.Debug >= 3) Log.Line($"EmitterEvent: no emitter is working, shield mode: {ShieldMode} - WarmedUp:{WarmedUp} - MaxPower:{ShieldMaxPower} - Radius:{ShieldSphere.Radius} - Broadcast:{_sendMessage} - ShieldId [{Shield.EntityId}]");
             }
         }
 
@@ -174,8 +174,6 @@ namespace DefenseShields
             Session.Instance.Controllers.Add(this);
 			
             //if (MyAPIGateway.Session.CreativeMode) CreativeModeWarning();
-            IsWorking = MyCube.IsWorking;
-            IsFunctional = MyCube.IsFunctional;
             NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
             InitTick = Session.Instance.Tick;
             _bTime = 1;
@@ -200,7 +198,7 @@ namespace DefenseShields
         {
             try
             {
-                if (_isServer && (ShieldComp.EmitterMode < 0 || ShieldComp.EmitterMode == 0 && ShieldComp.StationEmitter == null || ShieldComp.EmitterMode != 0 && ShieldComp.ShipEmitter == null || ShieldComp.EmittersSuspended || !IsFunctional))
+                if (_isServer && (ShieldComp.EmitterMode < 0 || ShieldComp.EmitterMode == 0 && ShieldComp.StationEmitter == null || ShieldComp.EmitterMode != 0 && ShieldComp.ShipEmitter == null || ShieldComp.EmittersSuspended || !MyCube.IsFunctional))
                 {
                     return false;
                 }
@@ -219,7 +217,7 @@ namespace DefenseShields
                     Session.Instance.DsAction = true;
                 }
 
-                if (_isServer && !IsFunctional) return false;
+                if (_isServer && !MyCube.IsFunctional) return false;
 
                 if (_mpActive && _isServer) DsState.NetworkUpdate();
 
@@ -375,7 +373,6 @@ namespace DefenseShields
                     Shield.Enabled = false;
                     Shield.Enabled = true;
                 }
-                IsWorking = MyCube.IsWorking;
                 if (Session.Enforced.Debug == 3) Log.Line($"PowerInit: ShieldId [{Shield.EntityId}]");
             }
             catch (Exception ex) { Log.Line($"Exception in AddResourceSourceComponent: {ex}"); }

@@ -40,8 +40,6 @@ namespace DefenseShields
 
         internal int RotationTime { get; set; }
         internal bool ContainerInited { get; set; }
-        internal bool IsFunctional { get; set; }
-        internal bool IsWorking { get; set; }
         internal IMyUpgradeModule Enhancer { get; set; }
         internal MyCubeGrid MyGrid { get; set; }
         internal MyCubeBlock MyCube { get; set; }

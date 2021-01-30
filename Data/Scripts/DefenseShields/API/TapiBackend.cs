@@ -316,7 +316,7 @@ namespace DefenseShields
         private static void TAPI_SetShieldHeat(IMyTerminalBlock block, int value)
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
-            if (logic == null) return;
+            if (logic == null || !Session.Instance.IsServer) return;
 
             logic.DsState.State.Heat = value;
         }
@@ -324,7 +324,7 @@ namespace DefenseShields
         private static void TAPI_OverLoadShield(IMyTerminalBlock block)
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
-            if (logic == null) return;
+            if (logic == null || !Session.Instance.IsServer) return;
 
             logic.DsState.State.Charge = -(logic.ShieldMaxCharge * 2);
         }
@@ -333,7 +333,7 @@ namespace DefenseShields
         private static void TAPI_SetCharge(IMyTerminalBlock block, float value)
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
-            if (logic == null) return;
+            if (logic == null || !Session.Instance.IsServer) return;
 
             logic.DsState.State.Charge = value;
         }

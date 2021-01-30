@@ -62,7 +62,7 @@ namespace DefenseShields
             _oldEllipsoidAdjust = DsState.State.EllipsoidAdjust;
             _oldShieldFudge = DsState.State.ShieldFudge;
             if (_entityChanged || BoundingRange <= 0) CreateShieldShape();
-            if (_tick300) CreateHalfExtents();
+            if (_isServer && _tick300) CreateHalfExtents();
         }
 
         public void RefreshDimensions()

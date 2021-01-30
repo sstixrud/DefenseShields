@@ -74,12 +74,9 @@ namespace DefenseShields
 
         internal float EmissiveIntensity { get; set; }
 
-        internal bool ServerUpdate { get; set; }
         internal bool IsStatic { get; set; }
         internal bool TookControl { get; set; }
         internal bool ContainerInited { get; set; }
-        internal bool IsFunctional { get; set; }
-        internal bool IsWorking { get; set; }
 
     }
 }

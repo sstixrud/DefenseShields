@@ -163,7 +163,7 @@ namespace DefenseShields
         private int _bTime;
         private int _pLossTimer;
         private bool _bInit;
-
+        private int _clientMessageCount;
         private long _gridOwnerId = -1;
         private long _controllerOwnerId = -1;
 
@@ -215,6 +215,8 @@ namespace DefenseShields
         private bool _firstSync;
         private bool _adjustShape;
         private bool _updateCap;
+        private bool _sendMessage;
+
         private string _modelActive = "\\Models\\Cubes\\ShieldActiveBase.mwm";
         private string _modelPassive = string.Empty;
 
@@ -342,12 +344,11 @@ namespace DefenseShields
         internal bool ClientUiUpdate { get; set; }
         internal bool IsStatic { get; set; }
         internal bool WebDamage { get; set; }
-        internal bool IsFunctional { get; set; }
-        internal bool IsWorking { get; set; }
         internal bool EntCleanUpTime { get; set; }
         internal HitType EnergyHit { get; set; }
         internal bool EffectsDirty { get; set; }
         internal bool ShieldActive { get; set; }
+        internal bool ClientInitPacket { get; set; }
 
         internal Vector3D MyGridCenter { get; set; }
         internal Vector3D DetectionCenter { get; set; }

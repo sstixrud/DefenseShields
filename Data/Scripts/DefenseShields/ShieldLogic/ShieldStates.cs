@@ -168,7 +168,7 @@ namespace DefenseShields
         private void DefaultShieldState(bool clear, bool keepCharge, bool resetShape = true)
         {
             NotFailed = false;
-            var clearHeat = !DsState.State.Lowered || !IsWorking;
+            var clearHeat = !DsState.State.Lowered || !MyCube.IsWorking;
             if (clear)
             {
                 _power = 0.001f;
@@ -221,9 +221,11 @@ namespace DefenseShields
                     if (!GridIsMobile) _ellipsoidOxyProvider.UpdateOxygenProvider(MatrixD.Zero, 0);
 
                     DsState.State.IncreaseO2ByFPercent = 0f;
-                    if (!_isDedicated) ShellVisibility(true);
+                    if (!_isDedicated) 
+                        ShellVisibility(true);
                     DsState.State.Lowered = true;
-                    ShieldChangeState();
+                    if (_isServer)
+                        ShieldChangeState();
                 }
                 PowerOnline();
                 return false;
@@ -236,8 +238,10 @@ namespace DefenseShields
                     ShieldComp.O2Updated = false;
                 }
                 DsState.State.Lowered = false;
-                if (!_isDedicated) ShellVisibility();
-                ShieldChangeState();
+                if (!_isDedicated) 
+                    ShellVisibility();
+                if (_isServer)
+                    ShieldChangeState();
             }
 
             return true;
@@ -282,7 +286,7 @@ namespace DefenseShields
             var nullShield = ShieldComp.DefenseShields == null;
             var myShield = ShieldComp.DefenseShields == this;
             var wrongRole = notStation || notShip || unKnown;
-            if (!nullShield && !myShield || !IsFunctional || primeMode || betaMode || wrongOwner || wrongRole)
+            if (!nullShield && !myShield || !MyCube.IsFunctional || primeMode || betaMode || wrongOwner || wrongRole)
             {
                 if (!DsState.State.Suspended) Suspend();
                 if (myShield) ShieldComp.DefenseShields = null;
@@ -296,7 +300,7 @@ namespace DefenseShields
                 return true;
             }
 
-            return !IsWorking;
+            return !MyCube.IsWorking;
         }
 
         private void Suspend()
@@ -333,7 +337,7 @@ namespace DefenseShields
                 if (!DsState.State.Waking)
                 {
                     DsState.State.Waking = true;
-                    DsState.State.Message = true;
+                    _sendMessage = true;
                     if (Session.Enforced.Debug >= 2) Log.Line($"Waking: ShieldId [{Shield.EntityId}]");
                 }
                 return true;
@@ -432,15 +436,18 @@ namespace DefenseShields
             {
                 if (!_isServer)
                 {
+                    ClientInitPacket = true;
                     if (Session.Enforced.Debug == 3) Log.Line($"[Shield Update]: On:{newState.Online} - Suspend:{newState.Suspended} - Sleep:{newState.Sleeping} - ClientOn:{_clientOn} - SId:{MyCube.EntityId} - Name:{MyGrid.DebugName}");
-                    if (!newState.EllipsoidAdjust.Equals(DsState.State.EllipsoidAdjust) || !newState.ShieldFudge.Equals(DsState.State.ShieldFudge) ||
-                        !newState.GridHalfExtents.Equals(DsState.State.GridHalfExtents))
+                    if (!newState.EllipsoidAdjust.Equals(DsState.State.EllipsoidAdjust) || !newState.ShieldFudge.Equals(DsState.State.ShieldFudge) || !newState.GridHalfExtents.Equals(DsState.State.GridHalfExtents))
                     {
                         _updateMobileShape = true;
                     }
-                    if (DsState.State.Message) BroadcastMessage();
                 }
                 DsState.State = newState;
+
+                if (!_isDedicated && _clientMessageCount < DsState.State.MessageCount)
+                    BroadcastMessage();
+
                 _clientNotReady = false;
             }
         }
@@ -468,15 +475,16 @@ namespace DefenseShields
 
         private void ShieldChangeState()
         {
-            if (Session.Instance.MpActive)
+            if (_isServer && _sendMessage)
+                ++DsState.State.MessageCount;
+            _sendMessage = false;
+
+            if (Session.Instance.MpActive && Session.Instance.IsServer)
             {
                 DsState.NetworkUpdate();
                 if (_isServer) TerminalRefresh(false);
             }
 
-            if (!_isDedicated && DsState.State.Message) BroadcastMessage();
-
-            DsState.State.Message = false;
             DsState.SaveState();
         }
     }
