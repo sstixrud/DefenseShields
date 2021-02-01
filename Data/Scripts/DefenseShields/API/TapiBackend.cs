@@ -479,12 +479,10 @@ namespace DefenseShields
             MyProtectors protectors;
             var myGrid = (MyCubeGrid)grid;
 
-            if (Session.Instance.GlobalProtect.TryGetValue(myGrid, out protectors))
-            {
+            if (Session.Instance.GlobalProtect.TryGetValue(myGrid, out protectors)) {
+
                 foreach (var s in protectors.Shields.Keys)
-                {
-                    if (s.ShieldComp.SubGrids.ContainsKey(myGrid)) return true;
-                }
+                    if (s?.ShieldComp != null && s.ShieldComp.SubGrids.ContainsKey(myGrid)) return true;
             }
             return false;
         }
@@ -499,7 +497,7 @@ namespace DefenseShields
             {
                 foreach (var s in protectors.Shields.Keys)
                 {
-                    if (s.ShieldComp.SubGrids.ContainsKey(myGrid) && s.DsState.State.Online && !s.DsState.State.Lowered) return true;
+                    if (s?.ShieldComp != null && s.ShieldComp.SubGrids.ContainsKey(myGrid) && s.DsState.State.Online && !s.DsState.State.Lowered) return true;
                 }
             }
             return false;

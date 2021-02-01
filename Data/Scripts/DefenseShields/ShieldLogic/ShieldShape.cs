@@ -62,7 +62,7 @@ namespace DefenseShields
             _oldEllipsoidAdjust = DsState.State.EllipsoidAdjust;
             _oldShieldFudge = DsState.State.ShieldFudge;
             if (_entityChanged || BoundingRange <= 0) CreateShieldShape();
-            if (_isServer && _tick300) CreateHalfExtents();
+            if (_isServer && _tick300) CreateHalfExtents(false, true);
         }
 
         public void RefreshDimensions()
@@ -72,7 +72,7 @@ namespace DefenseShields
             CreateShieldShape();
         }
 
-        public void CreateHalfExtents(bool forceUpdate = false)
+        public void CreateHalfExtents(bool forceUpdate = false, bool growOnly = false)
         {
             _oldGridHalfExtents = DsState.State.GridHalfExtents;
             var myAabb = MyGrid.PositionComp.LocalAABB;
@@ -110,10 +110,10 @@ namespace DefenseShields
             }
             else
             {
-                var blockHalfSize = MyGrid.GridSize * 0.5;
+                var offset = MyGrid.GridSize * 0.01;
                 DsState.State.ShieldFudge = 0f;
-                var extentsDiff = DsState.State.GridHalfExtents.LengthSquared() - expandedAabb.HalfExtents.LengthSquared();
-                var overThreshold = extentsDiff < -blockHalfSize || extentsDiff > blockHalfSize || forceUpdate;
+                var extentsDiff = DsState.State.GridHalfExtents.Length() - expandedAabb.HalfExtents.Length();
+                var overThreshold = extentsDiff < -offset || extentsDiff > offset || forceUpdate; //first grow, second shrink
                 if (overThreshold || DsState.State.GridHalfExtents == Vector3D.Zero) DsState.State.GridHalfExtents = expandedAabb.HalfExtents;
             }
             _halfExtentsChanged = !DsState.State.GridHalfExtents.Equals(_oldGridHalfExtents);

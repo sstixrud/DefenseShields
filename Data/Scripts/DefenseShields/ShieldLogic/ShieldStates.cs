@@ -307,7 +307,8 @@ namespace DefenseShields
         {
             SetShieldType(false);
             DsState.State.Suspended = true;
-            OfflineShield(true, true, true);
+            var keepCharge = MyCube.IsWorking && DsState.State.ControllerGridAccess;
+            OfflineShield(true, true, keepCharge);
             bool value;
             Session.Instance.BlockTagBackup(Shield);
             Session.Instance.FunctionalShields.TryRemove(this, out value);
@@ -376,7 +377,10 @@ namespace DefenseShields
                     ShellVisibility(true);
                     _clientOn = false;
                     TerminalRefresh();
+                    _power = 0.001f;
+                    _sink.Update();
                 }
+
                 return true;
             }
 

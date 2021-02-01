@@ -42,8 +42,8 @@ namespace DefenseShields
             return true;
         }
 
-        public ConcurrentDictionary<MyCubeGrid, byte> SubGrids = new ConcurrentDictionary<MyCubeGrid, byte>();
-        public ConcurrentDictionary<MyCubeGrid, byte> LinkedGrids = new ConcurrentDictionary<MyCubeGrid, byte>();
+        public readonly ConcurrentDictionary<MyCubeGrid, byte> SubGrids = new ConcurrentDictionary<MyCubeGrid, byte>();
+        public readonly ConcurrentDictionary<MyCubeGrid, byte> LinkedGrids = new ConcurrentDictionary<MyCubeGrid, byte>();
 
         public Vector3D[] PhysicsOutside { get; set; } = new Vector3D[642];
 
