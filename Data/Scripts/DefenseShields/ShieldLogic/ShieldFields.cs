@@ -84,7 +84,7 @@ namespace DefenseShields
         private const int HeatingStep = 600;
         private const int CoolingStep = 1200;
         private const int FallBackStep = 10;
-        private const float MagicCapRatio = 1000;
+        private const float MagicCapRatio = 2000;
         private const float MagicEllipsoidRatio = 1000;
 
         private const float ChargeRatio = 1.25f;
@@ -110,6 +110,7 @@ namespace DefenseShields
         private readonly RunningAverage _hpsAvg = new RunningAverage(2);
         private readonly EllipsoidOxygenProvider _ellipsoidOxyProvider = new EllipsoidOxygenProvider(Matrix.Zero);
         private readonly EllipsoidSA _ellipsoidSa = new EllipsoidSA(double.MinValue, double.MinValue, double.MinValue);
+
         private readonly Vector3D[] _resetEntCorners = new Vector3D[8];
         private readonly Vector3D[] _obbCorners = new Vector3D[8];
         private readonly Vector3D[] _obbPoints = new Vector3D[9];

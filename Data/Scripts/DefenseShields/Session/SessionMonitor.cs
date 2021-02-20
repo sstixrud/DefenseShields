@@ -423,7 +423,8 @@ namespace DefenseShields
             while (EntRefreshQueue.TryDequeue(out ent))
             {
                 MyProtectors myProtector;
-                if (!GlobalProtect.TryGetValue(ent, out myProtector)) continue;
+                if (!GlobalProtect.TryGetValue(ent, out myProtector))
+                    continue;
 
                 var entShields = myProtector.Shields;
                 var refreshCount = 0;

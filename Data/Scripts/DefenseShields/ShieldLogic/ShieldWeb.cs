@@ -172,7 +172,10 @@ namespace DefenseShields
                     relation = protectedEnt.Relation;
                     protectedEnt.LastTick = tick;
                 }
+
+                var player = ent as IMyCharacter;
                 var grid = ent as MyCubeGrid;
+
                 switch (relation)
                 {
                     case Ent.Authenticated:
@@ -205,7 +208,9 @@ namespace DefenseShields
                         }
                         IgnoreCache.Add(ent);
                         ProtectCache cache;
-                        if (grid != null && ProtectedEntCache.TryRemove(ent, out cache))
+                        
+
+                        if ((grid != null || player != null) && ProtectedEntCache.TryRemove(ent, out cache))
                         {
                             Session.Instance.EntRefreshQueue.Enqueue(ent);
                             Session.Instance.ProtectCachePool.Return(cache);

@@ -1,5 +1,6 @@
 ﻿
 
+using SpaceEngineers.Game.ModAPI;
 using VRage.Collections;
 using VRage.Game.ModAPI;
 
@@ -531,8 +532,14 @@ namespace DefenseShields
                 var subWorldCenter = sub.GridIntegerToWorld(Vector3I.Zero);
                 var parentLocalOffset = MyGrid.WorldToGridInteger(subWorldCenter);
 
-                foreach (var cube in sub.GetFatBlocks()) { 
+                foreach (var cube in sub.GetFatBlocks()) {
 
+                    var term = cube as IMyTerminalBlock;
+                    var sensor = cube as IMySensorBlock;
+                    var iLight = cube as IMyInteriorLight;
+                    var sound = cube as IMySoundBlock;
+                    var controlPanel = cube as IMyControlPanel;
+                    if (term == null || sensor != null || iLight != null || sound != null || controlPanel != null) continue;
                     Vector3I translatedPos;
 
                     if (!isRootGrid)
@@ -552,7 +559,7 @@ namespace DefenseShields
             var unitLen = MyGrid.GridSize;
 
             center /= totalBlockCnt;
-            var percentile95Th = (int)(totalBlockCnt * 0.10);
+            var percentile95Th = (int)(totalBlockCnt * 0.12);
 
             ShellSort(_capcubeBoxList, center);
             _capcubeBoxList.RemoveRange(totalBlockCnt - percentile95Th, percentile95Th);

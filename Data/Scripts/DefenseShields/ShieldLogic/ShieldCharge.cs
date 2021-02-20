@@ -128,13 +128,10 @@ namespace DefenseShields
                 }
             }
 
-            if (!DsState.State.Lowered) {
-
-                if (DsState.State.Heat != 0) 
-                    UpdateHeatRate();
-                else 
-                    _expChargeReduction = 0;
-            }
+            if (DsState.State.Heat != 0) 
+                UpdateHeatRate();
+            else 
+                _expChargeReduction = 0;
 
             if (_count == 29 && DsState.State.Charge < ShieldMaxCharge) {
                 DsState.State.Charge += ShieldChargeRate;
@@ -215,7 +212,7 @@ namespace DefenseShields
                     }
 
                     var shieldLoss = ShieldMaxCharge * 0.0016667f;
-                    DsState.State.Charge = DsState.State.Charge - shieldLoss;
+                    DsState.State.Charge -= shieldLoss;
                     if (DsState.State.Charge < 0.01f) DsState.State.Charge = 0.01f;
 
                     if (_isServer) {

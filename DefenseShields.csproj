@@ -144,7 +144,7 @@
     <Compile Include="Data\Scripts\DefenseShields\SupportClasses\TheadEvents.cs" />
     <Compile Include="Data\Scripts\DefenseShields\SupportClasses\Utils.cs" />
     <Compile Include="Data\Scripts\DefenseShields\SupportClasses\Render.cs" />
-    <Compile Include="Data\Scripts\DefenseShields\ShieldLogic\ShieldHealth.cs" />
+    <Compile Include="Data\Scripts\DefenseShields\ShieldLogic\ShieldHeat.cs" />
     <Compile Include="Data\Scripts\DefenseShields\SupportClasses\Collision\CSupport\Triangle3.cs" />
   </ItemGroup>
   <ItemGroup>

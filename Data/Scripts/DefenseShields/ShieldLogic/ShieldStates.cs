@@ -168,7 +168,7 @@ namespace DefenseShields
         private void DefaultShieldState(bool clear, bool keepCharge, bool resetShape = true)
         {
             NotFailed = false;
-            var clearHeat = !DsState.State.Lowered || !MyCube.IsWorking;
+            var clearHeat = !DsState.State.Lowered && !MyCube.IsWorking && Shield.Enabled;
             if (clear)
             {
                 _power = 0.001f;
