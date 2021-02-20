@@ -91,7 +91,7 @@ namespace DefenseShields
                         return;
                     }
 
-                    if (!s.PlayerByShield && !s.MoverByShield && !s.NewEntByShield)
+                    if (!s.PlayerByShield && !s.MoverByShield && !s.NewEntByShield && s.MyGrid.OccupiedBlocks.Count == 0)
                     {
                         if (s.TicksWithNoActivity++ % EntCleanCycle == 0) s.EntCleanUpTime = true;
                         if (shieldActive && !s.WasPaused && Tick > 1200)
@@ -325,6 +325,7 @@ namespace DefenseShields
             Tick30 = Tick % 30 == 0;
             Tick60 = Tick % 60 == 0;
             Tick60 = Tick % 60 == 0;
+            Tick180 = Tick % 120 == 0;
             Tick180 = Tick % 180 == 0;
             Tick300 = Tick % 300 == 0;
             Tick600 = Tick % 600 == 0;
@@ -503,6 +504,8 @@ namespace DefenseShields
 
                     if (!DedicatedServer && Tick20 && s.EffectsDirty) s.ResetDamageEffects();
                     if (Tick600) s.CleanWebEnts();
+                    else if (Tick60) s.ProtectClean();
+
                     s.WebEntities();
                 }
                 if (WebWrapperOn)

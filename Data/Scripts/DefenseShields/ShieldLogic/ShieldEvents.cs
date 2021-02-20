@@ -111,6 +111,9 @@
 
         private void GridSplit(MyCubeGrid oldGrid, MyCubeGrid newGrid)
         {
+            if (Asleep)
+                Awake();
+
             newGrid.RecalculateOwners();
             _subUpdate = true;
         }
@@ -124,6 +127,9 @@
         {
             try
             {
+                if (Asleep)
+                    Awake();
+
                 _blockAdded = true;
                 _blockChanged = true;
             }
@@ -134,6 +140,9 @@
         {
             try
             {
+                if (Asleep)
+                    Awake();
+
                 _blockRemoved = true;
                 _blockChanged = true;
             }

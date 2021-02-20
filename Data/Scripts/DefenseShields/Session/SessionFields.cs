@@ -261,6 +261,8 @@ namespace DefenseShields
         internal bool Tick30 { get; set; }
         internal bool Tick60 { get; set; }
         internal bool Tick180 { get; set; }
+        internal bool Tick120 { get; set; }
+
         internal bool Tick300 { get; set; }
         internal bool Tick600 { get; set; }
         internal bool Tick1800 { get; set; }

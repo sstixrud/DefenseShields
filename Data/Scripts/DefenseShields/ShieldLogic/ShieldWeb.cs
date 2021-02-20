@@ -15,6 +15,23 @@ namespace DefenseShields
     public partial class DefenseShields
     {
         #region Web Entities
+
+        public void ProtectClean()
+        {
+            foreach (var info in ProtectedEntCache) {
+
+                if (Vector3D.Transform(info.Key.PositionComp.WorldAABB.Center, DetectMatrixOutsideInv).LengthSquared() > 1) {
+                    ProtectCache cache;
+                    if (ProtectedEntCache.TryRemove(info.Key, out cache)) {
+
+                        Session.Instance.EntRefreshQueue.Enqueue(info.Key);
+                        Session.Instance.ProtectCachePool.Return(cache);
+                        Session.Instance.FastRefresh = true;
+                    }
+                }
+            }
+        }
+
         public void CleanWebEnts()
         {
             AuthenticatedCache.Clear();
@@ -26,7 +43,11 @@ namespace DefenseShields
 
                     ProtectCache cache;
                     if (ProtectedEntCache.TryRemove(info.Key, out cache))
+                    {
+                        Session.Instance.EntRefreshQueue.Enqueue(info.Key);
                         Session.Instance.ProtectCachePool.Return(cache);
+                        Session.Instance.FastRefresh = true;
+                    }
                 }
             }
 

@@ -74,6 +74,12 @@ namespace DefenseShields
         }
         #endregion
 
+        internal void Awake()
+        {
+            Asleep = false;
+            LastWokenTick = _tick;
+        }
+
         internal void TerminalRefresh(bool update = true)
         {
             Shield.RefreshCustomInfo();
