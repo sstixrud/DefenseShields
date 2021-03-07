@@ -371,6 +371,9 @@ namespace DefenseShields
                 if (_subpartRotor == null) return false;
             }
 
+            if (!MyCube.NeedsWorldMatrix)
+                MyCube.NeedsWorldMatrix = true;
+
             if (!_subpartRotor.Closed) return true;
 
             _subpartRotor.Subparts.Clear();

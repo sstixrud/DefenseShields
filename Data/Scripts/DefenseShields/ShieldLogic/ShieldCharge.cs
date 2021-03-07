@@ -67,6 +67,9 @@ namespace DefenseShields
             if (ShieldMode == ShieldType.Station && DsState.State.Enhancer)
                 hpsEfficiency *= 3.5f;
 
+            if (DsState.State.Heat > 0)
+                hpsEfficiency *= 0.2f;
+
             var bufferMaxScaler = 100 / percent * (baseScaler * shieldTypeRatio) / _sizeScaler;
             var bufferMinScaler = 100 / (95f * ChargeRatio) * (baseScaler * shieldTypeRatio) / _sizeScaler;
             

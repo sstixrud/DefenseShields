@@ -25,7 +25,7 @@ namespace DefenseShields.Support
         public static void PrepConfigFile()
         {
             const int BaseScaler = 46;
-            const float HeatScaler = 0.0065f;
+            const float HeatScaler = 0.00325f;
             const float Unused = 0f;
             const int StationRatio = 100;
             const int LargeShipRate = 100;
@@ -34,7 +34,7 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 75;
+            const int Version = 77;
             const float CapScaler = 1f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
@@ -74,11 +74,12 @@ namespace DefenseShields.Support
                 Session.Enforced.MaintenanceCost = !unPackedData.MaintenanceCost.Equals(-1f) ? unPackedData.MaintenanceCost : MaintenanceCost;
                 Session.Enforced.DisableBlockDamage = !unPackedData.DisableBlockDamage.Equals(-1) ? unPackedData.DisableBlockDamage : DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
-                if (unPackedData.Version <= 74)
+                if (unPackedData.Version <= 76)
                 {
                     Session.Enforced.CapScaler = 1f;
                     Session.Enforced.BaseScaler = 46;
                     Session.Enforced.HpsEfficiency = 0.25f;
+                    Session.Enforced.HeatScaler = 0.00325f;
                     Session.Enforced.LargeShipRatio = 100;
                     Session.Enforced.StationRatio = 100;
                     Session.Enforced.SmallShipRatio = 100;

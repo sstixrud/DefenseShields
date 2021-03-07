@@ -1,8 +1,6 @@
 ﻿namespace DefenseShields
 {
     using Support;
-    using Sandbox.ModAPI;
-    using VRage.Game.ModAPI;
 
     public partial class DefenseShields
     {

@@ -191,6 +191,9 @@ namespace DefenseShields
                 return Entity.TryGetSubpart("Rotor", out _subpartRotor);
             }
 
+            if (!MyCube.NeedsWorldMatrix)
+                MyCube.NeedsWorldMatrix = true;
+
             if (!_subpartRotor.Closed) return true;
 
             _subpartRotor.Subparts.Clear();

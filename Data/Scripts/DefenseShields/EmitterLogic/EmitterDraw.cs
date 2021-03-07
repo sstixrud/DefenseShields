@@ -55,6 +55,9 @@ namespace DefenseShields
                 return;
             }
 
+            if (!MyCube.NeedsWorldMatrix)
+                MyCube.NeedsWorldMatrix = true;
+
             if (SubpartRotor.Closed) BlockReset(false);
             RotationTime -= 1;
             if (AnimationLoop == 0) TranslationTime = 0;
