@@ -51,6 +51,7 @@ namespace DefenseShields
         private Func<IMyTerminalBlock, Vector3D, double> _getDistanceToShield;
         private Func<IMyTerminalBlock, Vector3D, Vector3D?> _getClosestShieldPoint;
         private Func<MyEntity, MyTuple<bool, bool, float, float, float, int>> _getShieldInfo;
+        private Func<MyEntity, MyTuple<bool, bool, float, float>> _getModulationInfo;
 
         public bool ApiLoad()
         {
@@ -93,6 +94,7 @@ namespace DefenseShields
             _getDistanceToShield = (Func<IMyTerminalBlock, Vector3D, double>)delegates["GetDistanceToShield"];
             _getClosestShieldPoint = (Func<IMyTerminalBlock, Vector3D, Vector3D?>)delegates["GetClosestShieldPoint"];
             _getShieldInfo = (Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>)delegates["GetShieldInfo"];
+            _getModulationInfo = (Func<MyEntity, MyTuple<bool, bool, float, float>>)delegates["GetModulationInfo"];
 
             return true;
         }
@@ -137,5 +139,7 @@ namespace DefenseShields
         public double GetDistanceToShield(IMyTerminalBlock block, Vector3D pos) => _getDistanceToShield?.Invoke(block, pos) ?? -1;
         public Vector3D? GetClosestShieldPoint(IMyTerminalBlock block, Vector3D pos) => _getClosestShieldPoint?.Invoke(block, pos) ?? null;
         public MyTuple<bool, bool, float, float, float, int> GetShieldInfo(MyEntity entity) => _getShieldInfo?.Invoke(entity) ?? new MyTuple<bool, bool, float, float, float, int>();
+        public MyTuple<bool, bool, float, float> GetModulationInfo(MyEntity entity) => _getModulationInfo?.Invoke(entity) ?? new MyTuple<bool, bool, float, float>();
+
     }
 }

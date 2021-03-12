@@ -55,6 +55,7 @@ namespace DefenseShields
             ["GetDistanceToShield"] = new Func<IMyTerminalBlock, Vector3D, double>(TAPI_GetDistanceToShield),
             ["GetClosestShieldPoint"] = new Func<IMyTerminalBlock, Vector3D, Vector3D?>(TAPI_GetClosestShieldPoint),
             ["GetShieldInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>(TAPI_GetShieldInfo),
+            ["GetModulationInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float>>(TAPI_GetModulationInfo),
         };
 
         private readonly Dictionary<string, Delegate> _terminalPbApiMethods = new Dictionary<string, Delegate>()
@@ -672,6 +673,25 @@ namespace DefenseShields
                     info.Item5 = state.ShieldPercent;
                     info.Item6 = state.Heat;
                 }
+            }
+
+            return info;
+        }
+
+        private static MyTuple<bool, bool, float, float> TAPI_GetModulationInfo(MyEntity entity)
+        {
+            var info = new MyTuple<bool, bool, float, float>();
+
+            if (entity == null) return info;
+            ShieldGridComponent c;
+            if (Session.Instance.IdToBus.TryGetValue(entity.EntityId, out c) && c?.DefenseShields != null)
+            {
+                var s = c.DefenseShields;
+                var state = s.DsState.State;
+                info.Item1 = state.ReInforce;
+                info.Item2 = state.EmpProtection;
+                info.Item3 = state.ModulateKinetic;
+                info.Item4 = state.ModulateEnergy;
             }
 
             return info;
