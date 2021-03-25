@@ -426,7 +426,7 @@ namespace DefenseShields
                     if (newSettings.Visible != DsSet.Settings.Visible) 
                         _clientAltered = true;
                 }
-                var newShape = newSettings.Fit != DsSet.Settings.Fit || newSettings.FortifyShield != DsSet.Settings.FortifyShield || newSettings.SphereFit != DsSet.Settings.SphereFit;
+                var newShape = newSettings.Fit != DsSet.Settings.Fit || newSettings.FortifyShield != DsSet.Settings.FortifyShield || newSettings.SphereFit != DsSet.Settings.SphereFit || newSettings.SideFit != DsSet.Settings.SideFit;
                 
                 DsSet.Settings = newSettings;
                 SettingsUpdated = true;

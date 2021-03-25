@@ -56,6 +56,7 @@ namespace DefenseShields
             ["GetClosestShieldPoint"] = new Func<IMyTerminalBlock, Vector3D, Vector3D?>(TAPI_GetClosestShieldPoint),
             ["GetShieldInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>(TAPI_GetShieldInfo),
             ["GetModulationInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float>>(TAPI_GetModulationInfo),
+            ["PointHitFace"] = new Func<IMyTerminalBlock, Vector3D, bool, bool>(TAPI_PointHitFace),
         };
 
         private readonly Dictionary<string, Delegate> _terminalPbApiMethods = new Dictionary<string, Delegate>()
@@ -81,7 +82,7 @@ namespace DefenseShields
             ["ProtectedByShield"] = new Func<VRage.Game.ModAPI.Ingame.IMyEntity, bool>(TAPI_ProtectedByShield),
             ["GetShieldBlock"] = new Func<VRage.Game.ModAPI.Ingame.IMyEntity, Sandbox.ModAPI.Ingame.IMyTerminalBlock>(TAPI_GetShieldBlock),
             ["IsShieldBlock"] = new Func<Sandbox.ModAPI.Ingame.IMyTerminalBlock, bool>(TAPI_IsShieldBlock),
-            ["GetClosestShield"] = new Func<Vector3D, Sandbox.ModAPI.Ingame.IMyTerminalBlock>(TAPI_GetClosestShield),
+            ["GetClosestShield"] = new Func<Vector3D, Sandbox.ModAPI.Ingame.IMyTerminalBlock>(TAPI_GetClosestShieldPb), // need to switch to entityId
             ["GetDistanceToShield"] = new Func<Sandbox.ModAPI.Ingame.IMyTerminalBlock, Vector3D, double>(TAPI_GetDistanceToShield),
             ["GetClosestShieldPoint"] = new Func<Sandbox.ModAPI.Ingame.IMyTerminalBlock, Vector3D, Vector3D?>(TAPI_GetClosestShieldPoint),
         };
@@ -243,16 +244,43 @@ namespace DefenseShields
             return hpRemaining * 0.01f;
         }
 
+        private static bool TAPI_PointHitFace(IMyTerminalBlock block, Vector3D pos, bool posMustBeInside = false)
+        {
+            var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
+            if (logic == null)
+                return false;
+
+            lock (logic.MatrixLock) {
+
+                if (posMustBeInside && !CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv))
+                    return false;
+
+                if (logic.DsSet.Settings.SideFit)
+                    return UtilsStatic.FaceIntersected(logic.ShieldShapeMatrix, logic.MyGrid.PositionComp.LocalMatrixRef, pos, logic.DsSet.Settings.ShieldOffset);
+            }
+
+            return false;
+        }
+
         private static float? TAPI_PointAttackShieldCon(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, float secondaryDamage, bool energy, bool drawParticle, bool posMustBeInside = false)
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
             if (logic == null)
-            {
-                Log.Line($"TAPI_PointAttackShieldCon shield logic was null");
                 return null;
+
+            if (posMustBeInside || logic.DsSet.Settings.SideFit) {
+
+                lock (logic.MatrixLock) {
+
+                    if (posMustBeInside && !CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) 
+                        return null;
+
+                    if (logic.DsSet.Settings.SideFit) {
+                        if (UtilsStatic.FaceIntersected(logic.ShieldShapeMatrix, logic.MyGrid.PositionComp.LocalMatrixRef, pos, logic.DsSet.Settings.ShieldOffset))
+                            return float.MinValue;
+                    }
+                }
             }
-            if (posMustBeInside)
-                lock (logic.MatrixLock) if (!CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) return null;
 
             float hpRemaining;
             
@@ -301,7 +329,6 @@ namespace DefenseShields
 
             logic.WebDamage = true;
             logic.Absorb += damage;
-
             return hpRemaining * 0.01f;
         }
 
@@ -714,10 +741,11 @@ namespace DefenseShields
                         Item2 =
                         {
                             Item1 = true,
+                            Item2 = s.DsSet.Settings.SideFit,
                             Item3 = state.Charge,
                             Item4 = s.ShieldMaxCharge,
                             Item5 = state.ShieldPercent,
-                            Item6 = state.Heat
+                            Item6 = state.Heat,
                         },
                         Item3 = { Item1 = s.DetectMatrixOutsideInv, Item2 = s.DetectMatrixOutside }
                     };
@@ -788,6 +816,11 @@ namespace DefenseShields
                 }
             }
             return cloestSBlock as IMyTerminalBlock;
+        }
+
+        private static IMyTerminalBlock TAPI_GetClosestShieldPb(Vector3D pos)
+        {
+            return null;
         }
 
         private static double TAPI_GetDistanceToShield(IMyTerminalBlock block, Vector3D pos)

@@ -227,7 +227,6 @@
             internal void ComputeEffects(MatrixD matrix, Vector3D impactPos, MyEntity shellPassive, MyEntity shellActive, int prevLod, float shieldPercent, bool activeVisible, bool refreshAnim)
             {
                 if (ShellActive == null) ComputeSides(shellActive);
-
                 _flash = shieldPercent <= 10;
                 if (_flash && _mainLoop < 30) shieldPercent += 10;
 
@@ -236,7 +235,8 @@
 
                 _matrix = matrix;
                 ImpactPosState = impactPos;
-                _active = activeVisible && _activeColor != Session.Instance.Color90;
+                //_active = activeVisible && _activeColor != Session.Instance.Color90;
+                _active = activeVisible && true;
 
                 if (prevLod != _lod)
                 {
@@ -288,7 +288,6 @@
                         if (_longerLoop == 6) _longerLoop = 0;
                     }
                 }
-
                 if (ImpactPosState != Vector3D.NegativeInfinity) ComputeImpacts();
                 else if (_flash && _mainLoop == 0 || _mainLoop == 30) for (int i = 0; i < _hitFaces.Count; i++) UpdateColor(_sidePartArray[_hitFaces[i]]);
 
@@ -363,15 +362,27 @@
 
                 var projFront = VectorProjection(intersection, matrix.Forward);
                 if (projFront.LengthSquared() >= 0.65 * matrix.Forward.LengthSquared()) //if within the side thickness
-                    impactFaces.Add(intersection.Dot(matrix.Forward) > 0 ? 5 : 4);
+                {
+                    var face = intersection.Dot(matrix.Forward) > 0 ? 5 : 4;
+                    //Log.Line($"forward/back:{face}");
+                    impactFaces.Add(face);
+                }
 
                 var projLeft = VectorProjection(intersection, matrix.Left);
                 if (projLeft.LengthSquared() >= 0.65 * matrix.Left.LengthSquared()) //if within the side thickness
-                    impactFaces.Add(intersection.Dot(matrix.Left) > 0 ? 1 : 0);
+                {
+                    var face = intersection.Dot(matrix.Left) > 0 ? 1 : 0;
+                    //Log.Line($"left/right:{face}");
+                    impactFaces.Add(face);
+                }
 
                 var projUp = VectorProjection(intersection, matrix.Up);
                 if (projUp.LengthSquared() >= 0.65 * matrix.Up.LengthSquared()) //if within the side thickness
-                    impactFaces.Add(intersection.Dot(matrix.Up) > 0 ? 2 : 3);
+                {
+                    var face = intersection.Dot(matrix.Up) > 0 ? 2 : 3;
+                    //Log.Line($"up/down:{face}");
+                    impactFaces.Add(face);
+                }
             }
 
             private static Vector3D VectorProjection(Vector3D a, Vector3D b)

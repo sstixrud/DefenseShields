@@ -99,6 +99,7 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<VoxelCollisionDmgThreadEvent> VoxelCollisionDmgPool = new MyConcurrentPool<VoxelCollisionDmgThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<VoxelCollisionPhysicsThreadEvent> VoxelCollisionPhysicsPool = new MyConcurrentPool<VoxelCollisionPhysicsThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<ForceDataThreadEvent> ForceDataPool = new MyConcurrentPool<ForceDataThreadEvent>(100, info => info.Clean());
+
         internal readonly HashSet<string> DsActions = new HashSet<string>()
         {
             "DS-C_ToggleShield_Toggle",
@@ -107,7 +108,7 @@ namespace DefenseShields
             "DS-C_ChargeRate_Reset",
             "DS-C_ChargeRate_Increase",
             "DS-C_ChargeRate_Decrease",
-            "DS-C_ExtendFit_Toggle",
+            "DS-C_SideFit_Toggle",
             "DS-C_SphereFit_Toggle",
             "DS-C_ShieldFortify_Toggle",
             "DS-C_HideActive_Toggle",
@@ -126,6 +127,37 @@ namespace DefenseShields
             "DS-M_ModulateGrids_Toggle",
             "DS-M_ModulateEmpProt_Toggle"
         };
+        internal readonly List<string> PassiveSides = new List<string>()
+        {
+            "ShieldPLeft",
+            "ShieldPRight",
+            "ShieldPTop",
+            "ShieldPBottom",
+            "ShieldPFront",
+            "ShieldPBack",
+        };
+        /*
+
+        internal readonly List<string> PassiveSides = new List<string>()
+        {
+            "ShieldLeft",
+            "ShieldRight",
+            "ShieldTop",
+            "ShieldBottom",
+            "ShieldFront",
+            "ShieldBack",
+        };
+        */
+
+        internal enum ShieldSides
+        {
+            Left,
+            Right,
+            Top,
+            Bottom,
+            Front,
+            Back
+        }
 
         /*
         internal readonly Color White1 = new Color(255, 255, 255);
@@ -295,6 +327,9 @@ namespace DefenseShields
         internal IMyTerminalControlSlider ChargeSlider { get; set; }
         internal IMyTerminalControlSlider Fit { get; set; }
         internal IMyTerminalControlCheckbox SphereFit { get; set; }
+        internal IMyTerminalControlCheckbox SideFit { get; set; }
+        internal IMyTerminalControlCombobox ShieldSide { get; set; }
+
         internal IMyTerminalControlCheckbox FortifyShield { get; set; }
         internal IMyTerminalControlCheckbox BatteryBoostCheckBox { get; set; }
         internal IMyTerminalControlCheckbox HideActiveCheckBox { get; set; }
@@ -305,6 +340,14 @@ namespace DefenseShields
 
         internal IMyTerminalControlCheckbox SendToHudCheckBox { get; set; }
         internal IMyTerminalControlOnOffSwitch ToggleShield { get; set; }
+
+        internal IMyTerminalControlOnOffSwitch TopShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch BottomShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch LeftShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch RightShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch FrontShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch BackShield { get; set; }
+
         internal IMyTerminalControlCombobox ShellSelect { get; set; }
         internal IMyTerminalControlCombobox ShellVisibility { get; set; }
         internal IMyTerminalControlCombobox PowerScaleSelect { get; set; }
@@ -357,6 +400,11 @@ namespace DefenseShields
 
         internal GetFitSeq[] Fits = new GetFitSeq[]
         {
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.6f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.7f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.8f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.9f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 1f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.1f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.2f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.3f),

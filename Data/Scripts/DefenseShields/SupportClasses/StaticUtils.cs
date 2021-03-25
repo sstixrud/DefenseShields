@@ -24,8 +24,8 @@ namespace DefenseShields.Support
     {
         public static void PrepConfigFile()
         {
-            const int BaseScaler = 46;
-            const float HeatScaler = 0.00325f;
+            const int BaseScaler = 175;
+            const float HeatScaler = 0.004f;
             const float Unused = 0f;
             const int StationRatio = 100;
             const int LargeShipRate = 100;
@@ -34,7 +34,7 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 77;
+            const int Version = 78;
             const float CapScaler = 1f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
@@ -74,12 +74,12 @@ namespace DefenseShields.Support
                 Session.Enforced.MaintenanceCost = !unPackedData.MaintenanceCost.Equals(-1f) ? unPackedData.MaintenanceCost : MaintenanceCost;
                 Session.Enforced.DisableBlockDamage = !unPackedData.DisableBlockDamage.Equals(-1) ? unPackedData.DisableBlockDamage : DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
-                if (unPackedData.Version <= 76)
+                if (unPackedData.Version <= 77)
                 {
                     Session.Enforced.CapScaler = 1f;
-                    Session.Enforced.BaseScaler = 46;
+                    Session.Enforced.BaseScaler = 175;
                     Session.Enforced.HpsEfficiency = 0.25f;
-                    Session.Enforced.HeatScaler = 0.00325f;
+                    Session.Enforced.HeatScaler = 0.004f;
                     Session.Enforced.LargeShipRatio = 100;
                     Session.Enforced.StationRatio = 100;
                     Session.Enforced.SmallShipRatio = 100;
@@ -313,11 +313,11 @@ namespace DefenseShields.Support
             }
         }
 
-        public static void UnitSphereTranslateScaleList(int pointLimit, ref Vector3D[] physicsArray, ref List<Vector3D> scaledCloudList, MyEntity shieldEnt, bool debug, MyEntity grid, bool rotate = true)
+        public static void UnitSphereTranslateScaleList(int pointLimit, ref Vector3D[] physicsArray, ref List<Vector3D> scaledCloudList, ref BoundingSphereD sphere, MyEntity shieldEnt, bool debug, MyEntity grid, bool rotate = true)
         {
             var sPosComp = shieldEnt.PositionComp;
-            var radius = sPosComp.WorldVolume.Radius;
-            var center = sPosComp.WorldAABB.Center;
+            var radius = sphere.Radius;
+            var center = sphere.Center;
             var gMatrix = grid.PositionComp.WorldMatrixRef;
             for (int i = 0; i < pointLimit; i++)
             {
@@ -462,6 +462,104 @@ namespace DefenseShields.Support
             if (distSq > rangeSq)
                 return 0.0;
             return 1.0 - (distSq / rangeSq);
+        }
+
+        internal static bool FaceIntersected(MatrixD shieldShape, MatrixD gridLocalMatrix, Vector3D worldPos, Vector3I faces)
+        {
+            var referenceLocalPosition = gridLocalMatrix.Translation;
+            var worldDirection = worldPos - referenceLocalPosition;
+            var localPosition = Vector3D.TransformNormal(worldDirection, MatrixD.Transpose(gridLocalMatrix));
+            var impactTransNorm = localPosition - shieldShape.Translation;
+
+            var boxMax = shieldShape.Backward + shieldShape.Right + shieldShape.Up;
+            var boxMin = -boxMax;
+            var box = new BoundingBoxD(boxMin, boxMax);
+
+            var maxWidth = box.Max.LengthSquared();
+            Vector3D norm;
+            Vector3D.Normalize(ref impactTransNorm, out norm);
+            var testLine = new LineD(Vector3D.Zero, norm * maxWidth); //This is to ensure we intersect the box
+            LineD testIntersection;
+            box.Intersect(ref testLine, out testIntersection);
+
+            var intersection = testIntersection.To;
+
+            var projFront = VectorProjection(intersection, shieldShape.Forward);
+            if (projFront.LengthSquared() >= 0.8 * shieldShape.Forward.LengthSquared()) //if within the side thickness
+            {
+                var face = intersection.Dot(shieldShape.Forward) > 0 ? 5 : 4;
+                Log.Line($"FaceIntersected (4-5): {face} - {faces}");
+                if (faces.Z == 2 || faces.Z != 0 && face == 5 && faces.Z == -1 || face == 4 && faces.Z == 1)
+                    return true;
+            }
+
+            var projLeft = VectorProjection(intersection, shieldShape.Left);
+            if (projLeft.LengthSquared() >= 0.8 * shieldShape.Left.LengthSquared()) //if within the side thickness
+            {
+                var face = intersection.Dot(shieldShape.Left) > 0 ? 1 : 0;
+                Log.Line($"FaceIntersected (1-0): {face}  - {faces}");
+                if (faces.X == 2 || faces.X != 0 && face == 1 && faces.X == -1 || face == 0 && faces.X == 1)
+                    return true;
+            }
+
+            var projUp = VectorProjection(intersection, shieldShape.Up);
+            if (projUp.LengthSquared() >= 0.8 * shieldShape.Up.LengthSquared()) //if within the side thickness
+            {
+                var face = intersection.Dot(shieldShape.Up) > 0 ? 2 : 3;
+                Log.Line($"FaceIntersected(2-3): {face} - {faces}");
+                if (faces.Y == 2 || faces.Y != 0 && face == 2 && faces.Y == -1 || face == 3 && faces.Y == 1)
+                    return true;
+            }
+
+            return false;
+        }
+
+
+        public static void UpdatePassiveRender(MyEntity shellPassive, Vector3I faces)
+        {
+            if (shellPassive == null) return;
+            for (int i = 0; i < 6; i++)
+            {
+                MyEntitySubpart part;
+                if (shellPassive.TryGetSubpart(Session.Instance.PassiveSides[i], out part))
+                {
+                    var enable = SideEnabled(faces, (Session.ShieldSides)i);
+                    Log.Line($"found subpart: {enable}");
+                    part.Render.UpdateRenderObject(SideEnabled(faces, (Session.ShieldSides)i));
+                }
+            }
+        }
+
+        public static bool SideEnabled(Vector3I faces, Session.ShieldSides side)
+        {
+            switch (side)
+            {
+                case Session.ShieldSides.Left:
+                    if (faces.X == 1 || faces.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Right:
+                    if (faces.X == -1 || faces.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Top:
+                    if (faces.Y == 1 || faces.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Bottom:
+                    if (faces.Y == -1 || faces.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Front:
+                    if (faces.Z == 1 || faces.Z == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Back:
+                    if (faces.Z == -1 || faces.Z == 2)
+                        return true;
+                    break;
+            }
+            return false;
         }
 
         public static double GetIntersectingSurfaceArea(MatrixD matrix, Vector3D hitPosLocal)

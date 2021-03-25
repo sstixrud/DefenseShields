@@ -58,32 +58,26 @@ namespace DefenseShields
             var hpsEfficiency = Session.Enforced.HpsEfficiency;
             var baseScaler = Session.Enforced.BaseScaler;
             var maintenanceCost = Session.Enforced.MaintenanceCost;
-            var fortify = DsSet.Settings.FortifyShield;
-            var percent = DsSet.Settings.Rate * ChargeRatio;
+            var fortify = DsSet.Settings.FortifyShield && DsState.State.Enhancer && !DsSet.Settings.SideFit;
             var shieldTypeRatio = _shieldTypeRatio / 100f;
-            var chargePercent = DsSet.Settings.Rate * ConvToDec;
-            var shieldMaintainPercent = maintenanceCost / percent;
+            var shieldMaintainPercent = maintenanceCost / 100;
 
             if (ShieldMode == ShieldType.Station && DsState.State.Enhancer)
                 hpsEfficiency *= 3.5f;
+            else if (fortify)
+                hpsEfficiency *= 2f;
 
-            if (DsState.State.Heat > 0)
-                hpsEfficiency *= 0.2f;
-
-            var bufferMaxScaler = 100 / percent * (baseScaler * shieldTypeRatio) / _sizeScaler;
-            var bufferMinScaler = 100 / (95f * ChargeRatio) * (baseScaler * shieldTypeRatio) / _sizeScaler;
-            
+            var bufferMaxScaler = (baseScaler * shieldTypeRatio) / _sizeScaler;
 
             ShieldMaxHpBase = ShieldMaxPower * bufferMaxScaler;
-            ShieldMinMaxHpBase = ShieldMaxPower * bufferMinScaler;
 
             var powerCap = DsState.State.GridIntegrity;
             if (capScaler > 0) {
 
-                if (fortify) 
+                if (ShieldMode == ShieldType.Station) 
+                    capScaler *= 3.5f;
+                else if (fortify || DsSet.Settings.SideFit)
                     capScaler *= 2f;
-                else if (ShieldMode == ShieldType.Station) 
-                    capScaler *= 5f;
 
                 powerCap *= capScaler;
             }
@@ -94,14 +88,12 @@ namespace DefenseShields
                 shieldMaintainPercent *= 0.25f;
 
             var maxHpScaler = ShieldMaxHpBase > powerCap ? powerCap / ShieldMaxHpBase : 1f;
-            var minMaxHpScaler = ShieldMinMaxHpBase > powerCap ? powerCap / ShieldMinMaxHpBase : 1f;
 
             _shieldMaintaintPower = ShieldMaxPower * maxHpScaler * shieldMaintainPercent;
 
             ShieldMaxCharge = ShieldMaxHpBase * maxHpScaler;
-            ShieldMinMaxCharge = ShieldMinMaxHpBase * minMaxHpScaler;
 
-            var powerForShield = PowerNeeded(chargePercent, hpsEfficiency);
+            var powerForShield = PowerNeeded(hpsEfficiency);
 
             if (!WarmedUp) return;
 
@@ -159,11 +151,12 @@ namespace DefenseShields
             }
         }
 
-        private float PowerNeeded(float chargePercent, float hpsEfficiency)
+        private float PowerNeeded(float hpsEfficiency)
         {
             var cleanPower = ShieldAvailablePower + ShieldCurrentPower;
             _otherPower = ShieldMaxPower - cleanPower;
-            var powerForShield = ((cleanPower * chargePercent) - _shieldMaintaintPower);
+            var powerForShield = (cleanPower * 0.9f) - _shieldMaintaintPower;
+
             var rawMaxChargeRate = powerForShield > 0 ? powerForShield : 0f;
             _shieldMaxChargeRate = rawMaxChargeRate;
             _shieldPeakRate = (_shieldMaxChargeRate * hpsEfficiency);

@@ -23,7 +23,6 @@ namespace DefenseShields
             Vector3D impactPos;
             lock (HandlerImpact) impactPos = HandlerImpact.Active ? ComputeHandlerImpact() : WorldImpactPosition;
             var intersected = WorldImpactPosition != Vector3D.NegativeInfinity && impactPos != Vector3D.Zero;
-
             WorldImpactPosition = impactPos;
             var activeVisible = DetermineVisualState(reInforce);
             WorldImpactPosition = Vector3D.NegativeInfinity;
@@ -31,7 +30,7 @@ namespace DefenseShields
             var kineticHit = EnergyHit == HitType.Kinetic;
             _localImpactPosition = Vector3D.NegativeInfinity;
 
-            if (impactPos != Vector3D.NegativeInfinity && (kineticHit && KineticCoolDown < 0 || EnergyHit == HitType.Energy && EnergyCoolDown < 0))
+            if (impactPos != Vector3D.NegativeInfinity && (kineticHit && KineticCoolDown < 0 || EnergyHit == HitType.Energy && EnergyCoolDown < 0 || EnergyHit == HitType.Other))
             {
                 if (_isServer && WebDamage && GridIsMobile)
                 {
