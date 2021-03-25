@@ -153,7 +153,8 @@ namespace DefenseShields
         {
             var losPointSphere = Session.Instance.LosPointSphere;
             LosScaledCloud.Clear();
-            UtilsStatic.UnitSphereTranslateScaleList(_unitSpherePoints, ref losPointSphere, ref LosScaledCloud, ShieldComp.DefenseShields.ShieldEnt, false, MyGrid);
+            var checkSphere = new BoundingSphereD(ShieldComp.DefenseShields.MyGridCenter, ShieldComp.DefenseShields.DsState.State.GridHalfExtents.Length() + 20);
+            UtilsStatic.UnitSphereTranslateScaleList(_unitSpherePoints, ref losPointSphere, ref LosScaledCloud, ref checkSphere, ShieldComp.DefenseShields.ShieldEnt, false, MyGrid);
         }
 
         private void BroadCastLosMessage(int blocked, int needed, DefenseShields controller)

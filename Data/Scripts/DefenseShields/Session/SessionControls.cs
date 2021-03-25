@@ -40,9 +40,10 @@
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep0");
                 ToggleShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_ToggleShield", "Shield Status", "Raise or Lower Shields", "Up", "Down", DsUi.GetRaiseShield, DsUi.SetRaiseShield);
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep1");
-                ChargeSlider = TerminalHelpers.AddSlider(comp?.Shield, "DS-C_ChargeRate", "Shield Charge Rate", "Percentage Of Power The Shield May Consume", DsUi.GetRate, DsUi.SetRate);
-                ChargeSlider.SetLimits(20, 95);
+                //ChargeSlider = TerminalHelpers.AddSlider(comp?.Shield, "DS-C_ChargeRate", "Shield Charge Rate", "Percentage Of Power The Shield May Consume", DsUi.GetRate, DsUi.SetRate);
+                //ChargeSlider.SetLimits(20, 95);
                 PowerScaleSelect = TerminalHelpers.AddCombobox(comp?.Shield, "DS-C_PowerScale", "Select Power Scale", "Select the power scale to use", DsUi.GetPowerScale, DsUi.SetPowerScale, DsUi.ListPowerScale);
+
                 PowerWatts = TerminalHelpers.AddSlider(comp?.Shield, "DS-C_PowerWatts", "Power To Use", "Select the maximum scaled power the shield can use", DsUi.GetPowerWatts, DsUi.SetPowerWatts,  DsUi.EnablePowerWatts);
                 PowerWatts.SetLimits(1, 999);
                 if (comp != null && comp.GridIsMobile)
@@ -51,11 +52,14 @@
                 }
 
                 Fit = TerminalHelpers.AddSlider(comp?.Shield, "DS-CFit", "Shield Fit", "Shield Fit", DsUi.GetFit, DsUi.SetFit);
-                Fit.SetLimits(0, 24);
+                Fit.SetLimits(0, 29);
 
                 SphereFit = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SphereFit", "Sphere Shield", "Sphere Shield", DsUi.GetSphereFit, DsUi.SetSphereFit);
                 FortifyShield = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShieldFortify", "Fortify Shield ", "Fortify Shield ", DsUi.GetFortify, DsUi.SetFortify);
+
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep3");
+                
+                ShieldSide = TerminalHelpers.AddCombobox(comp?.Shield, "DS-C_SideFit", "Side Shield", "Side Shield", DsUi.GetSide, DsUi.SetSide, DsUi.ListSides);
 
                 WidthSlider = TerminalHelpers.AddSlider(comp?.Shield, "DS-C_WidthSlider", "Shield Size Width", "Shield Size Width", DsUi.GetWidth, DsUi.SetWidth);
                 WidthSlider.SetLimits(30, 1000);
@@ -90,12 +94,25 @@
                 HitWaveAnimationCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_HitWaveAnimation", "Show Hit Wave Animation", "Show Wave Effect On Shield Damage", DsUi.GetHitWaveAnimation, DsUi.SetHitWaveAnimation);
                 NoWarningSoundsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_NoWarningSounds", "Disable audio warnings    ", "Supress shield audio warnings", DsUi.GetNoWarningSounds, DsUi.SetNoWarningSounds);
                 DimShieldHitsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_DimShieldHits", "Dim Incoming Hit Effects ", "Supress brightness of incoming hit effects", DsUi.GetDimShieldHits, DsUi.SetDimShieldHits);
+
+                TerminalHelpers.Separator(comp?.Shield, "DS-C_sep6");
+                SideFit = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideFit", "Side Shields", "Side Shields", DsUi.GetSideFit, DsUi.SetSideFit);
+
+                TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Top Shield", "Top Shield", "Up", "Down", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.SidesEnabled);
+                BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Bottom Shield", "Bottom Shield", "Up", "Down", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.SidesEnabled);
+                LeftShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_LeftShield", "Left Shield", "Left Shield", "Up", "Down", DsUi.GetLeftShield, DsUi.SetLeftShield, DsUi.SidesEnabled);
+                RightShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_RightShield", "Right Shield", "Right Shield", "Up", "Down", DsUi.GetRightShield, DsUi.SetRightShield, DsUi.SidesEnabled);
+                FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Front Shield", "Front Shield", "Up", "Down", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.SidesEnabled);
+                BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Back Shield", "Back Shield", "Up", "Down", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.SidesEnabled);
+
                 CreateAction<IMyUpgradeModule>(ToggleShield);
 
-                CreateActionChargeRate<IMyUpgradeModule>(ChargeSlider);
+                //CreateActionChargeRate<IMyUpgradeModule>(ChargeSlider);
 
                 //CreateAction<IMyUpgradeModule>(Fit);
                 CreateAction<IMyUpgradeModule>(SphereFit);
+                CreateAction<IMyUpgradeModule>(SideFit);
+
                 CreateAction<IMyUpgradeModule>(FortifyShield);
 
                 CreateAction<IMyUpgradeModule>(HideActiveCheckBox);
@@ -103,10 +120,237 @@
                 CreateAction<IMyUpgradeModule>(HitWaveAnimationCheckBox);
                 CreateAction<IMyUpgradeModule>(SendToHudCheckBox);
                 CreateAction<IMyUpgradeModule>(BatteryBoostCheckBox);
+                CreateFitAction<IMyUpgradeModule>(Fit);
+                CreateDepthAction<IMyUpgradeModule>(DepthSlider);
+                CreateWidthAction<IMyUpgradeModule>(WidthSlider);
+                CreateHeightAction<IMyUpgradeModule>(HeightSlider);
+                //CreateSideAction<IMyUpgradeModule>(SideFit);
+
+
                 DsControl = true;
             }
             catch (Exception ex) { Log.Line($"Exception in CreateControlerUi: {ex}"); }
         }
+
+        internal static void TerminalDepthIncrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+
+            var max = comp.ShieldMode == DefenseShields.ShieldType.Station ? 70 : 39;
+            var currentValue = DsUi.GetOffsetDepth(blk);
+            var nextValue = currentValue + 1 < max ? currentValue + 1 : currentValue; 
+            DsUi.SetOffsetDepth(blk, nextValue);
+        }
+
+        internal static void TerminalActionDepthDecrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+
+            var max = comp.ShieldMode == DefenseShields.ShieldType.Station ? 70 : 39;
+            var currentValue = DsUi.GetOffsetDepth(blk);
+            var nextValue = currentValue - 1 > -max ? currentValue - 1 : currentValue;
+            DsUi.SetOffsetDepth(blk, nextValue);
+        }
+
+        internal static void TerminalActioWidthIncrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+            var max = comp.ShieldMode == DefenseShields.ShieldType.Station ? 70 : 39;
+            var currentValue = DsUi.GetOffsetWidth(blk);
+            var nextValue = currentValue + 1 < max ? currentValue + 1 : currentValue;
+            DsUi.SetOffsetWidth(blk, nextValue);
+        }
+
+        internal static void TerminalActionWidthDecrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+
+            var max = comp.ShieldMode == DefenseShields.ShieldType.Station ? 70 : 39;
+            var currentValue = DsUi.GetOffsetWidth(blk);
+            var nextValue = currentValue - 1 > -max ? currentValue - 1 : currentValue;
+            DsUi.SetOffsetWidth(blk, nextValue);
+        }
+
+        internal static void TerminalActioHeightIncrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+
+            var max = comp.ShieldMode == DefenseShields.ShieldType.Station ? 70 : 39;
+            var currentValue = DsUi.GetOffsetHeight(blk);
+            var nextValue = currentValue + 1 < max ? currentValue + 1 : currentValue;
+            DsUi.SetOffsetHeight(blk, nextValue);
+        }
+
+        internal static void TerminalActionHeightDecrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+
+            var max = comp.ShieldMode == DefenseShields.ShieldType.Station ? 70 : 39;
+            var currentValue = DsUi.GetOffsetHeight(blk);
+            var nextValue = currentValue - 1 > -max ? currentValue - 1 : currentValue;
+            DsUi.SetOffsetHeight(blk, nextValue);
+        }
+
+        internal static void TerminalActioFitSizeIncrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+
+            var currentValue = DsUi.GetFit(blk);
+            var nextValue = currentValue + 1 < Instance.Fits.Length ? currentValue + 1 : currentValue;
+            DsUi.SetFit(blk, nextValue);
+        }
+
+        internal static void TerminalActionFitSizeDecrease(IMyTerminalBlock blk)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return;
+
+            var currentValue = DsUi.GetFit(blk);
+            var nextValue = currentValue - 1 >= 0 ? currentValue - 1 : currentValue;
+            DsUi.SetFit(blk, nextValue);
+        }
+
+        internal static bool HasShield(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            return comp != null;
+        }
+
+        internal static void FitSizeWriter(IMyTerminalBlock blk, StringBuilder sb)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+            sb.Append(comp.DsSet.Settings.Fit);
+        }
+
+        internal static void DepthWriter(IMyTerminalBlock blk, StringBuilder sb)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+            sb.Append(DsUi.GetOffsetDepth(blk));
+        }
+
+        internal static void WidthWriter(IMyTerminalBlock blk, StringBuilder sb)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+            sb.Append(DsUi.GetOffsetWidth(blk));
+        }
+
+        internal static void HeightWriter(IMyTerminalBlock blk, StringBuilder sb)
+        {
+            var comp = blk?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+            sb.Append(DsUi.GetOffsetHeight(blk));
+        }
+
+        public void CreateDepthAction<T>(IMyTerminalControlSlider c)
+        {
+            var id = ((IMyTerminalControl)c).Id;
+
+            var action0 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_DepthIncrease");
+            action0.Icon = @"Textures\GUI\Icons\Actions\Increase.dds";
+            action0.Name = new StringBuilder($"Depth Increase");
+            action0.Action = TerminalDepthIncrease;
+            action0.Writer = DepthWriter;
+            action0.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action0);
+
+            var action1 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_DepthDecrease");
+            action1.Icon = @"Textures\GUI\Icons\Actions\Decrease.dds";
+            action1.Name = new StringBuilder($"Depth Decrease");
+            action1.Action = TerminalActionDepthDecrease;
+            action1.Writer = DepthWriter;
+            action1.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action1);
+        }
+
+        public void CreateWidthAction<T>(IMyTerminalControlSlider c)
+        {
+            var id = ((IMyTerminalControl)c).Id;
+
+            var action0 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_WidthIncrease");
+            action0.Icon = @"Textures\GUI\Icons\Actions\Increase.dds";
+            action0.Name = new StringBuilder($"Width Increase");
+            action0.Action = TerminalActioWidthIncrease;
+            action0.Writer = WidthWriter;
+            action0.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action0);
+
+            var action1 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_WidthDecrease");
+            action1.Icon = @"Textures\GUI\Icons\Actions\Decrease.dds";
+            action1.Name = new StringBuilder($"Width Decrease");
+            action1.Action = TerminalActionWidthDecrease;
+            action1.Writer = WidthWriter;
+            action1.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action1);
+        }
+
+        public void CreateHeightAction<T>(IMyTerminalControlSlider c)
+        {
+            var id = ((IMyTerminalControl)c).Id;
+
+            var action0 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_HeightIncrease");
+            action0.Icon = @"Textures\GUI\Icons\Actions\Increase.dds";
+            action0.Name = new StringBuilder($"Height Increase");
+            action0.Action = TerminalActioHeightIncrease;
+            action0.Writer = HeightWriter;
+            action0.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action0);
+
+            var action1 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_HeightDecrease");
+            action1.Icon = @"Textures\GUI\Icons\Actions\Decrease.dds";
+            action1.Name = new StringBuilder($"Height Decrease");
+            action1.Action = TerminalActionHeightDecrease;
+            action1.Writer = HeightWriter;
+            action1.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action1);
+        }
+
+        public void CreateFitAction<T>(IMyTerminalControlSlider c)
+        {
+            var id = ((IMyTerminalControl)c).Id;
+
+            var action0 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_FitIncrease");
+            action0.Icon = @"Textures\GUI\Icons\Actions\Increase.dds";
+            action0.Name = new StringBuilder($"Fit Increase");
+            action0.Action = TerminalActioFitSizeIncrease;
+            action0.Writer = FitSizeWriter;
+            action0.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action0);
+
+            var action1 = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_FitDecrease");
+            action1.Icon = @"Textures\GUI\Icons\Actions\Decrease.dds";
+            action1.Name = new StringBuilder($"Fit Decrease");
+            action1.Action = TerminalActionFitSizeDecrease;
+            action1.Writer = FitSizeWriter;
+            action1.Enabled = HasShield;
+
+            MyAPIGateway.TerminalControls.AddAction<T>(action1);
+        }
+
 
         public void CreatePlanetShieldElements(IMyTerminalBlock block)
         {

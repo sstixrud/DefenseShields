@@ -107,7 +107,7 @@ namespace DefenseShields
             "DS-C_ChargeRate_Reset",
             "DS-C_ChargeRate_Increase",
             "DS-C_ChargeRate_Decrease",
-            "DS-C_ExtendFit_Toggle",
+            "DS-C_SideFit_Toggle",
             "DS-C_SphereFit_Toggle",
             "DS-C_ShieldFortify_Toggle",
             "DS-C_HideActive_Toggle",
@@ -295,6 +295,9 @@ namespace DefenseShields
         internal IMyTerminalControlSlider ChargeSlider { get; set; }
         internal IMyTerminalControlSlider Fit { get; set; }
         internal IMyTerminalControlCheckbox SphereFit { get; set; }
+        internal IMyTerminalControlCheckbox SideFit { get; set; }
+        internal IMyTerminalControlCombobox ShieldSide { get; set; }
+
         internal IMyTerminalControlCheckbox FortifyShield { get; set; }
         internal IMyTerminalControlCheckbox BatteryBoostCheckBox { get; set; }
         internal IMyTerminalControlCheckbox HideActiveCheckBox { get; set; }
@@ -305,6 +308,14 @@ namespace DefenseShields
 
         internal IMyTerminalControlCheckbox SendToHudCheckBox { get; set; }
         internal IMyTerminalControlOnOffSwitch ToggleShield { get; set; }
+
+        internal IMyTerminalControlOnOffSwitch TopShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch BottomShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch LeftShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch RightShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch FrontShield { get; set; }
+        internal IMyTerminalControlOnOffSwitch BackShield { get; set; }
+
         internal IMyTerminalControlCombobox ShellSelect { get; set; }
         internal IMyTerminalControlCombobox ShellVisibility { get; set; }
         internal IMyTerminalControlCombobox PowerScaleSelect { get; set; }
@@ -357,6 +368,11 @@ namespace DefenseShields
 
         internal GetFitSeq[] Fits = new GetFitSeq[]
         {
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.6f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.7f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.8f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 0.9f),
+            new GetFitSeq(Math.Sqrt(0), Math.Sqrt(1), 1f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.1f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.2f),
             new GetFitSeq(Math.Sqrt(1), Math.Sqrt(2), 0.3f),

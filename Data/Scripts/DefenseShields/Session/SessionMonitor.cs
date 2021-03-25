@@ -350,7 +350,7 @@ namespace DefenseShields
             {
                 if (!MiscLoaded)
                 {
-                    if (SessionReady && GlobalProtect.Count > 0 && (IsServer || !IsServer && ClientLoadCount++ > 60))
+                    if (SessionReady && GlobalProtect.Count > 0 && (IsServer || !IsServer && ClientLoadCount++ > 120))
                     {
                         UtilsStatic.GetDefinitons();
                         if (!IsServer) Players.TryAdd(MyAPIGateway.Session.Player.IdentityId, MyAPIGateway.Session.Player);

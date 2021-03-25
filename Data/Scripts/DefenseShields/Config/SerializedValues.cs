@@ -76,7 +76,7 @@
         [ProtoMember(5)] public bool NoWarningSounds = false;
         [ProtoMember(6)] public bool ActiveInvisible = false;
         [ProtoMember(7), DefaultValue(-1)] public float Rate = 50f;
-        [ProtoMember(8)] public bool ExtendFit = false;
+        [ProtoMember(8)] public bool SideFit = false;
         [ProtoMember(9)] public bool SphereFit = false;
         [ProtoMember(10)] public bool FortifyShield = false;
         [ProtoMember(11), DefaultValue(true)] public bool SendToHud = true;
@@ -90,7 +90,7 @@
         [ProtoMember(19)] public uint MId;
         [ProtoMember(20)] public long PowerScale = 0;
         [ProtoMember(21), DefaultValue(-1)] public int PowerWatts = 999;
-        [ProtoMember(22), DefaultValue(2)] public int Fit = 10;
+        [ProtoMember(22), DefaultValue(2)] public int Fit = 15;
     }
 
     [ProtoContract]

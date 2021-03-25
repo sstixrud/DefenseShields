@@ -23,7 +23,7 @@ namespace DefenseShields
 
         internal readonly object SubLock = new object();
 
-        internal readonly int[] ExpChargeReductions = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+        internal readonly int[] ExpChargeReductions = { 1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 };
         internal readonly float[] ReserveScaler = { -1f, 0.001f, 1, 1000, 1000000 };
 
         internal readonly List<MyEntity> PruneList = new List<MyEntity>();
@@ -321,7 +321,7 @@ namespace DefenseShields
 
         internal float ShieldChargeRate { get; set; }
         internal float ShieldMaxCharge { get; set; }
-        internal float ShieldMinMaxCharge { get; set; }
+        //internal float ShieldMinMaxCharge { get; set; }
         internal float GridMaxPower { get; set; }
         internal float GridCurrentPower { get; set; }
         internal float GridAvailablePower { get; set; }
@@ -329,7 +329,7 @@ namespace DefenseShields
         internal float ShieldAvailablePower { get; set; }
         internal float ShieldMaxPower { get; set; }
         internal float ShieldMaxHpBase { get; set; }
-        internal float ShieldMinMaxHpBase { get; set; }
+        //internal float ShieldMinMaxHpBase { get; set; }
 
         internal double BoundingRange { get; set; }
         internal double EllipsoidVolume { get; set; }

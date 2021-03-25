@@ -97,13 +97,16 @@ namespace DefenseShields
 
             if (DsSet.Settings.SphereFit || DsSet.Settings.FortifyShield)
             {
-                var extend = DsSet.Settings.Fit > 9 ? 2 : 1;
                 var fortify = DsSet.Settings.FortifyShield ? 3 : 1;
-                var size = expandedAabb.HalfExtents.Max() * fortify;
-                var scaler = 4;
-                if (shieldGrid.GridSizeEnum == MyCubeSize.Small && DsSet.Settings.Fit < 10) scaler = 5;
+                var fit = (float)UtilsStatic.GetFit(DsSet.Settings.Fit) * 0.5f;
+                var scaler = 4f;
+                if (shieldGrid.GridSizeEnum == MyCubeSize.Small && DsSet.Settings.Fit < 15) scaler = 5;
+
+
+                var size = (expandedAabb.HalfExtents.Max() * fortify) * fit;
                 var vectorSize = new Vector3D(size, size, size);
-                var fudge = shieldGrid.GridSize * scaler * extend;
+
+                var fudge = shieldGrid.GridSize * scaler;
                 var extentsDiff = DsState.State.GridHalfExtents.LengthSquared() - vectorSize.LengthSquared();
                 if (extentsDiff < -1 || extentsDiff > 1 || DsState.State.GridHalfExtents == Vector3D.Zero || !fudge.Equals(DsState.State.ShieldFudge)) DsState.State.GridHalfExtents = vectorSize;
                 DsState.State.ShieldFudge = fudge;
@@ -116,7 +119,8 @@ namespace DefenseShields
                 var overThreshold = extentsDiff < -offset || extentsDiff > offset || forceUpdate; //first grow, second shrink
                 if (overThreshold || DsState.State.GridHalfExtents == Vector3D.Zero) DsState.State.GridHalfExtents = expandedAabb.HalfExtents;
             }
-            _halfExtentsChanged = !DsState.State.GridHalfExtents.Equals(_oldGridHalfExtents);
+            _halfExtentsChanged = !DsState.State.GridHalfExtents.Equals(_oldGridHalfExtents) || (DsSet.Settings.SphereFit || DsSet.Settings.FortifyShield) && SettingsUpdated;
+
             if (_halfExtentsChanged || SettingsUpdated)
             {
                 _adjustShape = true;
@@ -150,15 +154,15 @@ namespace DefenseShields
             var height = DsSet.Settings.Height;
             var depth = DsSet.Settings.Depth;
 
-            var xMax = GridIsMobile ? DsState.State.GridHalfExtents.X * 0.25f : float.MaxValue;
-            var yMax = GridIsMobile ? DsState.State.GridHalfExtents.Y * 0.25f : float.MaxValue;
-            var zMax = GridIsMobile ? DsState.State.GridHalfExtents.Z * 0.25f : float.MaxValue;
+            var xMax = GridIsMobile ? DsState.State.GridHalfExtents.X * 0.33333f : float.MaxValue;
+            var yMax = GridIsMobile ? DsState.State.GridHalfExtents.Y * 0.33333f : float.MaxValue;
+            var zMax = GridIsMobile ? DsState.State.GridHalfExtents.Z * 0.33333f : float.MaxValue;
 
             var wOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.X, -xMax, xMax);
             var hOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Y, -yMax, yMax);
             var dOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Z, -zMax, zMax);
-
             var localOffsetMeters = new Vector3D(wOffset, hOffset, dOffset) * MyGrid.GridSize;
+
             var gridMatrix = MyGrid.PositionComp.WorldMatrixRef;
             var worldOffset = Vector3D.TransformNormal(localOffsetMeters, gridMatrix); 
 
@@ -232,7 +236,7 @@ namespace DefenseShields
                 _ellipsoidSurfaceArea = _ellipsoidSa.Surface;
                 EllipsoidVolume = 1.333333 * Math.PI * DetectMatrixOutside.Scale.X * DetectMatrixOutside.Scale.Y * DetectMatrixOutside.Scale.Z;
 
-                var magicMod = DsState.State.Enhancer && ShieldMode == ShieldType.Station ? 100f : 1f;
+                var magicMod = DsState.State.Enhancer && ShieldMode == ShieldType.Station ? 100f : DsState.State.Enhancer && DsSet.Settings.FortifyShield ? 10f : 1f;
                 var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio * magicMod);
                 _sizeScaler = (float)Math.Sqrt(ellipsoidMagic);
 
