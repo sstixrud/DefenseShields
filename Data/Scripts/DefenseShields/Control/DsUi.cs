@@ -654,32 +654,12 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            switch (newValue)
-            {
-                case 0:
-                    comp.DsSet.Settings.ShieldOffset = Vector3I.Up;
-                    break;
-                case 1:
-                    comp.DsSet.Settings.ShieldOffset = Vector3I.Down;
-                    break;
-                case 2:
-                    comp.DsSet.Settings.ShieldOffset = Vector3I.Left;
-                    break;
-                case 3:
-                    comp.DsSet.Settings.ShieldOffset = Vector3I.Right;
-                    break;
-                case 4:
-                    comp.DsSet.Settings.ShieldOffset = Vector3I.Forward;
-                    break;
-                default:
-                    comp.DsSet.Settings.ShieldOffset = Vector3I.Backward;
-                    break;
-            }
-            Log.Line($"SetSide: {newValue} - {comp.DsSet.Settings.ShieldOffset}");
-
-            comp.FitChanged = true;
+            comp.SelectPassiveShell();
+            comp.UpdatePassiveModel();
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
+            Log.Line($"SetSide: {newValue} - {comp.DsSet.Settings.ShieldOffset}");
+
         }
 
         internal static float GetPowerWatts(IMyTerminalBlock block)

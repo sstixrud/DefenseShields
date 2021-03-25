@@ -99,6 +99,7 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<VoxelCollisionDmgThreadEvent> VoxelCollisionDmgPool = new MyConcurrentPool<VoxelCollisionDmgThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<VoxelCollisionPhysicsThreadEvent> VoxelCollisionPhysicsPool = new MyConcurrentPool<VoxelCollisionPhysicsThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<ForceDataThreadEvent> ForceDataPool = new MyConcurrentPool<ForceDataThreadEvent>(100, info => info.Clean());
+
         internal readonly HashSet<string> DsActions = new HashSet<string>()
         {
             "DS-C_ToggleShield_Toggle",
@@ -126,6 +127,37 @@ namespace DefenseShields
             "DS-M_ModulateGrids_Toggle",
             "DS-M_ModulateEmpProt_Toggle"
         };
+        internal readonly List<string> PassiveSides = new List<string>()
+        {
+            "ShieldPLeft",
+            "ShieldPRight",
+            "ShieldPTop",
+            "ShieldPBottom",
+            "ShieldPFront",
+            "ShieldPBack",
+        };
+        /*
+
+        internal readonly List<string> PassiveSides = new List<string>()
+        {
+            "ShieldLeft",
+            "ShieldRight",
+            "ShieldTop",
+            "ShieldBottom",
+            "ShieldFront",
+            "ShieldBack",
+        };
+        */
+
+        internal enum ShieldSides
+        {
+            Left,
+            Right,
+            Top,
+            Bottom,
+            Front,
+            Back
+        }
 
         /*
         internal readonly Color White1 = new Color(255, 255, 255);

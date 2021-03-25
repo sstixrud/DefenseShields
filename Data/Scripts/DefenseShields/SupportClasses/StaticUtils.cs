@@ -514,6 +514,54 @@ namespace DefenseShields.Support
             return false;
         }
 
+
+        public static void UpdatePassiveRender(MyEntity shellPassive, Vector3I faces)
+        {
+            if (shellPassive == null) return;
+            for (int i = 0; i < 6; i++)
+            {
+                MyEntitySubpart part;
+                if (shellPassive.TryGetSubpart(Session.Instance.PassiveSides[i], out part))
+                {
+                    var enable = SideEnabled(faces, (Session.ShieldSides)i);
+                    Log.Line($"found subpart: {enable}");
+                    part.Render.UpdateRenderObject(SideEnabled(faces, (Session.ShieldSides)i));
+                }
+            }
+        }
+
+        public static bool SideEnabled(Vector3I faces, Session.ShieldSides side)
+        {
+            switch (side)
+            {
+                case Session.ShieldSides.Left:
+                    if (faces.X == 1 || faces.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Right:
+                    if (faces.X == -1 || faces.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Top:
+                    if (faces.Y == 1 || faces.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Bottom:
+                    if (faces.Y == -1 || faces.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Front:
+                    if (faces.Z == 1 || faces.Z == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Back:
+                    if (faces.Z == -1 || faces.Z == 2)
+                        return true;
+                    break;
+            }
+            return false;
+        }
+
         public static double GetIntersectingSurfaceArea(MatrixD matrix, Vector3D hitPosLocal)
         {
             var surfaceArea = -1d; 

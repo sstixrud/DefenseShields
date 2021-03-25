@@ -71,6 +71,13 @@ namespace DefenseShields
         {
             try
             {
+                if (DsSet.Settings.SideFit)
+                {
+                    _modelPassive = ModelSided;
+                    _hideColor = true;
+                    _supressedColor = false;
+                    return;
+                }
                 switch (DsSet.Settings.ShieldShell)
                 {
                     case 0:
@@ -142,6 +149,8 @@ namespace DefenseShields
                 _shellPassive.RefreshModels($"{Session.Instance.ModPath()}{_modelPassive}", null);
                 _shellPassive.Render.RemoveRenderObjects();
                 _shellPassive.Render.UpdateRenderObject(true);
+                if (DsSet.Settings.SideFit) 
+                    UtilsStatic.UpdatePassiveRender(_shellPassive, DsSet.Settings.ShieldOffset);
                 _hideShield = false;
                 if (Session.Enforced.Debug == 3) Log.Line($"UpdatePassiveModel: modelString:{_modelPassive} - ShellNumber:{DsSet.Settings.ShieldShell} - ShieldId [{Shield.EntityId}]");
             }
