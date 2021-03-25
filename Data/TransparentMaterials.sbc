@@ -665,7 +665,7 @@
       <IsFlareOccluder>false</IsFlareOccluder>
     </TransparentMaterial>
 
-    <TransparentMaterial>
+<TransparentMaterial>
 	<Id>
         <TypeId>TransparentMaterialDefinition</TypeId> <!-- IGNORE -->
 		<SubtypeId>DS_HUD</SubtypeId> <!-- This is the name of the material as it is named in the 3D modelling software (transparent materials are no longer double sided mesh, require duplicate normals reversed mesh for other side) -->
@@ -774,7 +774,7 @@
       <SpecularColorFactor>0</SpecularColorFactor>
       <IsFlareOccluder>false</IsFlareOccluder>
     </TransparentMaterial>
-	    <TransparentMaterial>
+	<TransparentMaterial>
       <Id>
         <TypeId>TransparentMaterialDefinition</TypeId>
         <SubtypeId>DS_ShieldInside</SubtypeId>
