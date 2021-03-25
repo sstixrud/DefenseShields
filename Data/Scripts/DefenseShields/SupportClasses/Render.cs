@@ -364,7 +364,7 @@
                 if (projFront.LengthSquared() >= 0.65 * matrix.Forward.LengthSquared()) //if within the side thickness
                 {
                     var face = intersection.Dot(matrix.Forward) > 0 ? 5 : 4;
-                    Log.Line($"forward/back:{face}");
+                    //Log.Line($"forward/back:{face}");
                     impactFaces.Add(face);
                 }
 
@@ -372,7 +372,7 @@
                 if (projLeft.LengthSquared() >= 0.65 * matrix.Left.LengthSquared()) //if within the side thickness
                 {
                     var face = intersection.Dot(matrix.Left) > 0 ? 1 : 0;
-                    Log.Line($"left/right:{face}");
+                    //Log.Line($"left/right:{face}");
                     impactFaces.Add(face);
                 }
 
@@ -380,7 +380,7 @@
                 if (projUp.LengthSquared() >= 0.65 * matrix.Up.LengthSquared()) //if within the side thickness
                 {
                     var face = intersection.Dot(matrix.Up) > 0 ? 2 : 3;
-                    Log.Line($"up/down:{face}");
+                    //Log.Line($"up/down:{face}");
                     impactFaces.Add(face);
                 }
             }
