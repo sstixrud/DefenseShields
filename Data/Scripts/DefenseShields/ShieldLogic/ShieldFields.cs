@@ -101,7 +101,6 @@ namespace DefenseShields
         private const string ModelGold = "\\Models\\Cubes\\ShieldPassive05.mwm";
         private const string ModelOrange = "\\Models\\Cubes\\ShieldPassive04.mwm";
         private const string ModelCyan = "\\Models\\Cubes\\ShieldPassive03.mwm";
-        private const string ModelSided = "\\Models\\Cubes\\PassiveBase_Sectioned.mwm";
 
         private readonly List<MyResourceSourceComponent> _powerSources = new List<MyResourceSourceComponent>();
         private readonly List<MyCubeBlock> _functionalBlocks = new List<MyCubeBlock>();

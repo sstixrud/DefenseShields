@@ -112,14 +112,19 @@
             private readonly Vector2 _v20 = new Vector2(.5f);
             private readonly Vector2 _v21 = new Vector2(0.25f);
             private readonly Vector2 _v22 = new Vector2(0.25f);
-
+            public enum SideState
+            {
+                Unknown,
+                Up,
+                Down
+            }
             private readonly int[] _impactCnt = new int[6];
             private readonly int[] _sideLoops = new int[6];
+            private readonly SideState[] _shieldSides = new SideState[6];
 
             private readonly List<int> _hitFaces = new List<int>();
 
             private readonly MyEntitySubpart[] _sidePartArray = { null, null, null, null, null, null };
-
             private readonly Vector3D[] _impactPos =
                 {
                     Vector3D.NegativeInfinity, Vector3D.NegativeInfinity, Vector3D.NegativeInfinity,
@@ -224,7 +229,7 @@
                 }
             }
 
-            internal void ComputeEffects(MatrixD matrix, Vector3D impactPos, MyEntity shellPassive, MyEntity shellActive, int prevLod, float shieldPercent, bool activeVisible, bool refreshAnim)
+            internal void ComputeEffects(MatrixD matrix, Vector3D impactPos, MyEntity shellPassive, MyEntity shellActive, int prevLod, float shieldPercent, bool activeVisible, bool refreshAnim, ref Vector3I sides)
             {
                 if (ShellActive == null) ComputeSides(shellActive);
                 _flash = shieldPercent <= 10;
@@ -235,8 +240,7 @@
 
                 _matrix = matrix;
                 ImpactPosState = impactPos;
-                //_active = activeVisible && _activeColor != Session.Instance.Color90;
-                _active = activeVisible && true;
+                _active = activeVisible && _activeColor != Session.Instance.Color90;
 
                 if (prevLod != _lod)
                 {
@@ -247,10 +251,14 @@
 
                 StepEffects();
 
+                if (activeVisible)
+                    UpdatePassiveRender(shellActive, sides);
+
                 if (refreshAnim && _refresh && ImpactsFinished && prevLod == _lod) RefreshColorAssignments(prevLod);
                 if (ImpactsFinished && prevLod == _lod) return;
 
                 ImpactColorAssignments(prevLod);
+
                 //// vec3 localSpherePositionOfImpact;
                 //    foreach (vec3 triangleCom in triangles) {
                 //    var surfDistance = Math.acos(dot(triangleCom, localSpherePositionOfImpact));
@@ -289,7 +297,7 @@
                     }
                 }
                 if (ImpactPosState != Vector3D.NegativeInfinity) ComputeImpacts();
-                else if (_flash && _mainLoop == 0 || _mainLoop == 30) for (int i = 0; i < _hitFaces.Count; i++) UpdateColor(_sidePartArray[_hitFaces[i]]);
+                else if (_flash && _mainLoop == 0 || _mainLoop == 30) for (int i = 0; i < _hitFaces.Count; i++) UpdateHealthColor(_sidePartArray[_hitFaces[i]]);
 
 
                 if (_impact)
@@ -345,6 +353,61 @@
                     }
                 }
                 catch (Exception ex) { Log.Line($"Exception in IcoSphere Draw - renderId {renderId.ToString()}: {ex}"); }
+            }
+
+            public void UpdatePassiveRender(MyEntity shellActive, Vector3I faces)
+            {
+                if (shellActive == null) return;
+                for (int i = 0; i < 6; i++)
+                {
+                    MyEntitySubpart part;
+                    if (shellActive.TryGetSubpart(Session.Instance.ActiveSides[i], out part))
+                    {
+                        var enable = SideEnabled(faces, (Session.ShieldSides)i);
+                        var update = _shieldSides[i];
+                        var needsUpdate = update == SideState.Unknown || update == SideState.Down && enable || update == SideState.Up && !enable;
+
+                        if (needsUpdate)
+                        {
+                            _shieldSides[i] = enable ? SideState.Up : SideState.Down;
+                            Log.Line($"found subpart: {enable} - {part.Render.Visible} - {faces}");
+                            part.Render.UpdateRenderObject(SideEnabled(faces, (Session.ShieldSides)i));
+                            UpdateSideColor(part, enable ? Color.Red : Color.Black);
+                        }
+                    }
+                }
+            }
+
+            public static bool SideEnabled(Vector3I faces, Session.ShieldSides side)
+            {
+                switch (side)
+                {
+                    case Session.ShieldSides.Left:
+                        if (faces.X == -1 || faces.X == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Right:
+                        if (faces.X == 1 || faces.X == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Top:
+                        if (faces.Y == 1 || faces.Y == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Bottom:
+                        if (faces.Y == -1 || faces.Y == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Front:
+                        if (faces.Z == -1 || faces.Z == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Back:
+                        if (faces.Z == 1 || faces.Z == 2)
+                            return false;
+                        break;
+                }
+                return true;
             }
 
             private static void GetIntersectingFace(MatrixD matrix, Vector3D hitPosLocal, ICollection<int> impactFaces)
@@ -496,6 +559,7 @@
                     ShellActive?.Render.UpdateRenderObject(false);
                     ImpactsFinished = true;
                     for (int i = 0; i < _triColorBuffer.Length; i++) _triColorBuffer[i] = 0;
+                    for (int i = 0; i < _shieldSides.Length; i++) _shieldSides[i] = SideState.Unknown;
                 }
             }
 
@@ -559,7 +623,7 @@
                 {
                     _sideLoops[face] = 1;
                     _sidePartArray[face].Render.UpdateRenderObject(true);
-                    UpdateColor(_sidePartArray[face]);
+                    UpdateHealthColor(_sidePartArray[face]);
                 }
             }
 
@@ -572,12 +636,22 @@
                 shellActive.TryGetSubpart("ShieldBottom", out _sidePartArray[3]);
                 shellActive.TryGetSubpart("ShieldFront", out _sidePartArray[4]);
                 shellActive.TryGetSubpart("ShieldBack", out _sidePartArray[5]);
-                ShellActive = shellActive;
+
+                if (shellActive != ShellActive) {
+                    ShellActive = shellActive;
+                    for (int i = 0; i < _shieldSides.Length; i++)
+                        _shieldSides[i] = SideState.Unknown;
+                }
             }
 
-            private void UpdateColor(MyEntitySubpart shellSide)
+            private void UpdateHealthColor(MyEntitySubpart shellSide)
             {
                 shellSide.SetEmissiveParts(ShieldEmissiveAlpha, _activeColor, 100f);
+            }
+
+            private void UpdateSideColor(MyEntitySubpart shellSide, Color color)
+            {
+                shellSide.SetEmissiveParts(ShieldEmissiveAlpha, color, 100f);
             }
         }
     }

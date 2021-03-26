@@ -42,16 +42,7 @@ namespace DefenseShields
             new MyTerminalControlComboBoxItem() { Key = 3, Value = MyStringId.GetOrCompute("GigaWatt") },
             new MyTerminalControlComboBoxItem() { Key = 4, Value = MyStringId.GetOrCompute("TeraWatt") },
         };
-
-        private static readonly List<MyTerminalControlComboBoxItem> SideList = new List<MyTerminalControlComboBoxItem>()
-        {
-            new MyTerminalControlComboBoxItem() { Key = 0, Value = MyStringId.GetOrCompute("Up") },
-            new MyTerminalControlComboBoxItem() { Key = 1, Value = MyStringId.GetOrCompute("Dowm") },
-            new MyTerminalControlComboBoxItem() { Key = 2, Value = MyStringId.GetOrCompute("Left") },
-            new MyTerminalControlComboBoxItem() { Key = 3, Value = MyStringId.GetOrCompute("Right") },
-            new MyTerminalControlComboBoxItem() { Key = 4, Value = MyStringId.GetOrCompute("Forward") },
-            new MyTerminalControlComboBoxItem() { Key = 5, Value = MyStringId.GetOrCompute("Backward") },
-        };
+            
 
         internal static void CreateUi(IMyTerminalBlock shield)
         {
@@ -142,11 +133,6 @@ namespace DefenseShields
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
-        }
-
-        internal static void ListSides(List<MyTerminalControlComboBoxItem> sideList)
-        {
-            foreach (var side in SideList) sideList.Add(side);
         }
 
         internal static long GetPowerScale(IMyTerminalBlock block)
@@ -408,170 +394,6 @@ namespace DefenseShields
             comp.ClientUiUpdate = true;
         }
 
-        internal static bool GeTopShield(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-            var up = comp.DsSet.Settings.ShieldOffset.Y == 1 || comp.DsSet.Settings.ShieldOffset.Y == 2;
-            return up;
-        }
-
-        internal static void SetTopShield(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Y;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == -1 ? 2 : 1;
-            else
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 2 ? -1 : 0;
-
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-        }
-
-        internal static bool GetBottomShield(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            var down = comp.DsSet.Settings.ShieldOffset.Y == -1 || comp.DsSet.Settings.ShieldOffset.Y == 2;
-            return down;
-        }
-
-        internal static void SetBottomShield(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Y;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 1 ? 2 : -1;
-            else
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 2 ? 1 : 0;
-
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-        }
-
-        internal static bool GetLeftShield(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            var left = comp.DsSet.Settings.ShieldOffset.X == 1 || comp.DsSet.Settings.ShieldOffset.X == 2;
-            return left;
-        }
-
-        internal static void SetLeftShield(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-
-            var currentValue = comp.DsSet.Settings.ShieldOffset.X;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == -1 ? 2 : 1;
-            else
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == 2 ? -1 : 0;
-
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-        }
-
-        internal static bool GetRightShield(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            var right = comp.DsSet.Settings.ShieldOffset.X == -1 || comp.DsSet.Settings.ShieldOffset.X == 2;
-            return right;
-        }
-
-        internal static void SetRightShield(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-
-            var currentValue = comp.DsSet.Settings.ShieldOffset.X;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == 1 ? 2 : -1;
-            else
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == 2 ? 1 : 0;
-
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-        }
-
-        internal static bool GetFrontShield(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-
-            var front = comp.DsSet.Settings.ShieldOffset.Z == 1 || comp.DsSet.Settings.ShieldOffset.Z == 2;
-            return front;
-        }
-
-        internal static void SetFrontShield(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Z;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == -1 ? 2 : 1;
-            else
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 2 ? -1 : 0;
-
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-        }
-
-        internal static bool GetBackShield(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            var back = comp.DsSet.Settings.ShieldOffset.Z == -1 || comp.DsSet.Settings.ShieldOffset.Z == 2;
-            return back;
-        }
-
-        internal static void SetBackShield(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Z;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 1 ? 2 : -1; 
-            else
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 2 ? 1 : 0;
-
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-        }
-
-        internal static bool SidesEnabled(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            return comp.DsSet.Settings.SideFit;
-        }
-
         internal static long GetShell(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
@@ -626,41 +448,6 @@ namespace DefenseShields
             foreach (var shell in ReserveList) reserveList.Add(shell);
         }
 
-        internal static long GetSide(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return 0;
-            long value;
-
-            if (comp.DsSet.Settings.ShieldOffset == Vector3I.Up)
-                value = 0;
-            else if (comp.DsSet.Settings.ShieldOffset == Vector3I.Down)
-                value = 1;
-            else if (comp.DsSet.Settings.ShieldOffset == Vector3I.Left)
-                value = 2;
-            else if (comp.DsSet.Settings.ShieldOffset == Vector3I.Right)
-                value = 3;
-            else if (comp.DsSet.Settings.ShieldOffset == Vector3I.Forward)
-                value = 4;
-            else 
-                value = 5;
-            Log.Line($"GetSide: {value}");
-            return value;
-        }
-
-        internal static void SetSide(IMyTerminalBlock block, long newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-
-            comp.SelectPassiveShell();
-            comp.UpdatePassiveModel();
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-            Log.Line($"SetSide: {newValue} - {comp.DsSet.Settings.ShieldOffset}");
-
-        }
 
         internal static float GetPowerWatts(IMyTerminalBlock block)
         {
@@ -682,6 +469,173 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return false;
             return comp.DsSet.Settings.PowerScale != 0;
+        }
+
+
+        internal static bool GeTopShield(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return false;
+            var up = comp.DsSet.Settings.ShieldOffset.Y == 1 || comp.DsSet.Settings.ShieldOffset.Y == 2;
+            return up;
+        }
+
+        internal static void SetTopShield(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+
+            var currentValue = comp.DsSet.Settings.ShieldOffset.Y;
+            if (newValue)
+                comp.DsSet.Settings.ShieldOffset.Y = currentValue == -1 ? 2 : 1;
+            else
+                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 2 ? -1 : 0;
+
+            comp.FitChanged = true;
+            comp.SettingsUpdated = true;
+            comp.ClientUiUpdate = true;
+        }
+
+        internal static bool GetBottomShield(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return false;
+
+            var down = comp.DsSet.Settings.ShieldOffset.Y == -1 || comp.DsSet.Settings.ShieldOffset.Y == 2;
+            return down;
+        }
+
+        internal static void SetBottomShield(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+
+            var currentValue = comp.DsSet.Settings.ShieldOffset.Y;
+            if (newValue)
+                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 1 ? 2 : -1;
+            else
+                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 2 ? 1 : 0;
+
+            comp.FitChanged = true;
+            comp.SettingsUpdated = true;
+            comp.ClientUiUpdate = true;
+        }
+
+
+        internal static bool GetRightShield(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return false;
+
+            var right = comp.DsSet.Settings.ShieldOffset.X == 1 || comp.DsSet.Settings.ShieldOffset.X == 2;
+            return right;
+        }
+
+        internal static void SetRightShield(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+
+            var currentValue = comp.DsSet.Settings.ShieldOffset.X;
+            if (newValue)
+                comp.DsSet.Settings.ShieldOffset.X = currentValue == -1 ? 2 : 1;
+            else
+                comp.DsSet.Settings.ShieldOffset.X = currentValue == 2 ? -1 : 0;
+
+            comp.FitChanged = true;
+            comp.SettingsUpdated = true;
+            comp.ClientUiUpdate = true;
+        }
+
+        internal static bool GetLeftShield(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return false;
+
+            var left = comp.DsSet.Settings.ShieldOffset.X == -1 || comp.DsSet.Settings.ShieldOffset.X == 2;
+            return left;
+        }
+
+        internal static void SetLeftShield(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+
+            var currentValue = comp.DsSet.Settings.ShieldOffset.X;
+            if (newValue)
+                comp.DsSet.Settings.ShieldOffset.X = currentValue == 1 ? 2 : -1;
+            else
+                comp.DsSet.Settings.ShieldOffset.X = currentValue == 2 ? 1 : 0;
+
+            comp.FitChanged = true;
+            comp.SettingsUpdated = true;
+            comp.ClientUiUpdate = true;
+        }
+
+
+        internal static bool GetFrontShield(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return false;
+
+
+            var front = comp.DsSet.Settings.ShieldOffset.Z == -1 || comp.DsSet.Settings.ShieldOffset.Z == 2;
+            return front;
+        }
+
+        internal static void SetFrontShield(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+            var currentValue = comp.DsSet.Settings.ShieldOffset.Z;
+            if (newValue)
+                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 1 ? 2 : -1;
+            else
+                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 2 ? 1 : 0;
+
+            comp.FitChanged = true;
+            comp.SettingsUpdated = true;
+            comp.ClientUiUpdate = true;
+        }
+
+        internal static bool GetBackShield(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return false;
+
+            var back = comp.DsSet.Settings.ShieldOffset.Z == 1 || comp.DsSet.Settings.ShieldOffset.Z == 2;
+            return back;
+        }
+
+        internal static void SetBackShield(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+
+            var currentValue = comp.DsSet.Settings.ShieldOffset.Z;
+            if (newValue)
+                comp.DsSet.Settings.ShieldOffset.Z = currentValue == -1 ? 2 : 1;
+            else
+                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 2 ? -1 : 0;
+
+            comp.FitChanged = true;
+            comp.SettingsUpdated = true;
+            comp.ClientUiUpdate = true;
+        }
+
+        internal static bool SidesEnabled(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null)
+                return false;
+
+            return comp.DsSet.Settings.SideFit;
         }
         #endregion
     }

@@ -127,14 +127,14 @@ namespace DefenseShields
             "DS-M_ModulateGrids_Toggle",
             "DS-M_ModulateEmpProt_Toggle"
         };
-        internal readonly List<string> PassiveSides = new List<string>()
+        internal readonly List<string> ActiveSides = new List<string>()
         {
-            "ShieldPLeft",
-            "ShieldPRight",
-            "ShieldPTop",
-            "ShieldPBottom",
-            "ShieldPFront",
-            "ShieldPBack",
+            "DamageRight",
+            "DamageLeft",
+            "DamageTop",
+            "DamageBottom",
+            "DamageFront",
+            "DamageBack",
         };
         /*
 
@@ -149,14 +149,14 @@ namespace DefenseShields
         };
         */
 
-        internal enum ShieldSides
+        public enum ShieldSides
         {
             Left,
             Right,
             Top,
             Bottom,
+            Back,
             Front,
-            Back
         }
 
         /*
@@ -328,8 +328,6 @@ namespace DefenseShields
         internal IMyTerminalControlSlider Fit { get; set; }
         internal IMyTerminalControlCheckbox SphereFit { get; set; }
         internal IMyTerminalControlCheckbox SideFit { get; set; }
-        internal IMyTerminalControlCombobox ShieldSide { get; set; }
-
         internal IMyTerminalControlCheckbox FortifyShield { get; set; }
         internal IMyTerminalControlCheckbox BatteryBoostCheckBox { get; set; }
         internal IMyTerminalControlCheckbox HideActiveCheckBox { get; set; }

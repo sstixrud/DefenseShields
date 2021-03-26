@@ -59,8 +59,6 @@
 
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep3");
                 
-                ShieldSide = TerminalHelpers.AddCombobox(comp?.Shield, "DS-C_SideFit", "Side Shield", "Side Shield", DsUi.GetSide, DsUi.SetSide, DsUi.ListSides);
-
                 WidthSlider = TerminalHelpers.AddSlider(comp?.Shield, "DS-C_WidthSlider", "Shield Size Width", "Shield Size Width", DsUi.GetWidth, DsUi.SetWidth);
                 WidthSlider.SetLimits(30, 1000);
 
