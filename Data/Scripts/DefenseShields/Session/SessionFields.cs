@@ -127,7 +127,19 @@ namespace DefenseShields
             "DS-M_ModulateGrids_Toggle",
             "DS-M_ModulateEmpProt_Toggle"
         };
-        internal readonly List<string> ActiveSides = new List<string>()
+
+
+        internal readonly List<string> ShieldHealthSides = new List<string>()
+        {
+            "ShieldLeft",
+            "ShieldRight",
+            "ShieldTop",
+            "ShieldBottom",
+            "ShieldFront",
+            "ShieldBack",
+        };
+
+        internal readonly List<string> ShieldDirectedSides = new List<string>()
         {
             "DamageRight",
             "DamageLeft",

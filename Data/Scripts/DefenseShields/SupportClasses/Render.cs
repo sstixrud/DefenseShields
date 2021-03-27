@@ -96,7 +96,8 @@
 
         public class Instance
         {
-            private const string ShieldEmissiveAlpha = "ShieldEmissiveAlpha";
+            private const string _shieldHealthEmissive = "ShieldEmissiveAlpha";
+            private const string _shieldRedirectEmissive = "ShieldDamageGlass";
             private const int SideSteps = 60;
             private const int ImpactSteps = 60;
             private const int RefreshSteps = 30;
@@ -151,6 +152,8 @@
             private MatrixD _matrix;
 
             private int _mainLoop = -1;
+            private int _sideLoop = -1;
+
             private int _lCount;
             private int _longerLoop;
             private int _refreshDrawStep;
@@ -162,7 +165,6 @@
             private bool _refresh;
             private bool _active;
             private bool _flash;
-
             private MyStringId _faceMaterial;
 
             internal Instance(Icosphere backing)
@@ -252,7 +254,7 @@
                 StepEffects();
 
                 if (activeVisible)
-                    UpdatePassiveRender(shellActive, sides);
+                    UpdatePassiveRender(shellActive, sides, _sideLoop <= 9);
 
                 if (refreshAnim && _refresh && ImpactsFinished && prevLod == _lod) RefreshColorAssignments(prevLod);
                 if (ImpactsFinished && prevLod == _lod) return;
@@ -275,6 +277,11 @@
             internal void StepEffects()
             {
                 _mainLoop++;
+                _sideLoop++;
+
+                if (_sideLoop == 300)
+                    _sideLoop = 0;
+
                 if (_mainLoop == 60)
                 {
                     _mainLoop = 0;
@@ -355,60 +362,6 @@
                 catch (Exception ex) { Log.Line($"Exception in IcoSphere Draw - renderId {renderId.ToString()}: {ex}"); }
             }
 
-            public void UpdatePassiveRender(MyEntity shellActive, Vector3I faces)
-            {
-                if (shellActive == null) return;
-                for (int i = 0; i < 6; i++)
-                {
-                    MyEntitySubpart part;
-                    if (shellActive.TryGetSubpart(Session.Instance.ActiveSides[i], out part))
-                    {
-                        var enable = SideEnabled(faces, (Session.ShieldSides)i);
-                        var update = _shieldSides[i];
-                        var needsUpdate = update == SideState.Unknown || update == SideState.Down && enable || update == SideState.Up && !enable;
-
-                        if (needsUpdate)
-                        {
-                            _shieldSides[i] = enable ? SideState.Up : SideState.Down;
-                            Log.Line($"found subpart: {enable} - {part.Render.Visible} - {faces}");
-                            part.Render.UpdateRenderObject(SideEnabled(faces, (Session.ShieldSides)i));
-                            UpdateSideColor(part, enable ? Color.Red : Color.Black);
-                        }
-                    }
-                }
-            }
-
-            public static bool SideEnabled(Vector3I faces, Session.ShieldSides side)
-            {
-                switch (side)
-                {
-                    case Session.ShieldSides.Left:
-                        if (faces.X == -1 || faces.X == 2)
-                            return false;
-                        break;
-                    case Session.ShieldSides.Right:
-                        if (faces.X == 1 || faces.X == 2)
-                            return false;
-                        break;
-                    case Session.ShieldSides.Top:
-                        if (faces.Y == 1 || faces.Y == 2)
-                            return false;
-                        break;
-                    case Session.ShieldSides.Bottom:
-                        if (faces.Y == -1 || faces.Y == 2)
-                            return false;
-                        break;
-                    case Session.ShieldSides.Front:
-                        if (faces.Z == -1 || faces.Z == 2)
-                            return false;
-                        break;
-                    case Session.ShieldSides.Back:
-                        if (faces.Z == 1 || faces.Z == 2)
-                            return false;
-                        break;
-                }
-                return true;
-            }
 
             private static void GetIntersectingFace(MatrixD matrix, Vector3D hitPosLocal, ICollection<int> impactFaces)
             {
@@ -630,12 +583,9 @@
             private void ComputeSides(MyEntity shellActive)
             {
                 if (shellActive == null) return;
-                shellActive.TryGetSubpart("ShieldLeft", out _sidePartArray[0]);
-                shellActive.TryGetSubpart("ShieldRight", out _sidePartArray[1]);
-                shellActive.TryGetSubpart("ShieldTop", out _sidePartArray[2]);
-                shellActive.TryGetSubpart("ShieldBottom", out _sidePartArray[3]);
-                shellActive.TryGetSubpart("ShieldFront", out _sidePartArray[4]);
-                shellActive.TryGetSubpart("ShieldBack", out _sidePartArray[5]);
+
+                for (int i = 0; i < Session.Instance.ShieldHealthSides.Count; i++)
+                    shellActive.TryGetSubpart(Session.Instance.ShieldHealthSides[i], out _sidePartArray[i]);
 
                 if (shellActive != ShellActive) {
                     ShellActive = shellActive;
@@ -644,14 +594,69 @@
                 }
             }
 
-            private void UpdateHealthColor(MyEntitySubpart shellSide)
+            public void UpdatePassiveRender(MyEntity shellActive, Vector3I faces, bool display)
             {
-                shellSide.SetEmissiveParts(ShieldEmissiveAlpha, _activeColor, 100f);
+                if (shellActive == null) return;
+                for (int i = 0; i < 6; i++)
+                {
+                    MyEntitySubpart part;
+                    if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[i], out part))
+                    {
+                        var update = _shieldSides[i];
+                        
+                        var enable = display && SideEnabled(faces, (Session.ShieldSides)i);
+                        var needsUpdate = update == SideState.Unknown || update == SideState.Down && enable || update == SideState.Up && !enable;
+
+                        if (needsUpdate)
+                        {
+                            _shieldSides[i] = enable ? SideState.Up : SideState.Down;
+                            part.Render.UpdateRenderObject(enable);
+                            UpdateRedirectColor(part, Session.Instance.Color00);
+                        }
+                    }
+                }
             }
 
-            private void UpdateSideColor(MyEntitySubpart shellSide, Color color)
+            public static bool SideEnabled(Vector3I faces, Session.ShieldSides side)
             {
-                shellSide.SetEmissiveParts(ShieldEmissiveAlpha, color, 100f);
+                switch (side)
+                {
+                    case Session.ShieldSides.Left:
+                        if (faces.X == -1 || faces.X == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Right:
+                        if (faces.X == 1 || faces.X == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Top:
+                        if (faces.Y == 1 || faces.Y == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Bottom:
+                        if (faces.Y == -1 || faces.Y == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Front:
+                        if (faces.Z == -1 || faces.Z == 2)
+                            return false;
+                        break;
+                    case Session.ShieldSides.Back:
+                        if (faces.Z == 1 || faces.Z == 2)
+                            return false;
+                        break;
+                }
+                return true;
+            }
+
+            private void UpdateHealthColor(MyEntitySubpart shellSide)
+            {
+                shellSide.SetEmissiveParts(_shieldHealthEmissive, _activeColor, 100f);
+            }
+
+            private void UpdateRedirectColor(MyEntitySubpart shellSide, Color color)
+            {
+                shellSide.SetEmissiveParts(_shieldRedirectEmissive, color, 1f);
             }
         }
     }
