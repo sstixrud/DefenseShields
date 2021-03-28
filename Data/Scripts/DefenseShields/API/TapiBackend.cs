@@ -277,7 +277,6 @@ namespace DefenseShields
 
                     var intersection = testIntersection.To;
                     var projForward = Vector3D.IsZero(logic.ShieldShapeMatrix.Forward) ? Vector3D.Zero : intersection.Dot(logic.ShieldShapeMatrix.Forward) / logic.ShieldShapeMatrix.Forward.LengthSquared() * logic.ShieldShapeMatrix.Forward;
-                    //var projFront = UtilsStatic.VectorProjection(intersection, logic.ShieldShapeMatrix.Forward);
                     int faceHit = -1;
                     if (projForward.LengthSquared() >= 0.8 * logic.ShieldShapeMatrix.Forward.LengthSquared()) //if within the side thickness
                     {
@@ -293,7 +292,6 @@ namespace DefenseShields
                     }
 
                     var projLeft = Vector3D.IsZero(logic.ShieldShapeMatrix.Left) ? Vector3D.Zero : intersection.Dot(logic.ShieldShapeMatrix.Left) / logic.ShieldShapeMatrix.Left.LengthSquared() * logic.ShieldShapeMatrix.Left;
-                    //var projLeft = UtilsStatic.VectorProjection(intersection, logic.ShieldShapeMatrix.Left);
                     if (projLeft.LengthSquared() >= 0.8 * logic.ShieldShapeMatrix.Left.LengthSquared()) //if within the side thickness
                     {
                         var dot = intersection.Dot(logic.ShieldShapeMatrix.Left);
@@ -310,7 +308,6 @@ namespace DefenseShields
                     }
 
                     var projUp = Vector3D.IsZero(logic.ShieldShapeMatrix.Up) ? Vector3D.Zero : intersection.Dot(logic.ShieldShapeMatrix.Up) / logic.ShieldShapeMatrix.Up.LengthSquared() * logic.ShieldShapeMatrix.Up;
-                    //var projUp = UtilsStatic.VectorProjection(intersection, logic.ShieldShapeMatrix.Up);
                     if (projUp.LengthSquared() >= 0.8 * logic.ShieldShapeMatrix.Up.LengthSquared()) //if within the side thickness
                     {
                         var dot = intersection.Dot(logic.ShieldShapeMatrix.Up);

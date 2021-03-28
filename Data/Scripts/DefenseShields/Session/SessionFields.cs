@@ -149,41 +149,16 @@ namespace DefenseShields
             "DamageFront",
             "DamageBack",
         };
-        /*
-
-        internal readonly List<string> PassiveSides = new List<string>()
-        {
-            "ShieldLeft",
-            "ShieldRight",
-            "ShieldTop",
-            "ShieldBottom",
-            "ShieldFront",
-            "ShieldBack",
-        };
-        */
 
         public enum ShieldSides
         {
-            Left,
             Right,
+            Left,
             Up,
             Down,
-            Forward,
             Back,
+            Forward,
         }
-
-        /*
-        internal readonly Color White1 = new Color(255, 255, 255);
-        internal readonly Color White2 = new Color(90, 118, 255);
-        internal readonly Color White3 = new Color(47, 86, 255);
-        internal readonly Color Blue1 = Color.Aquamarine;
-        internal readonly Color Blue2 = new Color(0, 66, 255);
-        internal readonly Color Blue3 = new Color(0, 7, 255, 255);
-        internal readonly Color Blue4 = new Color(22, 0, 170);
-        internal readonly Color Red1 = new Color(87, 0, 66);
-        internal readonly Color Red2 = new Color(121, 0, 13);
-        internal readonly Color Red3 = new Color(255, 0, 0);
-        */
 
         internal readonly Color Color90 = new Color(255, 255, 255, 255 );
         internal readonly Color Color80 = new Color(255, 255, 255, 0);

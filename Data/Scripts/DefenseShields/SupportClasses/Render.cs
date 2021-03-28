@@ -362,53 +362,6 @@
                 catch (Exception ex) { Log.Line($"Exception in IcoSphere Draw - renderId {renderId.ToString()}: {ex}"); }
             }
 
-
-            private static void GetIntersectingFace(MatrixD matrix, Vector3D hitPosLocal, ICollection<int> impactFaces)
-            {
-                var boxMax = matrix.Backward + matrix.Right + matrix.Up;
-                var boxMin = -boxMax;
-                var box = new BoundingBoxD(boxMin, boxMax);
-
-                var maxWidth = box.Max.LengthSquared();
-                var testLine = new LineD(Vector3D.Zero, Vector3D.Normalize(hitPosLocal) * maxWidth); //This is to ensure we intersect the box
-                LineD testIntersection;
-                box.Intersect(ref testLine, out testIntersection);
-
-                var intersection = testIntersection.To;
-
-                var projFront = VectorProjection(intersection, matrix.Forward);
-                if (projFront.LengthSquared() >= 0.65 * matrix.Forward.LengthSquared()) //if within the side thickness
-                {
-                    var face = intersection.Dot(matrix.Forward) > 0 ? 5 : 4;
-                    //Log.Line($"forward/back:{face}");
-                    impactFaces.Add(face);
-                }
-
-                var projLeft = VectorProjection(intersection, matrix.Left);
-                if (projLeft.LengthSquared() >= 0.65 * matrix.Left.LengthSquared()) //if within the side thickness
-                {
-                    var face = intersection.Dot(matrix.Left) > 0 ? 1 : 0;
-                    //Log.Line($"left/right:{face}");
-                    impactFaces.Add(face);
-                }
-
-                var projUp = VectorProjection(intersection, matrix.Up);
-                if (projUp.LengthSquared() >= 0.65 * matrix.Up.LengthSquared()) //if within the side thickness
-                {
-                    var face = intersection.Dot(matrix.Up) > 0 ? 2 : 3;
-                    //Log.Line($"up/down:{face}");
-                    impactFaces.Add(face);
-                }
-            }
-
-            private static Vector3D VectorProjection(Vector3D a, Vector3D b)
-            {
-                if (Vector3D.IsZero(b))
-                    return Vector3D.Zero;
-
-                return a.Dot(b) / b.LengthSquared() * b;
-            }
-
             private void ImpactColorAssignments(int prevLod)
             {
                 try
@@ -614,6 +567,52 @@
                         }
                     }
                 }
+            }
+
+            private static void GetIntersectingFace(MatrixD matrix, Vector3D hitPosLocal, ICollection<int> impactFaces)
+            {
+                var boxMax = matrix.Backward + matrix.Right + matrix.Up;
+                var boxMin = -boxMax;
+                var box = new BoundingBoxD(boxMin, boxMax);
+
+                var maxWidth = box.Max.LengthSquared();
+                var testLine = new LineD(Vector3D.Zero, Vector3D.Normalize(hitPosLocal) * maxWidth); //This is to ensure we intersect the box
+                LineD testIntersection;
+                box.Intersect(ref testLine, out testIntersection);
+
+                var intersection = testIntersection.To;
+
+                var projFront = VectorProjection(intersection, matrix.Forward);
+                if (projFront.LengthSquared() >= 0.65 * matrix.Forward.LengthSquared()) //if within the side thickness
+                {
+                    var face = intersection.Dot(matrix.Forward) > 0 ? 5 : 4;
+                    //Log.Line($"forward/back:{face} - {(Session.ShieldSides)face}");
+                    impactFaces.Add(face);
+                }
+
+                var projLeft = VectorProjection(intersection, matrix.Left);
+                if (projLeft.LengthSquared() >= 0.65 * matrix.Left.LengthSquared()) //if within the side thickness
+                {
+                    var face = intersection.Dot(matrix.Left) > 0 ? 1 : 0;
+                    //Log.Line($"left/right:{face} - {(Session.ShieldSides)face}");
+                    impactFaces.Add(face);
+                }
+
+                var projUp = VectorProjection(intersection, matrix.Up);
+                if (projUp.LengthSquared() >= 0.65 * matrix.Up.LengthSquared()) //if within the side thickness
+                {
+                    var face = intersection.Dot(matrix.Up) > 0 ? 2 : 3;
+                    //Log.Line($"up/down:{face} - {(Session.ShieldSides)face}");
+                    impactFaces.Add(face);
+                }
+            }
+
+            private static Vector3D VectorProjection(Vector3D a, Vector3D b)
+            {
+                if (Vector3D.IsZero(b))
+                    return Vector3D.Zero;
+
+                return a.Dot(b) / b.LengthSquared() * b;
             }
 
             public static bool SideEnabled(Vector3I faces, Session.ShieldSides side)
