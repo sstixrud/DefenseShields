@@ -333,10 +333,10 @@
       <IsFlareOccluder>false</IsFlareOccluder>
     </TransparentMaterial>
 
-    <TransparentMaterial> <!-- Shield Passive Sectioned MediumReflective -->
+    <TransparentMaterial> <!-- Shield Secondary Glass Subparts -->
       <Id>
         <TypeId>TransparentMaterialDefinition</TypeId>
-        <SubtypeId>ShieldPassiveSectioned</SubtypeId>
+        <SubtypeId>ShieldDamageGlass</SubtypeId>
       </Id>
       <AlphaMistingEnable>false</AlphaMistingEnable>
       <AlphaSaturation>1</AlphaSaturation>
@@ -356,15 +356,15 @@
         <Y>1</Y>
       </UVSize>
       <Color>
-        <X>0</X>
+        <X>0.2</X>
         <Y>0</Y>
         <Z>0</Z>
-        <W>0</W>
+        <W>0.1</W>
       </Color>
       <ColorAdd>
-        <X>0.00</X>
-        <Y>0.005</Y>
-        <Z>0.02</Z>
+        <X>0.43</X>
+        <Y>0.00</Y>
+        <Z>0.1</Z>
         <W>0.1</W>
       </ColorAdd>
       <ShadowMultiplier>
@@ -379,7 +379,7 @@
         <Z>0</Z>
         <W>0</W>
       </LightMultiplier>
-      <Reflectivity>0.5</Reflectivity>
+      <Reflectivity>0.8</Reflectivity>
       <Fresnel>5</Fresnel>
       <ReflectionShadow>1</ReflectionShadow>
       <Gloss>0.4</Gloss>
