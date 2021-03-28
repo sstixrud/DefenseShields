@@ -110,6 +110,7 @@ namespace DefenseShields
         private readonly RunningAverage _hpsAvg = new RunningAverage(2);
         private readonly EllipsoidOxygenProvider _ellipsoidOxyProvider = new EllipsoidOxygenProvider(Matrix.Zero);
         private readonly EllipsoidSA _ellipsoidSa = new EllipsoidSA(double.MinValue, double.MinValue, double.MinValue);
+        private readonly SideState[] _shieldSides = new SideState[6];
 
         private readonly Vector3D[] _resetEntCorners = new Vector3D[8];
         private readonly Vector3D[] _obbCorners = new Vector3D[8];
@@ -262,6 +263,12 @@ namespace DefenseShields
             VoxelBase,
             Authenticated,
             Floater
+        }
+        internal enum SideState
+        {
+            Unknown,
+            Normal,
+            Redirect,
         }
 
         internal enum State

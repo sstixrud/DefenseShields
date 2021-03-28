@@ -356,16 +356,16 @@
         <Y>1</Y>
       </UVSize>
       <Color>
-        <X>0.2</X>
+        <X>0</X>
         <Y>0</Y>
         <Z>0</Z>
-        <W>0.1</W>
+        <W>0</W>
       </Color>
       <ColorAdd>
-        <X>0.43</X>
-        <Y>0.00</Y>
-        <Z>0.1</Z>
-        <W>0.1</W>
+        <X>2.5</X>
+        <Y>0</Y>
+        <Z>0</Z>
+        <W>0.25</W>
       </ColorAdd>
       <ShadowMultiplier>
         <X>0</X>
@@ -379,11 +379,11 @@
         <Z>0</Z>
         <W>0</W>
       </LightMultiplier>
-      <Reflectivity>0.8</Reflectivity>
-      <Fresnel>5</Fresnel>
-      <ReflectionShadow>1</ReflectionShadow>
-      <Gloss>0.4</Gloss>
-      <GlossTextureAdd>0.8</GlossTextureAdd>
+      <Reflectivity>0.0</Reflectivity>
+      <Fresnel>0</Fresnel>
+      <ReflectionShadow>0</ReflectionShadow>
+      <Gloss>0.0</Gloss>
+      <GlossTextureAdd>0.0</GlossTextureAdd>
       <SpecularColorFactor>255</SpecularColorFactor>
       <IsFlareOccluder>false</IsFlareOccluder>
     </TransparentMaterial>

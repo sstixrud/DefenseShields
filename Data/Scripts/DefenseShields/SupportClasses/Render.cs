@@ -113,15 +113,9 @@
             private readonly Vector2 _v20 = new Vector2(.5f);
             private readonly Vector2 _v21 = new Vector2(0.25f);
             private readonly Vector2 _v22 = new Vector2(0.25f);
-            public enum SideState
-            {
-                Unknown,
-                Normal,
-                Redirect,
-            }
+
             private readonly int[] _impactCnt = new int[6];
             private readonly int[] _sideLoops = new int[6];
-            private readonly SideState[] _shieldSides = new SideState[6];
 
             private readonly List<int> _hitFaces = new List<int>();
 
@@ -231,7 +225,7 @@
                 }
             }
 
-            internal void ComputeEffects(MatrixD matrix, Vector3D impactPos, MyEntity shellPassive, MyEntity shellActive, int prevLod, float shieldPercent, bool activeVisible, bool refreshAnim, ref Vector3I sides)
+            internal void ComputeEffects(MatrixD matrix, Vector3D impactPos, MyEntity shellPassive, MyEntity shellActive, int prevLod, float shieldPercent, bool activeVisible, bool refreshAnim)
             {
                 if (ShellActive == null) ComputeSides(shellActive);
                 _flash = shieldPercent <= 10;
@@ -252,9 +246,6 @@
                 }
 
                 StepEffects();
-
-                if (activeVisible)
-                    UpdatePassiveRender(shellActive, sides, _sideLoop <= 179);
 
                 if (refreshAnim && _refresh && ImpactsFinished && prevLod == _lod) RefreshColorAssignments(prevLod);
                 if (ImpactsFinished && prevLod == _lod) return;
@@ -465,7 +456,6 @@
                     ShellActive?.Render.UpdateRenderObject(false);
                     ImpactsFinished = true;
                     for (int i = 0; i < _triColorBuffer.Length; i++) _triColorBuffer[i] = 0;
-                    for (int i = 0; i < _shieldSides.Length; i++) _shieldSides[i] = SideState.Unknown;
                 }
             }
 
@@ -542,30 +532,6 @@
 
                 if (shellActive != ShellActive) {
                     ShellActive = shellActive;
-                    for (int i = 0; i < _shieldSides.Length; i++)
-                        _shieldSides[i] = SideState.Unknown;
-                }
-            }
-
-            public void UpdatePassiveRender(MyEntity shellActive, Vector3I faces, bool display)
-            {
-                if (shellActive == null) return;
-                for (int i = 0; i < 6; i++)
-                {
-                    MyEntitySubpart part;
-                    if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[i], out part))
-                    {
-                        var update = _shieldSides[i];
-                        
-                        var enable = display && SideEnabled(faces, (Session.ShieldSides)i);
-                        var needsUpdate = update == SideState.Unknown || update == SideState.Redirect && enable || update == SideState.Normal && !enable;
-                        if (needsUpdate)
-                        {
-                            _shieldSides[i] = enable ? SideState.Redirect : SideState.Normal;
-                            part.Render.UpdateRenderObject(enable);
-                            UpdateRedirectColor(part, Session.Instance.Color00);
-                        }
-                    }
                 }
             }
 
@@ -615,46 +581,9 @@
                 return a.Dot(b) / b.LengthSquared() * b;
             }
 
-            public static bool SideEnabled(Vector3I faces, Session.ShieldSides side)
-            {
-                switch (side)
-                {
-                    case Session.ShieldSides.Left:
-                        if (faces.X == -1 || faces.X == 2)
-                            return true;
-                        break;
-                    case Session.ShieldSides.Right:
-                        if (faces.X == 1 || faces.X == 2)
-                            return true;
-                        break;
-                    case Session.ShieldSides.Up:
-                        if (faces.Y == 1 || faces.Y == 2)
-                            return true;
-                        break;
-                    case Session.ShieldSides.Down:
-                        if (faces.Y == -1 || faces.Y == 2)
-                            return true;
-                        break;
-                    case Session.ShieldSides.Forward:
-                        if (faces.Z == -1 || faces.Z == 2)
-                            return true;
-                        break;
-                    case Session.ShieldSides.Back:
-                        if (faces.Z == 1 || faces.Z == 2)
-                            return true;
-                        break;
-                }
-                return false;
-            }
-
             private void UpdateHealthColor(MyEntitySubpart shellSide)
             {
                 shellSide.SetEmissiveParts(_shieldHealthEmissive, _activeColor, 100f);
-            }
-
-            private void UpdateRedirectColor(MyEntitySubpart shellSide, Color color)
-            {
-                shellSide.SetEmissiveParts(_shieldRedirectEmissive, color, 1f);
             }
         }
     }

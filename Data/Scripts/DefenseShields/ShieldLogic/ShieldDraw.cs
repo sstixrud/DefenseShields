@@ -66,11 +66,17 @@ namespace DefenseShields
                     Icosphere.CalculateTransform(ShieldShapeMatrix, lod);
                     if (!GridIsMobile) Icosphere.ReturnPhysicsVerts(DetectionMatrix, ShieldComp.PhysicsOutside);
                 }
-                var sides = DsSet.Settings.SideFit ? DsSet.Settings.ShieldRedirects : Vector3I.Zero;
-                Icosphere.ComputeEffects(ShieldShapeMatrix, _localImpactPosition, _shellPassive, _shellActive, prevlod, percent, activeVisible, refreshAnim, ref sides);
+                Icosphere.ComputeEffects(ShieldShapeMatrix, _localImpactPosition, _shellPassive, _shellActive, prevlod, percent, activeVisible, refreshAnim);
 
             }
             else if (_shapeChanged) _updateRender = true;
+
+            var show = _tick180 && !_tick300;
+            var hide = _tick300;
+            if (_tick180 && _shellActive != null && RedirectVisualUpdate(show))
+            {
+                UpdateShieldRedirectVisuals(_shellActive, hide);
+            }
 
             if (hitAnim && sphereOnCamera && DsState.State.Online) Icosphere.Draw(renderId);
         }
@@ -241,6 +247,78 @@ namespace DefenseShields
                 _shellActive.Render.UpdateRenderObject(true);
                 _shellActive.Render.UpdateRenderObject(false);
             }
+        }
+
+        public bool RedirectVisualUpdate(bool display)
+        {
+            int needsUpdating = 0;
+            for (int i = 0; i < _shieldSides.Length; i++) {
+
+                var savedState = _shieldSides[i];
+                var redirecting = SideRedirecting((Session.ShieldSides)i);
+
+                var showStale = display && (redirecting && savedState == SideState.Normal || !redirecting && savedState == SideState.Redirect);
+                var hideStale = !display && savedState == SideState.Redirect; 
+
+                if (showStale || hideStale || savedState == SideState.Unknown) {
+                    needsUpdating++;
+                    _shieldSides[i] = SideState.Unknown;
+                }
+            }
+
+            return needsUpdating > 0;
+        }
+
+        public void UpdateShieldRedirectVisuals(MyEntity shellActive, bool forceHide)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                var currentState = _shieldSides[i];
+                if (currentState == SideState.Unknown)
+                {
+                    MyEntitySubpart part;
+                    if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[i], out part))
+                    {
+                        var redirecting = SideRedirecting((Session.ShieldSides)i) && !forceHide;
+                        Log.Line($"redirecting: {redirecting} - side:{(Session.ShieldSides)i} - forceHide:{forceHide}");
+                        _shieldSides[i] = redirecting ? SideState.Redirect : SideState.Normal;
+                        part.Render.UpdateRenderObject(redirecting);
+
+                    }
+                }
+            }
+        }
+
+        public bool SideRedirecting(Session.ShieldSides side)
+        {
+            switch (side)
+            {
+                case Session.ShieldSides.Left:
+                    if (DsSet.Settings.ShieldRedirects.X == -1 || DsSet.Settings.ShieldRedirects.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Right:
+                    if (DsSet.Settings.ShieldRedirects.X == 1 || DsSet.Settings.ShieldRedirects.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Up:
+                    if (DsSet.Settings.ShieldRedirects.Y == 1 || DsSet.Settings.ShieldRedirects.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Down:
+                    if (DsSet.Settings.ShieldRedirects.Y == -1 || DsSet.Settings.ShieldRedirects.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Forward:
+                    if (DsSet.Settings.ShieldRedirects.Z == -1 || DsSet.Settings.ShieldRedirects.Z == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Back:
+                    if (DsSet.Settings.ShieldRedirects.Z == 1 || DsSet.Settings.ShieldRedirects.Z == 2)
+                        return true;
+                    break;
+            }
+            return false;
         }
 
         private int CalculateLod(int onCount)
