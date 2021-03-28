@@ -250,7 +250,6 @@ namespace DefenseShields
 
                 var zeroMatrix = Matrix.Zero;
                 var shieldMatrix = (Matrix)ShieldShapeMatrix;
-
                 if (!_isDedicated) {                    
 
                     _shellPassive.PositionComp.SetLocalMatrix(ref zeroMatrix, null, true);  // Bug - Cannot just change X coord, so I reset first.

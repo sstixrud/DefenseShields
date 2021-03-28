@@ -116,8 +116,8 @@
             public enum SideState
             {
                 Unknown,
-                Up,
-                Down
+                Normal,
+                Redirect,
             }
             private readonly int[] _impactCnt = new int[6];
             private readonly int[] _sideLoops = new int[6];
@@ -254,7 +254,7 @@
                 StepEffects();
 
                 if (activeVisible)
-                    UpdatePassiveRender(shellActive, sides, _sideLoop <= 9);
+                    UpdatePassiveRender(shellActive, sides, _sideLoop <= 179);
 
                 if (refreshAnim && _refresh && ImpactsFinished && prevLod == _lod) RefreshColorAssignments(prevLod);
                 if (ImpactsFinished && prevLod == _lod) return;
@@ -605,11 +605,12 @@
                         var update = _shieldSides[i];
                         
                         var enable = display && SideEnabled(faces, (Session.ShieldSides)i);
-                        var needsUpdate = update == SideState.Unknown || update == SideState.Down && enable || update == SideState.Up && !enable;
-
+                        if (enable)
+                            Log.Line($"{(Session.ShieldSides)i} - {update} - {Session.Instance.ShieldDirectedSides[i]}");
+                        var needsUpdate = update == SideState.Unknown || update == SideState.Redirect && enable || update == SideState.Normal && !enable;
                         if (needsUpdate)
                         {
-                            _shieldSides[i] = enable ? SideState.Up : SideState.Down;
+                            _shieldSides[i] = enable ? SideState.Redirect : SideState.Normal;
                             part.Render.UpdateRenderObject(enable);
                             UpdateRedirectColor(part, Session.Instance.Color00);
                         }
@@ -623,30 +624,30 @@
                 {
                     case Session.ShieldSides.Left:
                         if (faces.X == -1 || faces.X == 2)
-                            return false;
+                            return true;
                         break;
                     case Session.ShieldSides.Right:
                         if (faces.X == 1 || faces.X == 2)
-                            return false;
+                            return true;
                         break;
-                    case Session.ShieldSides.Top:
+                    case Session.ShieldSides.Up:
                         if (faces.Y == 1 || faces.Y == 2)
-                            return false;
+                            return true;
                         break;
-                    case Session.ShieldSides.Bottom:
+                    case Session.ShieldSides.Down:
                         if (faces.Y == -1 || faces.Y == 2)
-                            return false;
+                            return true;
                         break;
-                    case Session.ShieldSides.Front:
+                    case Session.ShieldSides.Forward:
                         if (faces.Z == -1 || faces.Z == 2)
-                            return false;
+                            return true;
                         break;
                     case Session.ShieldSides.Back:
                         if (faces.Z == 1 || faces.Z == 2)
-                            return false;
+                            return true;
                         break;
                 }
-                return true;
+                return false;
             }
 
             private void UpdateHealthColor(MyEntitySubpart shellSide)

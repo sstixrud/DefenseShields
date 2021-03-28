@@ -49,7 +49,7 @@ namespace DefenseShields
         private Func<IMyTerminalBlock, Vector3D, Vector3D?> _getClosestShieldPoint;
         private Func<MyEntity, MyTuple<bool, bool, float, float, float, int>> _getShieldInfo;
         private Func<MyEntity, MyTuple<bool, bool, float, float>> _getModulationInfo;
-        private Func<IMyTerminalBlock, Vector3D, bool, bool> _pointHitFace;
+        private Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float>> _getFaceInfo;
 
         private const long Channel = 1365616918;
 
@@ -128,7 +128,7 @@ namespace DefenseShields
             _getClosestShieldPoint = (Func<IMyTerminalBlock, Vector3D, Vector3D?>)delegates["GetClosestShieldPoint"];
             _getShieldInfo = (Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>)delegates["GetShieldInfo"];
             _getModulationInfo = (Func<MyEntity, MyTuple<bool, bool, float, float>>)delegates["GetModulationInfo"];
-            _pointHitFace = (Func<IMyTerminalBlock, Vector3D, bool, bool>)delegates["PointHitFace"];
+            _getFaceInfo = (Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float>>)delegates["GetFaceInfo"];
 
         }
 
@@ -174,6 +174,6 @@ namespace DefenseShields
         public Vector3D? GetClosestShieldPoint(IMyTerminalBlock block, Vector3D pos) => _getClosestShieldPoint?.Invoke(block, pos) ?? null;
         public MyTuple<bool, bool, float, float, float, int> GetShieldInfo(MyEntity entity) => _getShieldInfo?.Invoke(entity) ?? new MyTuple<bool, bool, float, float, float, int>();
         public MyTuple<bool, bool, float, float> GetModulationInfo(MyEntity entity) => _getModulationInfo?.Invoke(entity) ?? new MyTuple<bool, bool, float, float>();
-        public bool PointHitFace(IMyTerminalBlock block, Vector3D pos, bool posMustBeInside = false) => _pointHitFace?.Invoke(block, pos, posMustBeInside) ?? false;
+        public MyTuple<bool, int, int, float> GetFaceInfo(IMyTerminalBlock block, Vector3D pos, bool posMustBeInside = false) => _getFaceInfo?.Invoke(block, pos, posMustBeInside) ?? new MyTuple<bool, int, int, float>();
     }
 }

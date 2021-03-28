@@ -9,6 +9,7 @@ using VRage.Game;
 using VRage.Game.Entity;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
+using VRage.Utils;
 using VRageMath;
 
 namespace DefenseShields
@@ -56,7 +57,7 @@ namespace DefenseShields
             ["GetClosestShieldPoint"] = new Func<IMyTerminalBlock, Vector3D, Vector3D?>(TAPI_GetClosestShieldPoint),
             ["GetShieldInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>(TAPI_GetShieldInfo),
             ["GetModulationInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float>>(TAPI_GetModulationInfo),
-            ["PointHitFace"] = new Func<IMyTerminalBlock, Vector3D, bool, bool>(TAPI_PointHitFace),
+            ["GetFaceInfo"] = new Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float>>(TAPI_GetFaceInfo),
         };
 
         private readonly Dictionary<string, Delegate> _terminalPbApiMethods = new Dictionary<string, Delegate>()
@@ -244,22 +245,100 @@ namespace DefenseShields
             return hpRemaining * 0.01f;
         }
 
-        private static bool TAPI_PointHitFace(IMyTerminalBlock block, Vector3D pos, bool posMustBeInside = false)
+        private static MyTuple<bool, int, int, float> TAPI_GetFaceInfo(IMyTerminalBlock block, Vector3D pos, bool posMustBeInside = false)
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
             if (logic == null)
-                return false;
+                return new MyTuple<bool, int, int, float>();
 
             lock (logic.MatrixLock) {
 
                 if (posMustBeInside && !CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv))
-                    return false;
+                    return new MyTuple<bool, int, int, float>();
 
                 if (logic.DsSet.Settings.SideFit)
-                    return UtilsStatic.FaceIntersected(logic.ShieldShapeMatrix, logic.MyGrid.PositionComp.LocalMatrixRef, pos, logic.DsSet.Settings.ShieldOffset);
+                {
+                    var referenceLocalPosition = logic.MyGrid.PositionComp.LocalMatrixRef.Translation;
+                    var worldDirection = pos - referenceLocalPosition;
+                    var localPosition = Vector3D.TransformNormal(worldDirection, MatrixD.Transpose(logic.MyGrid.PositionComp.LocalMatrixRef));
+                    var impactTransNorm = localPosition - logic.ShieldShapeMatrix.Translation;
+
+                    var boxMax = logic.ShieldShapeMatrix.Backward + logic.ShieldShapeMatrix.Right + logic.ShieldShapeMatrix.Up;
+                    var boxMin = -boxMax;
+                    var box = new BoundingBoxD(boxMin, boxMax);
+
+                    var maxWidth = box.Max.LengthSquared();
+                    Vector3D norm;
+                    Vector3D.Normalize(ref impactTransNorm, out norm);
+                    var testLine = new LineD(Vector3D.Zero, norm * maxWidth); //This is to ensure we intersect the box
+                    LineD testIntersection;
+                    box.Intersect(ref testLine, out testIntersection);
+
+                    var intersection = testIntersection.To;
+                    var projForward = Vector3D.IsZero(logic.ShieldShapeMatrix.Forward) ? Vector3D.Zero : intersection.Dot(logic.ShieldShapeMatrix.Forward) / logic.ShieldShapeMatrix.Forward.LengthSquared() * logic.ShieldShapeMatrix.Forward;
+                    //var projFront = UtilsStatic.VectorProjection(intersection, logic.ShieldShapeMatrix.Forward);
+                    int faceHit = -1;
+                    int redirectedFaces = 0;
+                    if (projForward.LengthSquared() >= 0.8 * logic.ShieldShapeMatrix.Forward.LengthSquared()) //if within the side thickness
+                    {
+                        var dot = intersection.Dot(logic.ShieldShapeMatrix.Forward);
+                        var face = dot > 0 ? Session.ShieldSides.Forward: Session.ShieldSides.Back;
+                        var lengDiffSqr = projForward.LengthSquared() - logic.ShieldShapeMatrix.Forward.LengthSquared();
+                        var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
+                        Log.Line($"{face} - {logic.DsSet.Settings.ShieldRedirects.Z}");
+                        if (logic.DsSet.Settings.ShieldRedirects.Z == 2 || face == Session.ShieldSides.Forward && logic.DsSet.Settings.ShieldRedirects.Z == -1 || face == Session.ShieldSides.Back && logic.DsSet.Settings.ShieldRedirects.Z == 1)
+                        {
+                            faceHit = (int)face;
+                            Log.Line($"FaceIntersected face:{face} - sides:{logic.DsSet.Settings.ShieldRedirects} - dot:{dot} - within:{lengDiffSqr}");
+                        }
+
+                        redirectedFaces += Math.Abs(logic.DsSet.Settings.ShieldRedirects.Z);
+                    }
+
+                    var projLeft = Vector3D.IsZero(logic.ShieldShapeMatrix.Left) ? Vector3D.Zero : intersection.Dot(logic.ShieldShapeMatrix.Left) / logic.ShieldShapeMatrix.Left.LengthSquared() * logic.ShieldShapeMatrix.Left;
+                    //var projLeft = UtilsStatic.VectorProjection(intersection, logic.ShieldShapeMatrix.Left);
+                    if (projLeft.LengthSquared() >= 0.8 * logic.ShieldShapeMatrix.Left.LengthSquared()) //if within the side thickness
+                    {
+                        var dot = intersection.Dot(logic.ShieldShapeMatrix.Left);
+                        var face = dot > 0 ? Session.ShieldSides.Left : Session.ShieldSides.Right;
+                        var lengDiffSqr = projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared();
+                        var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
+                        Log.Line($"{face} - {logic.DsSet.Settings.ShieldRedirects.X}");
+
+                        if (logic.DsSet.Settings.ShieldRedirects.X == 2 || face == Session.ShieldSides.Left && logic.DsSet.Settings.ShieldRedirects.X == -1 || face == Session.ShieldSides.Right && logic.DsSet.Settings.ShieldRedirects.X == 1)
+                        {
+                            faceHit = (int)face;
+                            Log.Line($"FaceIntersected face:{face} - sides:{logic.DsSet.Settings.ShieldRedirects} - dot:{dot} - within:{projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared()}");
+                        }
+
+                        redirectedFaces += Math.Abs(logic.DsSet.Settings.ShieldRedirects.X);
+                    }
+
+                    var projUp = Vector3D.IsZero(logic.ShieldShapeMatrix.Up) ? Vector3D.Zero : intersection.Dot(logic.ShieldShapeMatrix.Up) / logic.ShieldShapeMatrix.Up.LengthSquared() * logic.ShieldShapeMatrix.Up;
+                    //var projUp = UtilsStatic.VectorProjection(intersection, logic.ShieldShapeMatrix.Up);
+                    if (projUp.LengthSquared() >= 0.8 * logic.ShieldShapeMatrix.Up.LengthSquared()) //if within the side thickness
+                    {
+                        var dot = intersection.Dot(logic.ShieldShapeMatrix.Up);
+                        var face = dot > 0 ? Session.ShieldSides.Up : Session.ShieldSides.Down;
+                        var lengDiffSqr = projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared();
+                        var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
+                        Log.Line($"{face} - {logic.DsSet.Settings.ShieldRedirects.Y}");
+
+                        if (logic.DsSet.Settings.ShieldRedirects.Y == 2 || face == Session.ShieldSides.Up && logic.DsSet.Settings.ShieldRedirects.Y == 1 || face == Session.ShieldSides.Down && logic.DsSet.Settings.ShieldRedirects.Y == -1)
+                        {
+                            faceHit = (int)face;
+                            Log.Line($"FaceIntersected face:{face} - sides:{logic.DsSet.Settings.ShieldRedirects} - dot:{dot}  - within:{projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared()}");
+                        }
+
+                        redirectedFaces += Math.Abs(logic.DsSet.Settings.ShieldRedirects.Z);
+                    }
+                    var hitRedirectedSide = faceHit != -1;
+
+                    return new MyTuple<bool, int, int, float>(hitRedirectedSide, faceHit, redirectedFaces, !hitRedirectedSide ? 1 + (redirectedFaces * Session.ShieldRedirectBonus) : 0.1f);
+                }
             }
 
-            return false;
+            return new MyTuple<bool, int, int, float>();
         }
 
         private static float? TAPI_PointAttackShieldCon(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, float secondaryDamage, bool energy, bool drawParticle, bool posMustBeInside = false)
@@ -268,17 +347,12 @@ namespace DefenseShields
             if (logic == null)
                 return null;
 
-            if (posMustBeInside || logic.DsSet.Settings.SideFit) {
+            if (posMustBeInside) {
 
                 lock (logic.MatrixLock) {
 
-                    if (posMustBeInside && !CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) 
+                    if (!CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) 
                         return null;
-
-                    if (logic.DsSet.Settings.SideFit) {
-                        if (UtilsStatic.FaceIntersected(logic.ShieldShapeMatrix, logic.MyGrid.PositionComp.LocalMatrixRef, pos, logic.DsSet.Settings.ShieldOffset))
-                            return float.MinValue;
-                    }
                 }
             }
 

@@ -833,7 +833,7 @@ namespace DefenseShields.Support
             cfg.Close();
         }
 
-        private static Vector3D VectorProjection(Vector3D a, Vector3D b)
+        internal static Vector3D VectorProjection(Vector3D a, Vector3D b)
         {
             if (Vector3D.IsZero(b))
                 return Vector3D.Zero;

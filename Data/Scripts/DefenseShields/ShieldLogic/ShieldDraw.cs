@@ -66,7 +66,7 @@ namespace DefenseShields
                     Icosphere.CalculateTransform(ShieldShapeMatrix, lod);
                     if (!GridIsMobile) Icosphere.ReturnPhysicsVerts(DetectionMatrix, ShieldComp.PhysicsOutside);
                 }
-                var sides = DsSet.Settings.SideFit ? DsSet.Settings.ShieldOffset : Vector3I.Zero;
+                var sides = DsSet.Settings.SideFit ? DsSet.Settings.ShieldRedirects : Vector3I.Zero;
                 Icosphere.ComputeEffects(ShieldShapeMatrix, _localImpactPosition, _shellPassive, _shellActive, prevlod, percent, activeVisible, refreshAnim, ref sides);
 
             }

@@ -477,7 +477,7 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null)
                 return false;
-            var up = comp.DsSet.Settings.ShieldOffset.Y == 1 || comp.DsSet.Settings.ShieldOffset.Y == 2;
+            var up = comp.DsSet.Settings.ShieldRedirects.Y == 1 || comp.DsSet.Settings.ShieldRedirects.Y == 2;
             return up;
         }
 
@@ -486,11 +486,11 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Y;
+            var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
             if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == -1 ? 2 : 1;
+                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == -1 ? 2 : 1;
             else
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 2 ? -1 : 0;
+                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? -1 : 0;
 
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
@@ -503,7 +503,7 @@ namespace DefenseShields
             if (comp == null)
                 return false;
 
-            var down = comp.DsSet.Settings.ShieldOffset.Y == -1 || comp.DsSet.Settings.ShieldOffset.Y == 2;
+            var down = comp.DsSet.Settings.ShieldRedirects.Y == -1 || comp.DsSet.Settings.ShieldRedirects.Y == 2;
             return down;
         }
 
@@ -512,11 +512,11 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Y;
+            var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
             if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 1 ? 2 : -1;
+                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 1 ? 2 : -1;
             else
-                comp.DsSet.Settings.ShieldOffset.Y = currentValue == 2 ? 1 : 0;
+                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? 1 : 0;
 
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
@@ -530,7 +530,7 @@ namespace DefenseShields
             if (comp == null)
                 return false;
 
-            var right = comp.DsSet.Settings.ShieldOffset.X == 1 || comp.DsSet.Settings.ShieldOffset.X == 2;
+            var right = comp.DsSet.Settings.ShieldRedirects.X == 1 || comp.DsSet.Settings.ShieldRedirects.X == 2;
             return right;
         }
 
@@ -539,11 +539,11 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            var currentValue = comp.DsSet.Settings.ShieldOffset.X;
+            var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
             if (newValue)
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == -1 ? 2 : 1;
+                comp.DsSet.Settings.ShieldRedirects.X = currentValue == -1 ? 2 : 1;
             else
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == 2 ? -1 : 0;
+                comp.DsSet.Settings.ShieldRedirects.X = currentValue == 2 ? -1 : 0;
 
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
@@ -556,20 +556,20 @@ namespace DefenseShields
             if (comp == null)
                 return false;
 
-            var left = comp.DsSet.Settings.ShieldOffset.X == -1 || comp.DsSet.Settings.ShieldOffset.X == 2;
+            var left = comp.DsSet.Settings.ShieldRedirects.X == -1 || comp.DsSet.Settings.ShieldRedirects.X == 2;
             return left;
         }
 
-        internal static void SetLeftShield(IMyTerminalBlock block, bool newValue)
+        internal static void SetLeftShield(IMyTerminalBlock block, bool redirect)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            var currentValue = comp.DsSet.Settings.ShieldOffset.X;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == 1 ? 2 : -1;
+            var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
+            if (redirect)
+                comp.DsSet.Settings.ShieldRedirects.X = currentValue == 1 ? 2 : -1;
             else
-                comp.DsSet.Settings.ShieldOffset.X = currentValue == 2 ? 1 : 0;
+                comp.DsSet.Settings.ShieldRedirects.X = currentValue == 2 ? 1 : 0;
 
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
@@ -584,19 +584,19 @@ namespace DefenseShields
                 return false;
 
 
-            var front = comp.DsSet.Settings.ShieldOffset.Z == -1 || comp.DsSet.Settings.ShieldOffset.Z == 2;
+            var front = comp.DsSet.Settings.ShieldRedirects.Z == -1 || comp.DsSet.Settings.ShieldRedirects.Z == 2;
             return front;
         }
 
-        internal static void SetFrontShield(IMyTerminalBlock block, bool newValue)
+        internal static void SetFrontShield(IMyTerminalBlock block, bool redirect)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Z;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 1 ? 2 : -1;
+            var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
+            if (redirect)
+                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 1 ? 2 : -1;
             else
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 2 ? 1 : 0;
+                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 2 ? 1 : 0;
 
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
@@ -609,27 +609,27 @@ namespace DefenseShields
             if (comp == null)
                 return false;
 
-            var back = comp.DsSet.Settings.ShieldOffset.Z == 1 || comp.DsSet.Settings.ShieldOffset.Z == 2;
+            var back = comp.DsSet.Settings.ShieldRedirects.Z == 1 || comp.DsSet.Settings.ShieldRedirects.Z == 2;
             return back;
         }
 
-        internal static void SetBackShield(IMyTerminalBlock block, bool newValue)
+        internal static void SetBackShield(IMyTerminalBlock block, bool redirect)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            var currentValue = comp.DsSet.Settings.ShieldOffset.Z;
-            if (newValue)
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == -1 ? 2 : 1;
+            var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
+            if (redirect)
+                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == -1 ? 2 : 1;
             else
-                comp.DsSet.Settings.ShieldOffset.Z = currentValue == 2 ? -1 : 0;
+                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 2 ? -1 : 0;
 
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
         }
 
-        internal static bool SidesEnabled(IMyTerminalBlock block)
+        internal static bool RedirectEnabled(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null)

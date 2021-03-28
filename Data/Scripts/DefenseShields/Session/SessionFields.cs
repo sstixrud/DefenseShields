@@ -23,7 +23,7 @@ namespace DefenseShields
         internal const double TickTimeDiv = 0.0625;
         internal const double OneStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 1;
         internal const double TwoStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 2;
-
+        internal const float ShieldRedirectBonus = 0.2f;
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
 
         internal readonly int[] SlotCnt = new int[9];
@@ -141,8 +141,8 @@ namespace DefenseShields
 
         internal readonly List<string> ShieldDirectedSides = new List<string>()
         {
-            "DamageRight",
             "DamageLeft",
+            "DamageRight",
             "DamageTop",
             "DamageBottom",
             "DamageFront",
@@ -165,10 +165,10 @@ namespace DefenseShields
         {
             Left,
             Right,
-            Top,
-            Bottom,
+            Up,
+            Down,
+            Forward,
             Back,
-            Front,
         }
 
         /*

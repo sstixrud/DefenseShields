@@ -485,6 +485,7 @@ namespace DefenseShields
                 _shellActive.Save = false;
                 _shellActive.SyncFlag = false;
                 _shellActive.SetEmissiveParts("ShieldEmissiveAlpha", Color.Transparent, 0f);
+                _shellActive.SetEmissiveParts("ShieldDamageGlass", Color.Transparent, 0f);
                 _shellActive.RemoveFromGamePruningStructure();
             }
 

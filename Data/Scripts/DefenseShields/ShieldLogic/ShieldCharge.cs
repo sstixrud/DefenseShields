@@ -58,7 +58,7 @@ namespace DefenseShields
             var hpsEfficiency = Session.Enforced.HpsEfficiency;
             var baseScaler = Session.Enforced.BaseScaler;
             var maintenanceCost = Session.Enforced.MaintenanceCost;
-            var fortify = DsSet.Settings.FortifyShield && DsState.State.Enhancer && !DsSet.Settings.SideFit;
+            var fortify = DsSet.Settings.FortifyShield && DsState.State.Enhancer;
             var shieldTypeRatio = _shieldTypeRatio / 100f;
             var shieldMaintainPercent = maintenanceCost / 100;
 
@@ -76,7 +76,7 @@ namespace DefenseShields
 
                 if (ShieldMode == ShieldType.Station) 
                     capScaler *= 3.5f;
-                else if (fortify || DsSet.Settings.SideFit)
+                else if (fortify)
                     capScaler *= 2f;
 
                 powerCap *= capScaler;
