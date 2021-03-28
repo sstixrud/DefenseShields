@@ -344,7 +344,7 @@
       <IgnoreDepth>false</IgnoreDepth>
       <SoftParticleDistanceScale>1</SoftParticleDistanceScale>
       <Texture>Textures\Particles\SquareWindowDirtInside_ca.dds</Texture>
-      <!--<GlossTexture>Textures\Models\Cubes\AluminiumGlossy_ng.dds</GlossTexture> -->
+      <GlossTexture>Textures\Models\Cubes\HexagonDamageAlphaMask_ng.dds</GlossTexture>
       <UseAtlas>false</UseAtlas>
       <NeedSort>true</NeedSort>
       <UVOffset>
@@ -362,22 +362,22 @@
         <W>0</W>
       </Color>
       <ColorAdd>
-        <X>2.5</X>
+        <X>1.5</X>
         <Y>0</Y>
-        <Z>0</Z>
-        <W>0.25</W>
+        <Z>0.3</Z>
+        <W>0.005</W>
       </ColorAdd>
       <ShadowMultiplier>
-        <X>0</X>
+        <X>0.1</X>
         <Y>0</Y>
         <Z>0</Z>
-        <W>0</W>
+        <W>0.01</W>
       </ShadowMultiplier>
       <LightMultiplier>
-        <X>0</X>
+        <X>0.1</X>
         <Y>0</Y>
         <Z>0</Z>
-        <W>0</W>
+        <W>0.01</W>
       </LightMultiplier>
       <Reflectivity>0.0</Reflectivity>
       <Fresnel>0</Fresnel>
