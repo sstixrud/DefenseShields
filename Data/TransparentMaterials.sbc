@@ -343,7 +343,8 @@
       <CanBeAffectedByOtherLights>true</CanBeAffectedByOtherLights>
       <IgnoreDepth>false</IgnoreDepth>
       <SoftParticleDistanceScale>1</SoftParticleDistanceScale>
-      <Texture>Textures\Particles\SquareWindowDirtInside_ca.dds</Texture>
+      <!--<Texture>Textures\Particles\SquareWindowDirtInside_ca.dds</Texture>-->
+      <Texture>Textures\Models\Cubes\HexagonDamageAlphaMask_cm.dds</Texture>
       <GlossTexture>Textures\Models\Cubes\HexagonDamageAlphaMask_ng.dds</GlossTexture>
       <UseAtlas>false</UseAtlas>
       <NeedSort>true</NeedSort>
@@ -365,7 +366,7 @@
         <X>2</X>
         <Y>0</Y>
         <Z>0</Z>
-        <W>0.25</W>
+        <W>0.05</W>
       </ColorAdd>
       <ShadowMultiplier>
         <X>0</X>
