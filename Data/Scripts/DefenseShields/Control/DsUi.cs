@@ -481,13 +481,15 @@ namespace DefenseShields
             return up;
         }
 
-        internal static void SetTopShield(IMyTerminalBlock block, bool newValue)
+        internal static void SetTopShield(IMyTerminalBlock block, bool redirect)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
+            if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
+                return;
 
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
-            if (newValue)
+            if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.Y = currentValue == -1 ? 2 : 1;
             else
                 comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? -1 : 0;
@@ -507,13 +509,15 @@ namespace DefenseShields
             return down;
         }
 
-        internal static void SetBottomShield(IMyTerminalBlock block, bool newValue)
+        internal static void SetBottomShield(IMyTerminalBlock block, bool redirect)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
+            if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
+                return;
 
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
-            if (newValue)
+            if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 1 ? 2 : -1;
             else
                 comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? 1 : 0;
@@ -534,13 +538,15 @@ namespace DefenseShields
             return right;
         }
 
-        internal static void SetRightShield(IMyTerminalBlock block, bool newValue)
+        internal static void SetRightShield(IMyTerminalBlock block, bool redirect)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
+            if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
+                return;
 
             var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
-            if (newValue)
+            if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.X = currentValue == -1 ? 2 : 1;
             else
                 comp.DsSet.Settings.ShieldRedirects.X = currentValue == 2 ? -1 : 0;
@@ -564,6 +570,8 @@ namespace DefenseShields
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
+            if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
+                return;
 
             var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
             if (redirect)
@@ -592,6 +600,9 @@ namespace DefenseShields
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
+            if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
+                return;
+
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
             if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 1 ? 2 : -1;
@@ -617,6 +628,8 @@ namespace DefenseShields
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
+            if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
+                return;
 
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
             if (redirect)

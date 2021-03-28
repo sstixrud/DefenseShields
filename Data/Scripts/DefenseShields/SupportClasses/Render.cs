@@ -605,8 +605,6 @@
                         var update = _shieldSides[i];
                         
                         var enable = display && SideEnabled(faces, (Session.ShieldSides)i);
-                        if (enable)
-                            Log.Line($"{(Session.ShieldSides)i} - {update} - {Session.Instance.ShieldDirectedSides[i]}");
                         var needsUpdate = update == SideState.Unknown || update == SideState.Redirect && enable || update == SideState.Normal && !enable;
                         if (needsUpdate)
                         {
