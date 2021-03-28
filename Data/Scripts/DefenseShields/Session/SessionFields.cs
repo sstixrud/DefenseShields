@@ -142,12 +142,12 @@ namespace DefenseShields
 
         internal readonly List<string> ShieldDirectedSides = new List<string>()
         {
-            "DamageLeft",
-            "DamageRight",
-            "DamageTop",
-            "DamageBottom",
-            "DamageFront",
-            "DamageBack",
+            "RedirectLeft",
+            "RedirectRight",
+            "RedirectTop",
+            "RedirectBottom",
+            "RedirectFront",
+            "RedirectBack",
         };
 
         public enum ShieldSides

@@ -71,11 +71,9 @@ namespace DefenseShields
             }
             else if (_shapeChanged) _updateRender = true;
 
-            var show = _tick180 && !_tick300;
-            var hide = _tick300;
-            if (_tick180 && _shellActive != null && RedirectVisualUpdate(show))
+            if (Session.Instance.Tick180 && _shellActive != null && RedirectVisualUpdate())
             {
-                UpdateShieldRedirectVisuals(_shellActive, hide);
+                UpdateShieldRedirectVisuals(_shellActive);
             }
 
             if (hitAnim && sphereOnCamera && DsState.State.Online) Icosphere.Draw(renderId);
@@ -249,42 +247,42 @@ namespace DefenseShields
             }
         }
 
-        public bool RedirectVisualUpdate(bool display)
+        private bool _toggle;
+        public bool RedirectVisualUpdate()
         {
+            _toggle = !_toggle;
+            Log.Line($"{_toggle}");
             int needsUpdating = 0;
             for (int i = 0; i < _shieldSides.Length; i++) {
 
                 var savedState = _shieldSides[i];
                 var redirecting = SideRedirecting((Session.ShieldSides)i);
 
-                var showStale = display && (redirecting && savedState == SideState.Normal || !redirecting && savedState == SideState.Redirect);
-                var hideStale = !display && savedState == SideState.Redirect; 
+                var showStale = _toggle && (savedState == SideState.Unknown || redirecting && savedState == SideState.Normal || !redirecting && savedState == SideState.Redirect);
+                var hideStale = !_toggle && redirecting && savedState == SideState.Redirect; 
 
-                if (showStale || hideStale || savedState == SideState.Unknown) {
+                if (showStale || hideStale) {
+                    Log.Line($"hideState: {hideStale}");
                     needsUpdating++;
-                    _shieldSides[i] = SideState.Unknown;
                 }
+                else Log.Line($"_toggle: {_toggle} - {redirecting} - {savedState}");
             }
 
             return needsUpdating > 0;
         }
 
-        public void UpdateShieldRedirectVisuals(MyEntity shellActive, bool forceHide)
+        public void UpdateShieldRedirectVisuals(MyEntity shellActive)
         {
             for (int i = 0; i < 6; i++)
             {
-                var currentState = _shieldSides[i];
-                if (currentState == SideState.Unknown)
+                MyEntitySubpart part;
+                if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[i], out part))
                 {
-                    MyEntitySubpart part;
-                    if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[i], out part))
-                    {
-                        var redirecting = SideRedirecting((Session.ShieldSides)i) && !forceHide;
-                        Log.Line($"redirecting: {redirecting} - side:{(Session.ShieldSides)i} - forceHide:{forceHide}");
-                        _shieldSides[i] = redirecting ? SideState.Redirect : SideState.Normal;
-                        part.Render.UpdateRenderObject(redirecting);
+                    var redirecting = SideRedirecting((Session.ShieldSides)i) && !_toggle;
+                    Log.Line($"redirecting: {redirecting} - side:{(Session.ShieldSides)i} - forceHide:{_toggle}");
+                    _shieldSides[i] = redirecting ? SideState.Redirect : SideState.Normal;
+                    part.Render.UpdateRenderObject(redirecting);
 
-                    }
                 }
             }
         }
