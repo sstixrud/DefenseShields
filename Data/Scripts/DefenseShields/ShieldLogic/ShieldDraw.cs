@@ -71,7 +71,9 @@ namespace DefenseShields
             }
             else if (_shapeChanged) _updateRender = true;
 
-            if (Session.Instance.Tick180 && _shellActive != null && RedirectVisualUpdate())
+            var updated = Session.Instance.Tick300 || Session.Instance.Tick20 && _toggle;
+
+            if (updated && _shellActive != null && RedirectVisualUpdate())
             {
                 UpdateShieldRedirectVisuals(_shellActive);
             }
@@ -250,8 +252,11 @@ namespace DefenseShields
         private bool _toggle;
         public bool RedirectVisualUpdate()
         {
+            var turnedOff = !DsSet.Settings.SideFit || DsSet.Settings.ShieldRedirects == Vector3.Zero;
+            if (turnedOff && !_toggle)
+                return false;
+
             _toggle = !_toggle;
-            Log.Line($"{_toggle}");
             int needsUpdating = 0;
             for (int i = 0; i < _shieldSides.Length; i++) {
 
@@ -262,10 +267,8 @@ namespace DefenseShields
                 var hideStale = !_toggle && redirecting && savedState == SideState.Redirect; 
 
                 if (showStale || hideStale) {
-                    Log.Line($"hideState: {hideStale}");
                     needsUpdating++;
                 }
-                else Log.Line($"_toggle: {_toggle} - {redirecting} - {savedState}");
             }
 
             return needsUpdating > 0;
@@ -278,7 +281,7 @@ namespace DefenseShields
                 MyEntitySubpart part;
                 if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[i], out part))
                 {
-                    var redirecting = SideRedirecting((Session.ShieldSides)i) && !_toggle;
+                    var redirecting = SideRedirecting((Session.ShieldSides)i) && _toggle;
                     Log.Line($"redirecting: {redirecting} - side:{(Session.ShieldSides)i} - forceHide:{_toggle}");
                     _shieldSides[i] = redirecting ? SideState.Redirect : SideState.Normal;
                     part.Render.UpdateRenderObject(redirecting);

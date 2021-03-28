@@ -362,10 +362,10 @@
         <W>0</W>
       </Color>
       <ColorAdd>
-        <X>1.5</X>
+        <X>2.5</X>
         <Y>0</Y>
-        <Z>0.3</Z>
-        <W>0.005</W>
+        <Z>0</Z>
+        <W>0.25</W>
       </ColorAdd>
       <ShadowMultiplier>
         <X>0</X>
