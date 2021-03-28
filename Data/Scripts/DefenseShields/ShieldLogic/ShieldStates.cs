@@ -414,6 +414,16 @@ namespace DefenseShields
             return true;
         }
 
+        internal void StartRedirectTimer()
+        {
+            _redirectUpdateTime = Session.Instance.Tick + 120;
+        }
+
+        private void UpdateRedirectState()
+        {
+            ShieldRedirectState = DsSet.Settings.ShieldRedirects;
+        }
+
         internal void UpdateSettings(ControllerSettingsValues newSettings)
         {
             if (newSettings.MId > DsSet.Settings.MId)
@@ -426,11 +436,14 @@ namespace DefenseShields
                     if (newSettings.Visible != DsSet.Settings.Visible) 
                         _clientAltered = true;
                 }
-                var newShape = newSettings.Fit != DsSet.Settings.Fit || newSettings.FortifyShield != DsSet.Settings.FortifyShield || newSettings.SphereFit != DsSet.Settings.SphereFit || newSettings.SideFit != DsSet.Settings.SideFit;
+                var newShape = newSettings.Fit != DsSet.Settings.Fit || newSettings.FortifyShield != DsSet.Settings.FortifyShield ;
                 
                 DsSet.Settings = newSettings;
                 SettingsUpdated = true;
                 if (newShape) FitChanged = true;
+
+                if (_redirectUpdateTime <= Session.Instance.Tick && ShieldRedirectState != newSettings.ShieldRedirects)
+                    StartRedirectTimer();
             }
         }
 

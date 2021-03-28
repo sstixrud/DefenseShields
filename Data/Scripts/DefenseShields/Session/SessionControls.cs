@@ -94,7 +94,8 @@
                 DimShieldHitsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_DimShieldHits", "Dim Incoming Hit Effects ", "Supress brightness of incoming hit effects", DsUi.GetDimShieldHits, DsUi.SetDimShieldHits);
 
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep6");
-                SideFit = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideFit", "Side Shields", "Side Shields", DsUi.GetSideFit, DsUi.SetSideFit);
+                SideRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Side Shields", "Enable Side Shield Redirects", DsUi.GetSideRedirect, DsUi.SetSideRedirect);
+                ShowRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Redirected Shields", "Enable/Disable showing side shield state", DsUi.GetShowRedirect, DsUi.SetShowRedirect);
 
                 TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Redirect Top Shield", "Redirect Top Shield", "Up", "Down", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
                 BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Redirect Bottom Shield", "Redirect Bottom Shield", "Up", "Down", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
@@ -103,27 +104,31 @@
                 FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Redirect Front Shield", "Redirect Front Shield", "Up", "Down", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.RedirectEnabled);
                 BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Redirect Back Shield", "Redirect Back Shield", "Up", "Down", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.RedirectEnabled);
 
+
                 CreateAction<IMyUpgradeModule>(ToggleShield);
 
-                //CreateActionChargeRate<IMyUpgradeModule>(ChargeSlider);
-
-                //CreateAction<IMyUpgradeModule>(Fit);
                 CreateAction<IMyUpgradeModule>(SphereFit);
-                CreateAction<IMyUpgradeModule>(SideFit);
-
+                CreateFitAction<IMyUpgradeModule>(Fit);
                 CreateAction<IMyUpgradeModule>(FortifyShield);
+
 
                 CreateAction<IMyUpgradeModule>(HideActiveCheckBox);
                 CreateAction<IMyUpgradeModule>(RefreshAnimationCheckBox);
                 CreateAction<IMyUpgradeModule>(HitWaveAnimationCheckBox);
                 CreateAction<IMyUpgradeModule>(SendToHudCheckBox);
                 CreateAction<IMyUpgradeModule>(BatteryBoostCheckBox);
-                CreateFitAction<IMyUpgradeModule>(Fit);
                 CreateDepthAction<IMyUpgradeModule>(DepthSlider);
                 CreateWidthAction<IMyUpgradeModule>(WidthSlider);
                 CreateHeightAction<IMyUpgradeModule>(HeightSlider);
-                //CreateSideAction<IMyUpgradeModule>(SideFit);
 
+                CreateAction<IMyUpgradeModule>(TopShield);
+                CreateAction<IMyUpgradeModule>(BottomShield);
+                CreateAction<IMyUpgradeModule>(LeftShield);
+                CreateAction<IMyUpgradeModule>(RightShield);
+                CreateAction<IMyUpgradeModule>(FrontShield);
+                CreateAction<IMyUpgradeModule>(BackShield);
+
+                CreateAction<IMyUpgradeModule>(SideRedirect);
 
                 DsControl = true;
             }

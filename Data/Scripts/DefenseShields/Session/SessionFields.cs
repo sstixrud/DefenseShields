@@ -109,7 +109,7 @@ namespace DefenseShields
             "DS-C_ChargeRate_Reset",
             "DS-C_ChargeRate_Increase",
             "DS-C_ChargeRate_Decrease",
-            "DS-C_SideFit_Toggle",
+            "DS-C_SideRedirect_Toggle",
             "DS-C_SphereFit_Toggle",
             "DS-C_ShieldFortify_Toggle",
             "DS-C_HideActive_Toggle",
@@ -277,6 +277,7 @@ namespace DefenseShields
         internal bool OnCountThrottle { get; set; }
         internal bool GameLoaded { get; set; }
         internal bool MiscLoaded { get; set; }
+        internal bool Tick10 { get; set; }
         internal bool Tick20 { get; set; }
         internal bool Tick30 { get; set; }
         internal bool Tick60 { get; set; }
@@ -315,7 +316,9 @@ namespace DefenseShields
         internal IMyTerminalControlSlider ChargeSlider { get; set; }
         internal IMyTerminalControlSlider Fit { get; set; }
         internal IMyTerminalControlCheckbox SphereFit { get; set; }
-        internal IMyTerminalControlCheckbox SideFit { get; set; }
+        internal IMyTerminalControlCheckbox SideRedirect { get; set; }
+        internal IMyTerminalControlCheckbox ShowRedirect { get; set; }
+
         internal IMyTerminalControlCheckbox FortifyShield { get; set; }
         internal IMyTerminalControlCheckbox BatteryBoostCheckBox { get; set; }
         internal IMyTerminalControlCheckbox HideActiveCheckBox { get; set; }

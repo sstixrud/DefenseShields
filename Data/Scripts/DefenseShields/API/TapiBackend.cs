@@ -256,7 +256,7 @@ namespace DefenseShields
                 if (posMustBeInside && !CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv))
                     return new MyTuple<bool, int, int, float, float>();
 
-                if (logic.DsSet.Settings.SideFit)
+                if (logic.DsSet.Settings.SideRedirect)
                 {
                     var referenceLocalPosition = logic.MyGrid.PositionComp.LocalMatrixRef.Translation;
                     var worldDirection = pos - referenceLocalPosition;
@@ -266,7 +266,7 @@ namespace DefenseShields
                     var boxMax = logic.ShieldShapeMatrix.Backward + logic.ShieldShapeMatrix.Right + logic.ShieldShapeMatrix.Up;
                     var boxMin = -boxMax;
                     var box = new BoundingBoxD(boxMin, boxMax);
-                    var reDirects = logic.DsSet.Settings.ShieldRedirects;
+                    var reDirects = logic.ShieldRedirectState;
 
                     var maxWidth = box.Max.LengthSquared();
                     Vector3D norm;
@@ -287,7 +287,7 @@ namespace DefenseShields
                         if (validFace && (reDirects.Z == 2 || face == Session.ShieldSides.Forward && reDirects.Z == -1 || face == Session.ShieldSides.Back && reDirects.Z == 1))
                         {
                             faceHit = (int)face;
-                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{lengDiffSqr}");
+                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{lengDiffSqr}");
                         }
                     }
 
@@ -302,7 +302,7 @@ namespace DefenseShields
                         if (validFace && (reDirects.X == 2 || face == Session.ShieldSides.Left && reDirects.X == -1 || face == Session.ShieldSides.Right && reDirects.X == 1))
                         {
                             faceHit = (int)face;
-                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared()}");
+                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared()}");
                         }
 
                     }
@@ -318,7 +318,7 @@ namespace DefenseShields
                         if (validFace && (reDirects.Y == 2 || face == Session.ShieldSides.Up && reDirects.Y == 1 || face == Session.ShieldSides.Down && reDirects.Y == -1))
                         {
                             faceHit = (int)face;
-                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}  - within:{projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared()}");
+                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}  - within:{projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared()}");
                         }
 
                     }
@@ -808,7 +808,7 @@ namespace DefenseShields
                         Item2 =
                         {
                             Item1 = true,
-                            Item2 = s.DsSet.Settings.SideFit,
+                            Item2 = s.DsSet.Settings.SideRedirect,
                             Item3 = state.Charge,
                             Item4 = s.ShieldMaxCharge,
                             Item5 = state.ShieldPercent,

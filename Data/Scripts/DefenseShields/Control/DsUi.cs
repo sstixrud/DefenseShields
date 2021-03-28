@@ -119,17 +119,38 @@ namespace DefenseShields
             comp.ClientUiUpdate = true;
         }
 
-        internal static bool GetSideFit(IMyTerminalBlock block)
+        internal static bool GetSideRedirect(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            return comp?.DsSet.Settings.SideFit ?? false;
+            return comp?.DsSet.Settings.SideRedirect ?? false;
         }
 
-        internal static void SetSideFit(IMyTerminalBlock block, bool newValue)
+        internal static void SetSideRedirect(IMyTerminalBlock block, bool newValue)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
-            comp.DsSet.Settings.SideFit = newValue;
+            if (comp.DsSet.Settings.SideRedirect != newValue)
+            {
+                comp.StartRedirectTimer();
+                comp.DsSet.Settings.SideRedirect = newValue;
+                comp.FitChanged = true;
+                comp.SettingsUpdated = true;
+                comp.ClientUiUpdate = true;
+            }
+        }
+
+        internal static bool GetShowRedirect(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            return comp?.DsSet.Settings.ShowRedirect ?? false;
+        }
+
+        internal static void SetShowRedirect(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+
+            comp.DsSet.Settings.ShowRedirect = newValue;
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
@@ -488,15 +509,21 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
+            var current = comp.DsSet.Settings.ShieldRedirects;
+
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
             if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.Y = currentValue == -1 ? 2 : 1;
             else
                 comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? -1 : 0;
 
+            if (current == comp.DsSet.Settings.ShieldRedirects)
+                return;
+
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
+            comp.StartRedirectTimer();
         }
 
         internal static bool GetBottomShield(IMyTerminalBlock block)
@@ -515,6 +542,8 @@ namespace DefenseShields
             if (comp == null) return;
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
+            
+            var current = comp.DsSet.Settings.ShieldRedirects;
 
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
             if (redirect)
@@ -522,9 +551,12 @@ namespace DefenseShields
             else
                 comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? 1 : 0;
 
+            if (current == comp.DsSet.Settings.ShieldRedirects)
+                return;
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
+            comp.StartRedirectTimer();
         }
 
 
@@ -545,15 +577,20 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
+            var current = comp.DsSet.Settings.ShieldRedirects;
+
             var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
             if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.X = currentValue == -1 ? 2 : 1;
             else
                 comp.DsSet.Settings.ShieldRedirects.X = currentValue == 2 ? -1 : 0;
 
+            if (current == comp.DsSet.Settings.ShieldRedirects)
+                return;
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
+            comp.StartRedirectTimer();
         }
 
         internal static bool GetLeftShield(IMyTerminalBlock block)
@@ -573,15 +610,20 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
+            var current = comp.DsSet.Settings.ShieldRedirects;
+
             var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
             if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.X = currentValue == 1 ? 2 : -1;
             else
                 comp.DsSet.Settings.ShieldRedirects.X = currentValue == 2 ? 1 : 0;
 
+            if (current == comp.DsSet.Settings.ShieldRedirects)
+                return;
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
+            comp.StartRedirectTimer();
         }
 
 
@@ -602,6 +644,7 @@ namespace DefenseShields
             if (comp == null) return;
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
+            var current = comp.DsSet.Settings.ShieldRedirects;
 
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
             if (redirect)
@@ -609,9 +652,12 @@ namespace DefenseShields
             else
                 comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 2 ? 1 : 0;
 
+            if (current == comp.DsSet.Settings.ShieldRedirects)
+                return;
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
+            comp.StartRedirectTimer();
         }
 
         internal static bool GetBackShield(IMyTerminalBlock block)
@@ -631,15 +677,20 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
+            var current = comp.DsSet.Settings.ShieldRedirects;
+
             var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
             if (redirect)
                 comp.DsSet.Settings.ShieldRedirects.Z = currentValue == -1 ? 2 : 1;
             else
                 comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 2 ? -1 : 0;
 
+            if (current == comp.DsSet.Settings.ShieldRedirects)
+                return;
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
+            comp.StartRedirectTimer();
         }
 
         internal static bool RedirectEnabled(IMyTerminalBlock block)
@@ -648,7 +699,7 @@ namespace DefenseShields
             if (comp == null)
                 return false;
 
-            return comp.DsSet.Settings.SideFit;
+            return comp.DsSet.Settings.SideRedirect;
         }
         #endregion
     }

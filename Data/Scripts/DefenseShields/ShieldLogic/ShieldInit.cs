@@ -67,6 +67,13 @@ namespace DefenseShields
             }
         }
 
+        internal void ForceLowReflectiveNoColor()
+        {
+            _modelPassive = ModelLowReflective;
+            _hideColor = false;
+            _supressedColor = false;
+        }
+
         internal void SelectPassiveShell()
         {
             try

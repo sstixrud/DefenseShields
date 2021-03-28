@@ -60,6 +60,7 @@ namespace DefenseShields
         internal volatile bool ReInforcedShield;
 
         internal int LostPings;
+        internal Vector3I ShieldRedirectState;
 
         internal BoundingBoxD WebBox = new BoundingBoxD();
         internal MatrixD OldShieldMatrix;
@@ -225,7 +226,7 @@ namespace DefenseShields
         private readonly Vector2D _shieldIconPos = new Vector2D(-0.89, -0.86);
         private Vector3D _localImpactPosition;
         private Vector3D _oldGridHalfExtents;
-
+        internal uint _redirectUpdateTime;
         internal Quaternion SQuaternion;
         private Color _oldPercentColor = Color.Transparent;
 

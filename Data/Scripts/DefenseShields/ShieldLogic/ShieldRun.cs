@@ -73,6 +73,9 @@ namespace DefenseShields
 
                 if (!EntityAlive() || !_isServer && !ClientInitPacket) return;
 
+                if (ShieldRedirectState != DsSet.Settings.ShieldRedirects && Session.Instance.Tick >= _redirectUpdateTime)
+                    UpdateRedirectState();
+                
                 if (!_isDedicated && _clientMessageCount < DsState.State.MessageCount)
                     BroadcastMessage();
 
