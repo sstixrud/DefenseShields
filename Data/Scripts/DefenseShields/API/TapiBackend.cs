@@ -274,7 +274,6 @@ namespace DefenseShields
                     var testLine = new LineD(Vector3D.Zero, norm * maxWidth); //This is to ensure we intersect the box
                     LineD testIntersection;
                     box.Intersect(ref testLine, out testIntersection);
-
                     var intersection = testIntersection.To;
                     var projForward = Vector3D.IsZero(logic.ShieldShapeMatrix.Forward) ? Vector3D.Zero : intersection.Dot(logic.ShieldShapeMatrix.Forward) / logic.ShieldShapeMatrix.Forward.LengthSquared() * logic.ShieldShapeMatrix.Forward;
                     int faceHit = -1;
@@ -282,12 +281,11 @@ namespace DefenseShields
                     {
                         var dot = intersection.Dot(logic.ShieldShapeMatrix.Forward);
                         var face = dot > 0 ? Session.ShieldSides.Forward: Session.ShieldSides.Back;
-                        var lengDiffSqr = projForward.LengthSquared() - logic.ShieldShapeMatrix.Forward.LengthSquared();
-                        var validFace = !MyUtils.IsZero(lengDiffSqr);
-                        if (validFace && (reDirects.Z == 2 || face == Session.ShieldSides.Forward && reDirects.Z == -1 || face == Session.ShieldSides.Back && reDirects.Z == 1))
+
+                        if ((reDirects.Z == 2 || face == Session.ShieldSides.Forward && reDirects.Z == -1 || face == Session.ShieldSides.Back && reDirects.Z == 1))
                         {
                             faceHit = (int)face;
-                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{lengDiffSqr}");
+                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}");
                         }
                     }
 

@@ -220,7 +220,7 @@ namespace DefenseShields
         private bool _updateCap;
         private bool _sendMessage;
 
-        private string _modelActive = "\\Models\\Cubes\\ShieldActiveBase.mwm";
+        private string _modelActive = "\\Models\\Cubes\\ShieldActiveBaseAlt.mwm";
         private string _modelPassive = string.Empty;
 
         private readonly Vector2D _shieldIconPos = new Vector2D(-0.89, -0.86);
