@@ -300,38 +300,6 @@ namespace DefenseShields
             }
         }
 
-        public bool SideRedirecting(Session.ShieldSides side)
-        {
-            switch (side)
-            {
-                case Session.ShieldSides.Left:
-                    if (DsSet.Settings.ShieldRedirects.X == -1 || DsSet.Settings.ShieldRedirects.X == 2)
-                        return true;
-                    break;
-                case Session.ShieldSides.Right:
-                    if (DsSet.Settings.ShieldRedirects.X == 1 || DsSet.Settings.ShieldRedirects.X == 2)
-                        return true;
-                    break;
-                case Session.ShieldSides.Up:
-                    if (DsSet.Settings.ShieldRedirects.Y == 1 || DsSet.Settings.ShieldRedirects.Y == 2)
-                        return true;
-                    break;
-                case Session.ShieldSides.Down:
-                    if (DsSet.Settings.ShieldRedirects.Y == -1 || DsSet.Settings.ShieldRedirects.Y == 2)
-                        return true;
-                    break;
-                case Session.ShieldSides.Forward:
-                    if (DsSet.Settings.ShieldRedirects.Z == -1 || DsSet.Settings.ShieldRedirects.Z == 2)
-                        return true;
-                    break;
-                case Session.ShieldSides.Back:
-                    if (DsSet.Settings.ShieldRedirects.Z == 1 || DsSet.Settings.ShieldRedirects.Z == 2)
-                        return true;
-                    break;
-            }
-            return false;
-        }
-
         private int CalculateLod(int onCount)
         {
             var lod = 4;

@@ -225,14 +225,16 @@
                 var status = GetShieldStatus();
                 if (status == "[Shield Up]" || status == "[Shield Down]" || status == "[Shield Offline]") {
 
+                    var redirectedSides = RedirectedSideCount();
+                    var bonusAmount = redirectedSides * 20;
                     stringBuilder.Append(status + maxString + hpValue.ToString("N0") +
-                                         "\n" +
                                          "\n[Shield HP__]: " + (DsState.State.Charge * ConvToHp).ToString("N0") + " (" + shieldPercent.ToString("0") + "%)" +
                                          "\n[HP Per Sec_]: " + (ShieldChargeRate * ConvToHp).ToString("N0") +
                                          "\n[Damage In__]: " + _damageReadOut.ToString("N0") +
                                          "\n[Charge Rate]: " + ShieldChargeRate.ToString("0.0") + " Mw" +
                                          "\n[Full Charge_]: " + secToFull.ToString("N0") + "s" +
                                          "\n[Over Heated]: " + DsState.State.Heat.ToString("0") + "%" +
+                                         "\n[Redirections]: " + redirectedSides.ToString("0") + " side(s) ("  + bonusAmount + "%)" +
                                          "\n[Maintenance]: " + _shieldMaintaintPower.ToString("0.0") + " Mw" +
                                          "\n[Shield Power]: " + ShieldCurrentPower.ToString("0.0") + " Mw" +
                                          "\n[Power Use]: " + powerUsage.ToString("0.0") + " (" + GridMaxPower.ToString("0.0") + ")Mw");

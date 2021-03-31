@@ -98,6 +98,50 @@ namespace DefenseShields
             return worldAabb;
         }
 
+        internal int RedirectedSideCount()
+        {
+            int count = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                if (SideRedirecting((Session.ShieldSides)i))
+                    count++;
+            }
+
+            return count;
+        }
+
+        public bool SideRedirecting(Session.ShieldSides side)
+        {
+            switch (side)
+            {
+                case Session.ShieldSides.Left:
+                    if (DsSet.Settings.ShieldRedirects.X == -1 || DsSet.Settings.ShieldRedirects.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Right:
+                    if (DsSet.Settings.ShieldRedirects.X == 1 || DsSet.Settings.ShieldRedirects.X == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Up:
+                    if (DsSet.Settings.ShieldRedirects.Y == 1 || DsSet.Settings.ShieldRedirects.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Down:
+                    if (DsSet.Settings.ShieldRedirects.Y == -1 || DsSet.Settings.ShieldRedirects.Y == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Forward:
+                    if (DsSet.Settings.ShieldRedirects.Z == -1 || DsSet.Settings.ShieldRedirects.Z == 2)
+                        return true;
+                    break;
+                case Session.ShieldSides.Back:
+                    if (DsSet.Settings.ShieldRedirects.Z == 1 || DsSet.Settings.ShieldRedirects.Z == 2)
+                        return true;
+                    break;
+            }
+            return false;
+        }
+
         public void ResetDamageEffects()
         {
             if (DsState.State.Online && !DsState.State.Lowered)

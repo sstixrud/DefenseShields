@@ -97,12 +97,12 @@
                 SideRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Side Shields", "Enable Side Shield Redirects", DsUi.GetSideRedirect, DsUi.SetSideRedirect);
                 ShowRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Redirected Shields", "Enable/Disable showing side shield state", DsUi.GetShowRedirect, DsUi.SetShowRedirect);
 
-                TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Redirect Top Shield", "Redirect Top Shield", "Up", "Down", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
-                BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Redirect Bottom Shield", "Redirect Bottom Shield", "Up", "Down", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
-                LeftShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_LeftShield", "Redirect Left Shield", "Redirect Left Shield", "Up", "Down", DsUi.GetLeftShield, DsUi.SetLeftShield, DsUi.RedirectEnabled);
-                RightShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_RightShield", "Redirect Right Shield", "Redirect Right Shield", "Up", "Down", DsUi.GetRightShield, DsUi.SetRightShield, DsUi.RedirectEnabled);
-                FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Redirect Front Shield", "Redirect Front Shield", "Up", "Down", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.RedirectEnabled);
-                BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Redirect Back Shield", "Redirect Back Shield", "Up", "Down", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.RedirectEnabled);
+                TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Redirect Top Shield", "Redirect Top Shield", "On", "Off", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
+                BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Redirect Bottom Shield", "Redirect Bottom Shield", "On", "Off", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
+                LeftShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_LeftShield", "Redirect Left Shield", "Redirect Left Shield", "On", "Off", DsUi.GetLeftShield, DsUi.SetLeftShield, DsUi.RedirectEnabled);
+                RightShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_RightShield", "Redirect Right Shield", "Redirect Right Shield", "On", "Off", DsUi.GetRightShield, DsUi.SetRightShield, DsUi.RedirectEnabled);
+                FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Redirect Front Shield", "Redirect Front Shield", "On", "Off", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.RedirectEnabled);
+                BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Redirect Back Shield", "Redirect Back Shield", "On", "Off", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.RedirectEnabled);
 
 
                 CreateAction<IMyUpgradeModule>(ToggleShield);
