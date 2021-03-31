@@ -1215,6 +1215,7 @@
 		<MountPoint Side="Right" StartX="0.00" StartY="0.00" EndX="2.00" EndY="0.50" />
 		<MountPoint Side="Bottom" StartX="0.00" StartY="0.00" EndX="1.00" EndY="2.00" />
       </MountPoints>
+      <IsAirTight>true</IsAirTight>
       <MirroringZ>Y</MirroringZ>
       <MirroringY>Z</MirroringY>
       <PhysicalMaterial>Metal</PhysicalMaterial>
@@ -1264,7 +1265,7 @@
 		<MountPoint Side="Right" StartX="0.00" StartY="0.00" EndX="2.00" EndY="0.50" />
 		<MountPoint Side="Bottom" StartX="0.00" StartY="0.00" EndX="1.00" EndY="2.00" />
       </MountPoints>
-      <IsAirTight>false</IsAirTight>
+      <IsAirTight>true</IsAirTight>
       <MirroringZ>Y</MirroringZ>
       <MirroringY>Z</MirroringY>
       <PhysicalMaterial>Metal</PhysicalMaterial>
