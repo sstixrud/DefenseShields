@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using VRage.Utils;
 
 namespace DefenseShields
 {
@@ -422,6 +424,7 @@ namespace DefenseShields
         private void UpdateRedirectState()
         {
             ShieldRedirectState = DsSet.Settings.ShieldRedirects;
+            UpdateMapping();
         }
 
         internal void UpdateSettings(ControllerSettingsValues newSettings)

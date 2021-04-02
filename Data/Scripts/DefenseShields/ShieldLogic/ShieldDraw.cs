@@ -249,57 +249,6 @@ namespace DefenseShields
             }
         }
 
-        private bool _toggle;
-        public bool RedirectVisualUpdate()
-        {
-            var turnedOff = !DsSet.Settings.SideRedirect || DsSet.Settings.ShieldRedirects == Vector3.Zero;
-
-            if (turnedOff && !_toggle)
-                return false;
-
-            if (!_toggle) {
-
-                var relation = MyAPIGateway.Session.Player.GetRelationTo(MyCube.OwnerId);
-                var enemy = relation == MyRelationsBetweenPlayerAndBlock.Neutral || relation == MyRelationsBetweenPlayerAndBlock.Enemies;
-                if (!enemy && !DsSet.Settings.ShowRedirect)
-                    return false;
-            }
-
-
-            _toggle = !_toggle;
-            int needsUpdating = 0;
-            for (int i = 0; i < _shieldSides.Length; i++) {
-
-                var savedState = _shieldSides[i];
-                var redirecting = SideRedirecting((Session.ShieldSides)i);
-
-                var showStale = _toggle && (savedState == SideState.Unknown || redirecting && savedState == SideState.Normal || !redirecting && savedState == SideState.Redirect);
-                var hideStale = !_toggle && redirecting && savedState == SideState.Redirect; 
-
-                if (showStale || hideStale) {
-                    needsUpdating++;
-                }
-            }
-
-            var update = needsUpdating > 0;
-
-            return update;
-        }
-
-        public void UpdateShieldRedirectVisuals(MyEntity shellActive)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                MyEntitySubpart part;
-                if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[i], out part))
-                {
-                    var redirecting = SideRedirecting((Session.ShieldSides)i) && _toggle;
-                    _shieldSides[i] = redirecting ? SideState.Redirect : SideState.Normal;
-                    part.Render.UpdateRenderObject(redirecting);
-                }
-            }
-        }
-
         private int CalculateLod(int onCount)
         {
             var lod = 4;

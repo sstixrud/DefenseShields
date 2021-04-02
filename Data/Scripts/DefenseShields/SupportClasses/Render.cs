@@ -552,7 +552,7 @@
                 if (projFront.LengthSquared() >= 0.65 * matrix.Forward.LengthSquared()) //if within the side thickness
                 {
                     var face = intersection.Dot(matrix.Forward) > 0 ? 5 : 4;
-                    //Log.Line($"forward/back:{face} - {(Session.ShieldSides)face}");
+                    Log.Line($"forward/back:{face} - name:{Session.Instance.ShieldHealthSides[face]}({Session.Instance.ShieldDirectedSides[(Session.ShieldSides)face]}) - side:{(Session.ShieldSides)face} - forward:{matrix.Forward} - backward:{matrix.Backward}");
                     impactFaces.Add(face);
                 }
 
@@ -560,7 +560,7 @@
                 if (projLeft.LengthSquared() >= 0.65 * matrix.Left.LengthSquared()) //if within the side thickness
                 {
                     var face = intersection.Dot(matrix.Left) > 0 ? 1 : 0;
-                    //Log.Line($"left/right:{face} - {(Session.ShieldSides)face}");
+                    Log.Line($"left/right:{face} - name:{Session.Instance.ShieldHealthSides[face]}({Session.Instance.ShieldDirectedSides[(Session.ShieldSides)face]}) - side:{(Session.ShieldSides)face} - left:{matrix.Left} - right:{matrix.Right}");
                     impactFaces.Add(face);
                 }
 
@@ -568,7 +568,7 @@
                 if (projUp.LengthSquared() >= 0.65 * matrix.Up.LengthSquared()) //if within the side thickness
                 {
                     var face = intersection.Dot(matrix.Up) > 0 ? 2 : 3;
-                    //Log.Line($"up/down:{face} - {(Session.ShieldSides)face}");
+                    Log.Line($"up/down:{face} - name:{Session.Instance.ShieldHealthSides[face]}({Session.Instance.ShieldDirectedSides[(Session.ShieldSides)face]}) - side:{(Session.ShieldSides)face} - up:{matrix.Up} - down:{matrix.Down}");
                     impactFaces.Add(face);
                 }
             }
