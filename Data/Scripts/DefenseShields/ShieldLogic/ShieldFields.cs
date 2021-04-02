@@ -42,6 +42,25 @@ namespace DefenseShields
         internal readonly ConcurrentDictionary<MyEntity, EntIntersectInfo> WebEnts = new ConcurrentDictionary<MyEntity, EntIntersectInfo>();
         internal readonly ConcurrentDictionary<MyEntity, MoverInfo> EntsByMe = new ConcurrentDictionary<MyEntity, MoverInfo>();
         internal readonly ConcurrentDictionary<MyVoxelBase, int> VoxelsToIntersect = new ConcurrentDictionary<MyVoxelBase, int>();
+        internal readonly Dictionary<Session.ShieldSides, bool> RealSideStates = new Dictionary<Session.ShieldSides, bool> 
+        {
+            {Session.ShieldSides.Left, false },
+            {Session.ShieldSides.Right, false },
+            {Session.ShieldSides.Up, false },
+            {Session.ShieldSides.Down, false },
+            {Session.ShieldSides.Forward, false },
+            {Session.ShieldSides.Backward, false }
+        };
+
+        internal readonly Dictionary<Session.ShieldSides, bool> RenderingSides = new Dictionary<Session.ShieldSides, bool>
+        {
+            {Session.ShieldSides.Left, false },
+            {Session.ShieldSides.Right, false },
+            {Session.ShieldSides.Up, false },
+            {Session.ShieldSides.Down, false },
+            {Session.ShieldSides.Forward, false },
+            {Session.ShieldSides.Backward, false }
+        };
 
         internal readonly object MatrixLock = new object();
 
@@ -111,8 +130,6 @@ namespace DefenseShields
         private readonly RunningAverage _hpsAvg = new RunningAverage(2);
         private readonly EllipsoidOxygenProvider _ellipsoidOxyProvider = new EllipsoidOxygenProvider(Matrix.Zero);
         private readonly EllipsoidSA _ellipsoidSa = new EllipsoidSA(double.MinValue, double.MinValue, double.MinValue);
-        private readonly SideState[] _shieldSides = new SideState[6];
-
         private readonly Vector3D[] _resetEntCorners = new Vector3D[8];
         private readonly Vector3D[] _obbCorners = new Vector3D[8];
         private readonly Vector3D[] _obbPoints = new Vector3D[9];

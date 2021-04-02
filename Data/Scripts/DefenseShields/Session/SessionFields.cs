@@ -140,25 +140,35 @@ namespace DefenseShields
             "ShieldBack",
         };
 
-        internal readonly List<string> ShieldDirectedSides = new List<string>()
+        internal readonly Dictionary<ShieldSides, string> ShieldDirectedSides = new Dictionary<ShieldSides, string>
         {
-            "RedirectLeft",
-            "RedirectRight",
-            "RedirectTop",
-            "RedirectBottom",
-            "RedirectFront",
-            "RedirectBack",
+            {ShieldSides.Left, "RedirectLeft" },
+            {ShieldSides.Right, "RedirectRight" },
+            {ShieldSides.Up, "RedirectTop" },
+            {ShieldSides.Down, "RedirectBottom" },
+            {ShieldSides.Forward, "RedirectFront" },
+            {ShieldSides.Backward, "RedirectBack" }
         };
 
         public enum ShieldSides
         {
-            Right,
-            Left,
-            Up,
-            Down,
-            Back,
             Forward,
+            Backward,
+            Left,
+            Right,
+            Up,
+            Down
         }
+
+        internal readonly Dictionary<ShieldSides, int> SideControlMap = new Dictionary<ShieldSides, int>
+        {
+            {ShieldSides.Left, -1 },
+            {ShieldSides.Right, 1 },
+            {ShieldSides.Up, 1 },
+            {ShieldSides.Down, -1 },
+            {ShieldSides.Forward, -1 },
+            {ShieldSides.Backward, 1 }
+        };
 
         internal readonly Color Color90 = new Color(255, 255, 255, 255 );
         internal readonly Color Color80 = new Color(255, 255, 255, 0);

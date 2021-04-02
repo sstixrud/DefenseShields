@@ -1,4 +1,7 @@
-﻿using VRage.Game.ModAPI.Interfaces;
+﻿using System;
+using VRage.Game;
+using VRage.Game.Entity;
+using VRage.Game.ModAPI.Interfaces;
 
 namespace DefenseShields
 {
@@ -9,6 +12,7 @@ namespace DefenseShields
     using VRage.Utils;
     using VRageMath;
     using CollisionLayers = Sandbox.Engine.Physics.MyPhysics.CollisionLayers;
+    using BlendTypeEnum = VRageRender.MyBillboard.BlendTypeEnum;
 
     public partial class DefenseShields
     {
@@ -100,47 +104,112 @@ namespace DefenseShields
 
         internal int RedirectedSideCount()
         {
-            int count = 0;
-            for (int i = 0; i < 6; i++)
-            {
-                if (SideRedirecting((Session.ShieldSides)i))
-                    count++;
-            }
-
-            return count;
+            return Math.Abs(ShieldRedirectState.X) + Math.Abs(ShieldRedirectState.Y) + Math.Abs(ShieldRedirectState.Z);
         }
 
-        public bool SideRedirecting(Session.ShieldSides side)
+        public void UpdateMapping()
+        {
+            var orientation = MyGrid.MainCockpit?.Orientation ?? MyCube.Orientation;
+            var fwdReverse = Base6Directions.GetOppositeDirection(orientation.Forward);
+            var upReverse = Base6Directions.GetOppositeDirection(orientation.Up);
+            var leftReverse = Base6Directions.GetOppositeDirection(orientation.Left);
+
+            RealSideStates[(Session.ShieldSides)fwdReverse] = IsSideRedirected(Session.ShieldSides.Forward);
+            RealSideStates[(Session.ShieldSides)orientation.Forward] = IsSideRedirected(Session.ShieldSides.Backward);
+            
+            RealSideStates[(Session.ShieldSides)orientation.Up] = IsSideRedirected(Session.ShieldSides.Up);
+            RealSideStates[(Session.ShieldSides)upReverse] = IsSideRedirected(Session.ShieldSides.Down);
+            
+            RealSideStates[(Session.ShieldSides)leftReverse] = IsSideRedirected(Session.ShieldSides.Left);
+            RealSideStates[(Session.ShieldSides)orientation.Left] = IsSideRedirected(Session.ShieldSides.Right);
+
+            //foreach (var pair in RealSideStates) Log.CleanLine($"realSide:{pair.Key} - enabled:{pair.Value}");
+        }
+
+
+        private bool _toggle;
+        public bool RedirectVisualUpdate()
+        {
+            var turnedOff = !DsSet.Settings.SideRedirect || ShieldRedirectState == Vector3.Zero;
+
+            if (turnedOff && !_toggle)
+                return false;
+
+            if (!_toggle)
+            {
+
+                var relation = MyAPIGateway.Session.Player.GetRelationTo(MyCube.OwnerId);
+                var enemy = relation == MyRelationsBetweenPlayerAndBlock.Neutral || relation == MyRelationsBetweenPlayerAndBlock.Enemies;
+                if (!enemy && !DsSet.Settings.ShowRedirect)
+                    return false;
+            }
+
+            _toggle = !_toggle;
+            foreach (var pair in RenderingSides)
+            {
+                var side = pair.Key;
+                var draw = pair.Value;
+                
+                var redirecting = RealSideStates[side];
+                var showStale = _toggle && (redirecting && !draw || !redirecting && draw);
+                var hideStale = !_toggle && draw;
+
+                if (showStale || hideStale)
+                    return true;
+            }
+
+
+            return false;
+        }
+
+        public void UpdateShieldRedirectVisuals(MyEntity shellActive)
+        {
+            foreach (var key in RealSideStates)
+            {
+                var side = key.Key;
+                var enabled = key.Value;
+                MyEntitySubpart part;
+                if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[side], out part))
+                {
+                    var redirecting = enabled && _toggle;
+                    RenderingSides[side] = redirecting;
+                    part.Render.UpdateRenderObject(redirecting);
+                }
+            }
+        }
+
+        public bool IsSideRedirected(Session.ShieldSides side)
         {
             switch (side)
             {
                 case Session.ShieldSides.Left:
-                    if (DsSet.Settings.ShieldRedirects.X == -1 || DsSet.Settings.ShieldRedirects.X == 2)
+                    if (ShieldRedirectState.X == -1 || ShieldRedirectState.X == 2)
                         return true;
                     break;
                 case Session.ShieldSides.Right:
-                    if (DsSet.Settings.ShieldRedirects.X == 1 || DsSet.Settings.ShieldRedirects.X == 2)
+                    if (ShieldRedirectState.X == 1 || ShieldRedirectState.X == 2)
                         return true;
                     break;
                 case Session.ShieldSides.Up:
-                    if (DsSet.Settings.ShieldRedirects.Y == 1 || DsSet.Settings.ShieldRedirects.Y == 2)
+                    if (ShieldRedirectState.Y == 1 || ShieldRedirectState.Y == 2)
                         return true;
                     break;
                 case Session.ShieldSides.Down:
-                    if (DsSet.Settings.ShieldRedirects.Y == -1 || DsSet.Settings.ShieldRedirects.Y == 2)
+                    if (ShieldRedirectState.Y == -1 || ShieldRedirectState.Y == 2)
                         return true;
                     break;
                 case Session.ShieldSides.Forward:
-                    if (DsSet.Settings.ShieldRedirects.Z == -1 || DsSet.Settings.ShieldRedirects.Z == 2)
+                    if (ShieldRedirectState.Z == -1 || ShieldRedirectState.Z == 2)
                         return true;
                     break;
-                case Session.ShieldSides.Back:
-                    if (DsSet.Settings.ShieldRedirects.Z == 1 || DsSet.Settings.ShieldRedirects.Z == 2)
+                case Session.ShieldSides.Backward:
+                    if (ShieldRedirectState.Z == 1 || ShieldRedirectState.Z == 2)
                         return true;
                     break;
             }
             return false;
         }
+
 
         public void ResetDamageEffects()
         {

@@ -496,10 +496,7 @@ namespace DefenseShields
         internal static bool GeTopShield(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-            var up = comp.DsSet.Settings.ShieldRedirects.Y == 1 || comp.DsSet.Settings.ShieldRedirects.Y == 2;
-            return up;
+            return comp != null && SideEnabled(Session.ShieldSides.Up, comp.DsSet.Settings.ShieldRedirects.Y);
         }
 
         internal static void SetTopShield(IMyTerminalBlock block, bool redirect)
@@ -509,15 +506,7 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
-            var current = comp.DsSet.Settings.ShieldRedirects;
-
-            var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
-            if (redirect)
-                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == -1 ? 2 : 1;
-            else
-                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? -1 : 0;
-
-            if (current == comp.DsSet.Settings.ShieldRedirects)
+            if (!NewSideState(comp, Session.ShieldSides.Up, redirect, comp.DsSet.Settings.ShieldRedirects.Y))
                 return;
 
             comp.FitChanged = true;
@@ -529,11 +518,8 @@ namespace DefenseShields
         internal static bool GetBottomShield(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
+            return comp != null && SideEnabled(Session.ShieldSides.Down, comp.DsSet.Settings.ShieldRedirects.Y);
 
-            var down = comp.DsSet.Settings.ShieldRedirects.Y == -1 || comp.DsSet.Settings.ShieldRedirects.Y == 2;
-            return down;
         }
 
         internal static void SetBottomShield(IMyTerminalBlock block, bool redirect)
@@ -542,17 +528,10 @@ namespace DefenseShields
             if (comp == null) return;
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
-            
-            var current = comp.DsSet.Settings.ShieldRedirects;
 
-            var currentValue = comp.DsSet.Settings.ShieldRedirects.Y;
-            if (redirect)
-                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 1 ? 2 : -1;
-            else
-                comp.DsSet.Settings.ShieldRedirects.Y = currentValue == 2 ? 1 : 0;
-
-            if (current == comp.DsSet.Settings.ShieldRedirects)
+            if (!NewSideState(comp, Session.ShieldSides.Down, redirect, comp.DsSet.Settings.ShieldRedirects.Y))
                 return;
+
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
@@ -563,11 +542,7 @@ namespace DefenseShields
         internal static bool GetRightShield(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            var right = comp.DsSet.Settings.ShieldRedirects.X == 1 || comp.DsSet.Settings.ShieldRedirects.X == 2;
-            return right;
+            return comp != null && SideEnabled(Session.ShieldSides.Right, comp.DsSet.Settings.ShieldRedirects.X);
         }
 
         internal static void SetRightShield(IMyTerminalBlock block, bool redirect)
@@ -577,16 +552,9 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
-            var current = comp.DsSet.Settings.ShieldRedirects;
-
-            var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
-            if (redirect)
-                comp.DsSet.Settings.ShieldRedirects.X = currentValue == -1 ? 2 : 1;
-            else
-                comp.DsSet.Settings.ShieldRedirects.X = currentValue == 2 ? -1 : 0;
-
-            if (current == comp.DsSet.Settings.ShieldRedirects)
+            if (!NewSideState(comp, Session.ShieldSides.Right, redirect, comp.DsSet.Settings.ShieldRedirects.X))
                 return;
+
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
@@ -596,11 +564,7 @@ namespace DefenseShields
         internal static bool GetLeftShield(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            var left = comp.DsSet.Settings.ShieldRedirects.X == -1 || comp.DsSet.Settings.ShieldRedirects.X == 2;
-            return left;
+            return comp != null && SideEnabled(Session.ShieldSides.Left, comp.DsSet.Settings.ShieldRedirects.X);
         }
 
         internal static void SetLeftShield(IMyTerminalBlock block, bool redirect)
@@ -610,16 +574,9 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
-            var current = comp.DsSet.Settings.ShieldRedirects;
-
-            var currentValue = comp.DsSet.Settings.ShieldRedirects.X;
-            if (redirect)
-                comp.DsSet.Settings.ShieldRedirects.X = currentValue == 1 ? 2 : -1;
-            else
-                comp.DsSet.Settings.ShieldRedirects.X = currentValue == 2 ? 1 : 0;
-
-            if (current == comp.DsSet.Settings.ShieldRedirects)
+            if (!NewSideState(comp, Session.ShieldSides.Left, redirect, comp.DsSet.Settings.ShieldRedirects.X))
                 return;
+
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
@@ -630,12 +587,7 @@ namespace DefenseShields
         internal static bool GetFrontShield(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-
-            var front = comp.DsSet.Settings.ShieldRedirects.Z == -1 || comp.DsSet.Settings.ShieldRedirects.Z == 2;
-            return front;
+            return comp != null && SideEnabled(Session.ShieldSides.Forward, comp.DsSet.Settings.ShieldRedirects.Z);
         }
 
         internal static void SetFrontShield(IMyTerminalBlock block, bool redirect)
@@ -644,16 +596,10 @@ namespace DefenseShields
             if (comp == null) return;
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
-            var current = comp.DsSet.Settings.ShieldRedirects;
 
-            var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
-            if (redirect)
-                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 1 ? 2 : -1;
-            else
-                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 2 ? 1 : 0;
-
-            if (current == comp.DsSet.Settings.ShieldRedirects)
+            if (!NewSideState(comp, Session.ShieldSides.Forward, redirect, comp.DsSet.Settings.ShieldRedirects.Z))
                 return;
+
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
@@ -663,11 +609,7 @@ namespace DefenseShields
         internal static bool GetBackShield(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null)
-                return false;
-
-            var back = comp.DsSet.Settings.ShieldRedirects.Z == 1 || comp.DsSet.Settings.ShieldRedirects.Z == 2;
-            return back;
+            return comp != null && SideEnabled(Session.ShieldSides.Backward, comp.DsSet.Settings.ShieldRedirects.Z);
         }
 
         internal static void SetBackShield(IMyTerminalBlock block, bool redirect)
@@ -677,20 +619,54 @@ namespace DefenseShields
             if (Math.Abs(comp.DsSet.Settings.ShieldRedirects.X) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Y) + Math.Abs(comp.DsSet.Settings.ShieldRedirects.Z) >= 5 && redirect)
                 return;
 
-            var current = comp.DsSet.Settings.ShieldRedirects;
-
-            var currentValue = comp.DsSet.Settings.ShieldRedirects.Z;
-            if (redirect)
-                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == -1 ? 2 : 1;
-            else
-                comp.DsSet.Settings.ShieldRedirects.Z = currentValue == 2 ? -1 : 0;
-
-            if (current == comp.DsSet.Settings.ShieldRedirects)
+            if (!NewSideState(comp, Session.ShieldSides.Backward, redirect, comp.DsSet.Settings.ShieldRedirects.Z))
                 return;
+
             comp.FitChanged = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
             comp.StartRedirectTimer();
+        }
+
+
+        public static bool NewSideState(DefenseShields ds, Session.ShieldSides side, bool redirect, int currentState)
+        {
+            int newState;
+            var enableValue = Session.Instance.SideControlMap[side];
+            var oppositeValue = enableValue * -1;
+
+            if (redirect)
+                newState = currentState == oppositeValue ? 2 : enableValue;
+            else
+                newState = currentState == 2 ? oppositeValue : 0;
+
+            SetRedirect(ds, side, newState);
+
+            return newState != currentState;
+        }
+
+        public static bool SideEnabled(Session.ShieldSides side, int state)
+        {
+            return state == 2 || Session.Instance.SideControlMap[side] == state;
+        }
+
+        public static void SetRedirect(DefenseShields ds, Session.ShieldSides side, int newValue)
+        {
+            switch (side)
+            {
+                case Session.ShieldSides.Left:
+                case Session.ShieldSides.Right:
+                    ds.DsSet.Settings.ShieldRedirects.X = newValue;
+                    break;
+                case Session.ShieldSides.Up:
+                case Session.ShieldSides.Down:
+                    ds.DsSet.Settings.ShieldRedirects.Y = newValue;
+                    break;
+                case Session.ShieldSides.Forward:
+                case Session.ShieldSides.Backward:
+                    ds.DsSet.Settings.ShieldRedirects.Z = newValue;
+                    break;
+            }
         }
 
         internal static bool RedirectEnabled(IMyTerminalBlock block)

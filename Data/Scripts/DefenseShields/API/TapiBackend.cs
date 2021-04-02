@@ -280,12 +280,12 @@ namespace DefenseShields
                     if (projForward.LengthSquared() >= 0.8 * logic.ShieldShapeMatrix.Forward.LengthSquared()) //if within the side thickness
                     {
                         var dot = intersection.Dot(logic.ShieldShapeMatrix.Forward);
-                        var face = dot > 0 ? Session.ShieldSides.Forward: Session.ShieldSides.Back;
-
-                        if ((reDirects.Z == 2 || face == Session.ShieldSides.Forward && reDirects.Z == -1 || face == Session.ShieldSides.Back && reDirects.Z == 1))
+                        var face = dot > 0 ? Session.ShieldSides.Forward: Session.ShieldSides.Backward;
+                        Log.Line($"face:{face}");
+                        if ((reDirects.Z == 2 || face == Session.ShieldSides.Forward && reDirects.Z == -1 || face == Session.ShieldSides.Backward && reDirects.Z == 1))
                         {
                             faceHit = (int)face;
-                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}");
+                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}");
                         }
                     }
 
@@ -296,11 +296,12 @@ namespace DefenseShields
                         var face = dot > 0 ? Session.ShieldSides.Left : Session.ShieldSides.Right;
                         var lengDiffSqr = projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared();
                         var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
+                        Log.Line($"face:{face}");
 
                         if (validFace && (reDirects.X == 2 || face == Session.ShieldSides.Left && reDirects.X == -1 || face == Session.ShieldSides.Right && reDirects.X == 1))
                         {
                             faceHit = (int)face;
-                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared()}");
+                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared()}");
                         }
 
                     }
@@ -312,11 +313,12 @@ namespace DefenseShields
                         var face = dot > 0 ? Session.ShieldSides.Up : Session.ShieldSides.Down;
                         var lengDiffSqr = projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared();
                         var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
+                        Log.Line($"face:{face}");
 
                         if (validFace && (reDirects.Y == 2 || face == Session.ShieldSides.Up && reDirects.Y == 1 || face == Session.ShieldSides.Down && reDirects.Y == -1))
                         {
                             faceHit = (int)face;
-                            //Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}  - within:{projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared()}");
+                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}  - within:{projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared()}");
                         }
 
                     }
