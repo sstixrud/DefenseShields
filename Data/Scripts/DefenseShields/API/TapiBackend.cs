@@ -266,7 +266,6 @@ namespace DefenseShields
                     var boxMax = logic.ShieldShapeMatrix.Backward + logic.ShieldShapeMatrix.Right + logic.ShieldShapeMatrix.Up;
                     var boxMin = -boxMax;
                     var box = new BoundingBoxD(boxMin, boxMax);
-                    var reDirects = logic.ShieldRedirectState;
 
                     var maxWidth = box.Max.LengthSquared();
                     Vector3D norm;
@@ -281,11 +280,11 @@ namespace DefenseShields
                     {
                         var dot = intersection.Dot(logic.ShieldShapeMatrix.Forward);
                         var face = dot > 0 ? Session.ShieldSides.Forward: Session.ShieldSides.Backward;
-                        Log.Line($"face:{face}");
-                        if ((reDirects.Z == 2 || face == Session.ShieldSides.Forward && reDirects.Z == -1 || face == Session.ShieldSides.Backward && reDirects.Z == 1))
+                        //Log.Line($"face: {logic.RealSideStates[face].Side}({face}) - redirected:{logic.RealSideStates[face].Redirected}");
+                        if (logic.RealSideStates[face].Redirected)
                         {
+                            //Log.Line($"hit: {face}");
                             faceHit = (int)face;
-                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}");
                         }
                     }
 
@@ -296,12 +295,12 @@ namespace DefenseShields
                         var face = dot > 0 ? Session.ShieldSides.Left : Session.ShieldSides.Right;
                         var lengDiffSqr = projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared();
                         var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
-                        Log.Line($"face:{face}");
 
-                        if (validFace && (reDirects.X == 2 || face == Session.ShieldSides.Left && reDirects.X == -1 || face == Session.ShieldSides.Right && reDirects.X == 1))
+                        //Log.Line($"face: {logic.RealSideStates[face].Side}({face}) - redirected:{logic.RealSideStates[face].Redirected}");
+                        if (validFace && logic.RealSideStates[face].Redirected)
                         {
+                            //Log.Line($"hit: {face}");
                             faceHit = (int)face;
-                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot} - within:{projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared()}");
                         }
 
                     }
@@ -313,17 +312,18 @@ namespace DefenseShields
                         var face = dot > 0 ? Session.ShieldSides.Up : Session.ShieldSides.Down;
                         var lengDiffSqr = projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared();
                         var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
-                        Log.Line($"face:{face}");
 
-                        if (validFace && (reDirects.Y == 2 || face == Session.ShieldSides.Up && reDirects.Y == 1 || face == Session.ShieldSides.Down && reDirects.Y == -1))
+
+                        //Log.Line($"face: {logic.RealSideStates[face].Side}({face}) - redirected:{logic.RealSideStates[face].Redirected}");
+                        if (validFace && logic.RealSideStates[face].Redirected)
                         {
+                            //Log.Line($"hit: {face}");
                             faceHit = (int)face;
-                            Log.Line($"FaceIntersected face:{face} - sides:{reDirects} - dot:{dot}  - within:{projUp.LengthSquared() - logic.ShieldShapeMatrix.Up.LengthSquared()}");
                         }
 
                     }
                     var hitRedirectedSide = faceHit != -1;
-                    var redirectedFaces = Math.Abs(reDirects.X) + Math.Abs(reDirects.Y) + Math.Abs(reDirects.Z);
+                    var redirectedFaces = Math.Abs(logic.ShieldRedirectState.X) + Math.Abs(logic.ShieldRedirectState.Y) + Math.Abs(logic.ShieldRedirectState.Z);
                     var redirectMod = !hitRedirectedSide ? 1 - (redirectedFaces * Session.ShieldRedirectBonus) : 0.1f;
                     var preventBypassMod = MathHelper.Clamp(redirectedFaces * Session.ShieldBypassBonus, 0f, 1f);
 

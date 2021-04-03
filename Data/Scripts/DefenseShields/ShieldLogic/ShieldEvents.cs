@@ -234,7 +234,7 @@
                                          "\n[Charge Rate]: " + ShieldChargeRate.ToString("0.0") + " Mw" +
                                          "\n[Full Charge_]: " + secToFull.ToString("N0") + "s" +
                                          "\n[Over Heated]: " + DsState.State.Heat.ToString("0") + "%" +
-                                         "\n[Redirections]: " + redirectedSides.ToString("0") + " side(s) ("  + bonusAmount + "%)" +
+                                         "\n[Shunted Sides]: " + redirectedSides.ToString("0") + " ("  + bonusAmount + "%)" +
                                          "\n[Maintenance]: " + _shieldMaintaintPower.ToString("0.0") + " Mw" +
                                          "\n[Shield Power]: " + ShieldCurrentPower.ToString("0.0") + " Mw" +
                                          "\n[Power Use]: " + powerUsage.ToString("0.0") + " (" + GridMaxPower.ToString("0.0") + ")Mw");

@@ -42,14 +42,14 @@ namespace DefenseShields
         internal readonly ConcurrentDictionary<MyEntity, EntIntersectInfo> WebEnts = new ConcurrentDictionary<MyEntity, EntIntersectInfo>();
         internal readonly ConcurrentDictionary<MyEntity, MoverInfo> EntsByMe = new ConcurrentDictionary<MyEntity, MoverInfo>();
         internal readonly ConcurrentDictionary<MyVoxelBase, int> VoxelsToIntersect = new ConcurrentDictionary<MyVoxelBase, int>();
-        internal readonly Dictionary<Session.ShieldSides, bool> RealSideStates = new Dictionary<Session.ShieldSides, bool> 
+        internal readonly Dictionary<Session.ShieldSides, Session.ShieldInfo> RealSideStates = new Dictionary<Session.ShieldSides, Session.ShieldInfo> 
         {
-            {Session.ShieldSides.Left, false },
-            {Session.ShieldSides.Right, false },
-            {Session.ShieldSides.Up, false },
-            {Session.ShieldSides.Down, false },
-            {Session.ShieldSides.Forward, false },
-            {Session.ShieldSides.Backward, false }
+            {Session.ShieldSides.Left, new Session.ShieldInfo() },
+            {Session.ShieldSides.Right, new Session.ShieldInfo() },
+            {Session.ShieldSides.Up, new Session.ShieldInfo() },
+            {Session.ShieldSides.Down, new Session.ShieldInfo() },
+            {Session.ShieldSides.Forward, new Session.ShieldInfo() },
+            {Session.ShieldSides.Backward, new Session.ShieldInfo() }
         };
 
         internal readonly Dictionary<Session.ShieldSides, bool> RenderingSides = new Dictionary<Session.ShieldSides, bool>
@@ -91,6 +91,8 @@ namespace DefenseShields
         internal BoundingSphereD ShieldSphere3K = new BoundingSphereD(Vector3D.Zero, 1f);
         internal BoundingSphereD WebSphere = new BoundingSphereD(Vector3D.Zero, 1f);
         internal MyStorageData TmpStorage = new MyStorageData();
+        internal MyEntity ShellActive;
+        internal MyCockpit LastCockpit;
         internal bool InControlPanel => MyAPIGateway.Gui.GetCurrentScreen == MyTerminalPageEnum.ControlPanel;
         internal bool InThisTerminal => Session.Instance.LastTerminalId == Shield.EntityId;
 
@@ -252,7 +254,6 @@ namespace DefenseShields
 
         private MyCubeGrid _slavedToGrid;
         private MyEntity _shellPassive;
-        private MyEntity _shellActive;
         private MyParticleEffect _effect1 = new MyParticleEffect();
         private MyParticleEffect _effect2 = new MyParticleEffect();
         private MyEntity3DSoundEmitter _alertAudio;

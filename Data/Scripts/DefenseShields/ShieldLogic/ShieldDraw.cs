@@ -66,16 +66,16 @@ namespace DefenseShields
                     Icosphere.CalculateTransform(ShieldShapeMatrix, lod);
                     if (!GridIsMobile) Icosphere.ReturnPhysicsVerts(DetectionMatrix, ShieldComp.PhysicsOutside);
                 }
-                Icosphere.ComputeEffects(ShieldShapeMatrix, _localImpactPosition, _shellPassive, _shellActive, prevlod, percent, activeVisible, refreshAnim);
+                Icosphere.ComputeEffects(this, _localImpactPosition,  prevlod, percent, activeVisible, refreshAnim);
 
             }
             else if (_shapeChanged) _updateRender = true;
 
             var updated = Session.Instance.Tick300 || Session.Instance.Tick20 && _toggle;
 
-            if (updated && _shellActive != null && RedirectVisualUpdate())
+            if (updated && ShellActive != null && RedirectVisualUpdate())
             {
-                UpdateShieldRedirectVisuals(_shellActive);
+                UpdateShieldRedirectVisuals(ShellActive);
             }
 
             if (hitAnim && sphereOnCamera && DsState.State.Online) Icosphere.Draw(renderId);
@@ -237,15 +237,15 @@ namespace DefenseShields
             if (forceInvisible)
             {
                 _shellPassive.Render.UpdateRenderObject(false);
-                _shellActive.Render.UpdateRenderObject(false);
+                ShellActive.Render.UpdateRenderObject(false);
                 return;
             }
 
             if (DsState.State.Online && !DsState.State.Lowered && !DsState.State.Sleeping)
             {
                 if (DsSet.Settings.Visible == 0) _shellPassive.Render.UpdateRenderObject(true);
-                _shellActive.Render.UpdateRenderObject(true);
-                _shellActive.Render.UpdateRenderObject(false);
+                ShellActive.Render.UpdateRenderObject(true);
+                ShellActive.Render.UpdateRenderObject(false);
             }
         }
 

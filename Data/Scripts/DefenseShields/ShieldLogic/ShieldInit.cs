@@ -249,7 +249,7 @@ namespace DefenseShields
             SetShieldType(false);
             if (!_isDedicated) ShellVisibility(true);
             if (Session.Enforced.Debug == 2) Log.Line($"UpdateEntity: sEnt:{ShieldEnt == null} - sPassive:{_shellPassive == null} - controller mode is: {ShieldMode} - EW:{DsState.State.EmitterLos} - ES:{ShieldComp.EmittersSuspended} - ShieldId [{Shield.EntityId}]");
-            Icosphere.ShellActive = null;
+            Icosphere.Shield = null;
             DsState.State.Heat = 0;
 
             _updateRender = true;
@@ -458,7 +458,7 @@ namespace DefenseShields
                 Session.Instance.IdToBus.Remove(ShieldEnt.EntityId);
                 ShieldEnt.Close();
             }
-            _shellActive?.Close();
+            ShellActive?.Close();
             _shellPassive?.Close();
 
             if (!fullInit)
@@ -482,18 +482,18 @@ namespace DefenseShields
                 _shellPassive.SyncFlag = false;
                 _shellPassive.RemoveFromGamePruningStructure();
 
-                _shellActive = Spawn.EmptyEntity("dShellActive", $"{Session.Instance.ModPath()}{_modelActive}", parent, true);
-                _shellActive.Render.CastShadows = false;
-                _shellActive.IsPreview = true;
-                _shellActive.Render.Visible = true;
-                _shellActive.Render.RemoveRenderObjects();
-                _shellActive.Render.UpdateRenderObject(true);
-                _shellActive.Render.UpdateRenderObject(false);
-                _shellActive.Save = false;
-                _shellActive.SyncFlag = false;
-                _shellActive.SetEmissiveParts("ShieldEmissiveAlpha", Color.Transparent, 0f);
-                _shellActive.SetEmissiveParts("ShieldDamageGlass", Color.Transparent, 0f);
-                _shellActive.RemoveFromGamePruningStructure();
+                ShellActive = Spawn.EmptyEntity("dShellActive", $"{Session.Instance.ModPath()}{_modelActive}", parent, true);
+                ShellActive.Render.CastShadows = false;
+                ShellActive.IsPreview = true;
+                ShellActive.Render.Visible = true;
+                ShellActive.Render.RemoveRenderObjects();
+                ShellActive.Render.UpdateRenderObject(true);
+                ShellActive.Render.UpdateRenderObject(false);
+                ShellActive.Save = false;
+                ShellActive.SyncFlag = false;
+                ShellActive.SetEmissiveParts("ShieldEmissiveAlpha", Color.Transparent, 0f);
+                ShellActive.SetEmissiveParts("ShieldDamageGlass", Color.Transparent, 0f);
+                ShellActive.RemoveFromGamePruningStructure();
             }
 
             ShieldEnt = Spawn.EmptyEntity("dShield", null, parent);

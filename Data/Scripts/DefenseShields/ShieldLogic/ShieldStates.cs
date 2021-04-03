@@ -66,7 +66,9 @@ namespace DefenseShields
                 if (Suspended()) return State.Init;
                 if (ShieldSleeping()) return State.Sleep;
                 if (ShieldWaking()) return State.Wake;
-
+                
+                UpdateSides();
+                
                 if (UpdateDimensions) RefreshDimensions();
 
                 if (_tick60)
@@ -89,6 +91,8 @@ namespace DefenseShields
             else
             {
                 if (ClientOfflineStates()) return State.Failure;
+
+                UpdateSides();
 
                 if (UpdateDimensions) RefreshDimensions();
 

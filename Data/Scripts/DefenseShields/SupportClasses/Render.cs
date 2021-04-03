@@ -96,8 +96,7 @@
 
         public class Instance
         {
-            private const string _shieldHealthEmissive = "ShieldEmissiveAlpha";
-            private const string _shieldRedirectEmissive = "ShieldDamageGlass";
+            private const string ShieldHealthEmissive = "ShieldEmissiveAlpha";
             private const int SideSteps = 60;
             private const int ImpactSteps = 60;
             private const int RefreshSteps = 30;
@@ -117,7 +116,7 @@
             private readonly int[] _impactCnt = new int[6];
             private readonly int[] _sideLoops = new int[6];
 
-            private readonly List<int> _hitFaces = new List<int>();
+            private readonly List<Session.ShieldSides> _hitFaces = new List<Session.ShieldSides>();
 
             private readonly MyEntitySubpart[] _sidePartArray = { null, null, null, null, null, null };
             private readonly Vector3D[] _impactPos =
@@ -168,7 +167,7 @@
 
             internal bool ImpactsFinished { get; set; } = true;
 
-            internal MyEntity ShellActive { get; set; }
+            internal DefenseShields Shield;
 
             internal Vector3D ImpactPosState { get; set; }
 
@@ -225,16 +224,21 @@
                 }
             }
 
-            internal void ComputeEffects(MatrixD matrix, Vector3D impactPos, MyEntity shellPassive, MyEntity shellActive, int prevLod, float shieldPercent, bool activeVisible, bool refreshAnim)
+            internal void ComputeEffects(DefenseShields shield, Vector3D impactPos, int prevLod, float shieldPercent, bool activeVisible, bool refreshAnim)
             {
-                if (ShellActive == null) ComputeSides(shellActive);
+                Shield = shield;
+                if (Shield?.ShellActive != null)
+                    ComputeSides();
+                else return;
+                _matrix = Shield.ShieldShapeMatrix;
+
+
                 _flash = shieldPercent <= 10;
                 if (_flash && _mainLoop < 30) shieldPercent += 10;
 
                 var newActiveColor = UtilsStatic.GetShieldColorFromFloat(shieldPercent);
                 _activeColor = newActiveColor;
 
-                _matrix = matrix;
                 ImpactPosState = impactPos;
                 _active = activeVisible && _activeColor != Session.Instance.Color90;
 
@@ -282,10 +286,10 @@
                         _lCount = 0;
                         if ((_longerLoop == 2 && Random.Next(0, 3) == 2))
                         {
-                            if (ShellActive != null)
+                            if (Shield?.ShellActive != null)
                             {
                                 _refresh = true;
-                                var localImpacts = ShellActive.PositionComp.LocalMatrix.Forward;
+                                var localImpacts = Shield.ShellActive.PositionComp.LocalMatrix.Forward;
                                 localImpacts.Normalize();
                                 _refreshPoint = localImpacts;
                             }
@@ -295,7 +299,13 @@
                     }
                 }
                 if (ImpactPosState != Vector3D.NegativeInfinity) ComputeImpacts();
-                else if (_flash && _mainLoop == 0 || _mainLoop == 30) for (int i = 0; i < _hitFaces.Count; i++) UpdateHealthColor(_sidePartArray[_hitFaces[i]]);
+                else if (_flash && _mainLoop == 0 || _mainLoop == 30) 
+                {
+                    for (int i = 0; i < _hitFaces.Count; i++)
+                    {
+                        UpdateHealthColor(_sidePartArray[(int)_hitFaces[i]]);
+                    }
+                }
 
 
                 if (_impact)
@@ -453,7 +463,7 @@
                 }
                 if (_impactCnt[0] == 0 && _impactCnt[1] == 0 && _impactCnt[2] == 0 && _impactCnt[3] == 0 && _impactCnt[4] == 0 && _impactCnt[5] == 0)
                 {
-                    ShellActive?.Render.UpdateRenderObject(false);
+                    Shield?.ShellActive?.Render.UpdateRenderObject(false);
                     ImpactsFinished = true;
                     for (int i = 0; i < _triColorBuffer.Length; i++) _triColorBuffer[i] = 0;
                 }
@@ -517,26 +527,25 @@
                 GetIntersectingFace(_matrix, impactTransNorm, _hitFaces);
                 foreach (var face in _hitFaces)
                 {
-                    _sideLoops[face] = 1;
-                    _sidePartArray[face].Render.UpdateRenderObject(true);
-                    UpdateHealthColor(_sidePartArray[face]);
+                    _sideLoops[(int)face] = 1;
+                    _sidePartArray[(int)face].Render.UpdateRenderObject(true);
+                    UpdateHealthColor(_sidePartArray[(int)face]);
                 }
             }
 
-            private void ComputeSides(MyEntity shellActive)
+            private void ComputeSides()
             {
-                if (shellActive == null) return;
-
-                for (int i = 0; i < Session.Instance.ShieldHealthSides.Count; i++)
-                    shellActive.TryGetSubpart(Session.Instance.ShieldHealthSides[i], out _sidePartArray[i]);
-
-                if (shellActive != ShellActive) {
-                    ShellActive = shellActive;
+                foreach (var sides in Session.Instance.ShieldHealthSides)
+                {
+                    Shield.ShellActive.TryGetSubpart(sides.Value, out _sidePartArray[(int) sides.Key]);
                 }
             }
 
-            private static void GetIntersectingFace(MatrixD matrix, Vector3D hitPosLocal, ICollection<int> impactFaces)
+            private void GetIntersectingFace(MatrixD matrix, Vector3D hitPosLocal, ICollection<Session.ShieldSides> impactFaces)
             {
+                if (Shield?.ShellActive == null)
+                    return;
+
                 var boxMax = matrix.Backward + matrix.Right + matrix.Up;
                 var boxMin = -boxMax;
                 var box = new BoundingBoxD(boxMin, boxMax);
@@ -551,24 +560,27 @@
                 var projFront = VectorProjection(intersection, matrix.Forward);
                 if (projFront.LengthSquared() >= 0.65 * matrix.Forward.LengthSquared()) //if within the side thickness
                 {
-                    var face = intersection.Dot(matrix.Forward) > 0 ? 5 : 4;
-                    Log.Line($"forward/back:{face} - name:{Session.Instance.ShieldHealthSides[face]}({Session.Instance.ShieldDirectedSides[(Session.ShieldSides)face]}) - side:{(Session.ShieldSides)face} - forward:{matrix.Forward} - backward:{matrix.Backward}");
+                    var dot = intersection.Dot(matrix.Forward);
+                    //var face = intersection.Dot(matrix.Forward) > 0 ? Shield.RealSideStates[(Session.ShieldSides)0].Side : Shield.RealSideStates[(Session.ShieldSides)1].Side;
+                    var face = dot > 0 ? Session.ShieldSides.Forward : Session.ShieldSides.Backward;
                     impactFaces.Add(face);
                 }
 
                 var projLeft = VectorProjection(intersection, matrix.Left);
                 if (projLeft.LengthSquared() >= 0.65 * matrix.Left.LengthSquared()) //if within the side thickness
                 {
-                    var face = intersection.Dot(matrix.Left) > 0 ? 1 : 0;
-                    Log.Line($"left/right:{face} - name:{Session.Instance.ShieldHealthSides[face]}({Session.Instance.ShieldDirectedSides[(Session.ShieldSides)face]}) - side:{(Session.ShieldSides)face} - left:{matrix.Left} - right:{matrix.Right}");
+                    var dot = intersection.Dot(matrix.Left);
+                    //var face = intersection.Dot(matrix.Left) > 0 ? Shield.RealSideStates[(Session.ShieldSides)3].Side : Shield.RealSideStates[(Session.ShieldSides)2].Side;
+                    var face = dot > 0 ? Session.ShieldSides.Left : Session.ShieldSides.Right;
                     impactFaces.Add(face);
                 }
 
                 var projUp = VectorProjection(intersection, matrix.Up);
                 if (projUp.LengthSquared() >= 0.65 * matrix.Up.LengthSquared()) //if within the side thickness
                 {
-                    var face = intersection.Dot(matrix.Up) > 0 ? 2 : 3;
-                    Log.Line($"up/down:{face} - name:{Session.Instance.ShieldHealthSides[face]}({Session.Instance.ShieldDirectedSides[(Session.ShieldSides)face]}) - side:{(Session.ShieldSides)face} - up:{matrix.Up} - down:{matrix.Down}");
+                    var dot = intersection.Dot(matrix.Up);
+                    //var face = intersection.Dot(matrix.Up) > 0 ? Shield.RealSideStates[Session.ShieldSides.Up].Side : Shield.RealSideStates[Session.ShieldSides.Down].Side;
+                    var face = dot > 0 ? Session.ShieldSides.Up : Session.ShieldSides.Down;
                     impactFaces.Add(face);
                 }
             }
@@ -583,7 +595,7 @@
 
             private void UpdateHealthColor(MyEntitySubpart shellSide)
             {
-                shellSide.SetEmissiveParts(_shieldHealthEmissive, _activeColor, 100f);
+                shellSide.SetEmissiveParts(ShieldHealthEmissive, _activeColor, 100f);
             }
         }
     }

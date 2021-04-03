@@ -73,9 +73,6 @@ namespace DefenseShields
 
                 if (!EntityAlive() || !_isServer && !ClientInitPacket) return;
 
-                if (ShieldRedirectState != DsSet.Settings.ShieldRedirects && Session.Instance.Tick >= _redirectUpdateTime)
-                    UpdateRedirectState();
-                
                 if (!_isDedicated && _clientMessageCount < DsState.State.MessageCount)
                     BroadcastMessage();
 
@@ -152,7 +149,7 @@ namespace DefenseShields
                 RegisterEvents(false);
                 InitEntities(false);
                 _shellPassive?.Render?.RemoveRenderObjects();
-                _shellActive?.Render?.RemoveRenderObjects();
+                ShellActive?.Render?.RemoveRenderObjects();
                 ShieldEnt?.Render?.RemoveRenderObjects();
             }
             catch (Exception ex) { Log.Line($"Exception in OnRemovedFromScene: {ex}"); }

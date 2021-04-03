@@ -94,15 +94,15 @@
                 DimShieldHitsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_DimShieldHits", "Dim Incoming Hit Effects ", "Supress brightness of incoming hit effects", DsUi.GetDimShieldHits, DsUi.SetDimShieldHits);
 
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep6");
-                SideRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Side Shields", "Enable Side Shield Redirects", DsUi.GetSideRedirect, DsUi.SetSideRedirect);
-                ShowRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Redirected Shields", "Enable/Disable showing side shield state", DsUi.GetShowRedirect, DsUi.SetShowRedirect);
+                SideRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Shunt Shields", "Enable Shield Shunting", DsUi.GetSideRedirect, DsUi.SetSideRedirect);
+                ShowRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Shunted Shields", "Enable/Disable showing side shield states", DsUi.GetShowRedirect, DsUi.SetShowRedirect);
 
-                TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Redirect Top Shield", "Redirect Top Shield", "On", "Off", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
-                BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Redirect Bottom Shield", "Redirect Bottom Shield", "On", "Off", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
-                LeftShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_LeftShield", "Redirect Left Shield", "Redirect Left Shield", "On", "Off", DsUi.GetLeftShield, DsUi.SetLeftShield, DsUi.RedirectEnabled);
-                RightShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_RightShield", "Redirect Right Shield", "Redirect Right Shield", "On", "Off", DsUi.GetRightShield, DsUi.SetRightShield, DsUi.RedirectEnabled);
-                FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Redirect Front Shield", "Redirect Front Shield", "On", "Off", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.RedirectEnabled);
-                BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Redirect Back Shield", "Redirect Back Shield", "On", "Off", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.RedirectEnabled);
+                TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Shunt Top Shield", "Redirect Top shield power to others", "On", "Off", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
+                BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Shunt Bottom Shield", "Redirect bottom shield power to others", "On", "Off", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
+                LeftShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_LeftShield", "Shunt Left Shield", "Redirect Left shield power to others", "On", "Off", DsUi.GetLeftShield, DsUi.SetLeftShield, DsUi.RedirectEnabled);
+                RightShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_RightShield", "Shunt Right Shield", "Redirect Right shield power to others", "On", "Off", DsUi.GetRightShield, DsUi.SetRightShield, DsUi.RedirectEnabled);
+                FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Shunt Front Shield", "Redirect Front shield power to others", "On", "Off", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.RedirectEnabled);
+                BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Shunt Back Shield", "Redirect Back shield power to others", "On", "Off", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.RedirectEnabled);
 
 
                 CreateAction<IMyUpgradeModule>(ToggleShield);
@@ -689,7 +689,7 @@
         }
 
         private void CreateActionDamageModRate<T>(IMyTerminalControlSlider c,
-        float defaultValue = 50f, // HACK terminal controls don't have a default value built in...
+        float defaultValue = 100f, // HACK terminal controls don't have a default value built in...
         float modifier = 1f,
         string iconReset = null,
         string iconIncrease = null,

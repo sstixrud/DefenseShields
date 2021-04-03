@@ -130,14 +130,14 @@ namespace DefenseShields
         };
 
 
-        internal readonly List<string> ShieldHealthSides = new List<string>()
+        internal readonly Dictionary<ShieldSides, string> ShieldHealthSides = new Dictionary<ShieldSides, string>
         {
-            "ShieldLeft",
-            "ShieldRight",
-            "ShieldTop",
-            "ShieldBottom",
-            "ShieldFront",
-            "ShieldBack",
+            {ShieldSides.Left, "ShieldLeft" },
+            {ShieldSides.Right, "ShieldRight" },
+            {ShieldSides.Up, "ShieldTop" },
+            {ShieldSides.Down, "ShieldBottom" },
+            {ShieldSides.Forward, "ShieldFront" },
+            {ShieldSides.Backward, "ShieldBack" }
         };
 
         internal readonly Dictionary<ShieldSides, string> ShieldDirectedSides = new Dictionary<ShieldSides, string>
@@ -158,6 +158,12 @@ namespace DefenseShields
             Right,
             Up,
             Down
+        }
+
+        public struct ShieldInfo
+        {
+            public ShieldSides Side;
+            public bool Redirected;
         }
 
         internal readonly Dictionary<ShieldSides, int> SideControlMap = new Dictionary<ShieldSides, int>
@@ -317,6 +323,7 @@ namespace DefenseShields
         internal DefenseShields HudComp { get; set; }
         internal DSUtils Dsutil1 { get; set; } = new DSUtils();
 
+        internal IMyHudNotification HudNotify;
         internal IMyTerminalControlSlider WidthSlider { get; set; }
         internal IMyTerminalControlSlider HeightSlider { get; set; }
         internal IMyTerminalControlSlider DepthSlider { get; set; }

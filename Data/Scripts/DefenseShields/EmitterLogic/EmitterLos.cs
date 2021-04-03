@@ -56,7 +56,7 @@ namespace DefenseShields
             else
             {
                 UpdateLosState();
-                EmiState.State.Los = _blocksLos.Count <= 1700;
+                EmiState.State.Los = _blocksLos.Count <= 1900;
 
                 if (!EmiState.State.Los) ShieldComp.EmitterEvent = true;
                 else LosScaledCloud.Clear();
@@ -83,14 +83,14 @@ namespace DefenseShields
 
             testDir.Normalize();
             var testCenter = MyCube.PositionComp.WorldAABB.Center;
-            var testPos = testCenter + (testDir * testDist);
+            //var testPos = testCenter + (testDir * testDist);
             var valid = !MyUtils.IsZero(testCenter) && !MyUtils.IsZero(testDir) && !MyUtils.IsZero(testDist);
             if (!valid) Log.Line($"invalid Los Init check");
             MyAPIGateway.Parallel.For(0, _unitSpherePoints, i =>
             {
                 if (valid)
                 {
-                    var hit = MyGrid.RayCastBlocks(testPos, LosScaledCloud[i]);
+                    var hit = MyGrid.RayCastBlocks(LosScaledCloud[i], testCenter);
 
                     if (hit.HasValue && MyGrid.GetCubeBlock(hit.Value) != MyCube.SlimBlock)
                         _blocksLos[i] = false;
@@ -132,18 +132,18 @@ namespace DefenseShields
                         foreach (var blocking in _blocksLos.Keys)
                         {
                             var blockedPos = LosScaledCloud[blocking];
-                            DsDebugDraw.DrawLosBlocked(blockedPos, MyGrid.PositionComp.LocalMatrix, blockCam.Radius / 25);
+                            DsDebugDraw.DrawLosBlocked(blockedPos, MyGrid.PositionComp.LocalMatrixRef, blockCam.Radius / 25);
                         }
                     }
 
                     foreach (var clear in _vertsSighted)
                     {
                         var blockedPos = LosScaledCloud[clear];
-                        DsDebugDraw.DrawLosClear(blockedPos, MyGrid.PositionComp.LocalMatrix, blockCam.Radius / 25);
+                        DsDebugDraw.DrawLosClear(blockedPos, MyGrid.PositionComp.LocalMatrixRef, blockCam.Radius / 25);
                     }
 
                     var blocked = _blocksLos.Count;
-                    var needed = -300 + _vertsSighted.Count;
+                    var needed = -100 + _vertsSighted.Count;
                     if (_count == 0) BroadCastLosMessage(blocked, needed, controller);
                 }
             }

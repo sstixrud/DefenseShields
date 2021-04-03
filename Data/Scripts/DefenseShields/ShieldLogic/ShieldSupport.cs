@@ -102,6 +102,15 @@ namespace DefenseShields
             return worldAabb;
         }
 
+        private void UpdateSides()
+        {
+            if (ShieldRedirectState != DsSet.Settings.ShieldRedirects && Session.Instance.Tick >= _redirectUpdateTime)
+                UpdateRedirectState();
+
+            if (Session.Instance.Tick180 && MyGrid.MainCockpit != null && LastCockpit != MyGrid.MainCockpit)
+                UpdateMapping();
+        }
+
         internal int RedirectedSideCount()
         {
             return Math.Abs(ShieldRedirectState.X) + Math.Abs(ShieldRedirectState.Y) + Math.Abs(ShieldRedirectState.Z);
@@ -109,21 +118,22 @@ namespace DefenseShields
 
         public void UpdateMapping()
         {
-            var orientation = MyGrid.MainCockpit?.Orientation ?? MyCube.Orientation;
+            LastCockpit = MyGrid.MainCockpit as MyCockpit;
+            var orientation = LastCockpit?.Orientation ?? MyCube.Orientation;
             var fwdReverse = Base6Directions.GetOppositeDirection(orientation.Forward);
             var upReverse = Base6Directions.GetOppositeDirection(orientation.Up);
             var leftReverse = Base6Directions.GetOppositeDirection(orientation.Left);
 
-            RealSideStates[(Session.ShieldSides)fwdReverse] = IsSideRedirected(Session.ShieldSides.Forward);
-            RealSideStates[(Session.ShieldSides)orientation.Forward] = IsSideRedirected(Session.ShieldSides.Backward);
-            
-            RealSideStates[(Session.ShieldSides)orientation.Up] = IsSideRedirected(Session.ShieldSides.Up);
-            RealSideStates[(Session.ShieldSides)upReverse] = IsSideRedirected(Session.ShieldSides.Down);
-            
-            RealSideStates[(Session.ShieldSides)leftReverse] = IsSideRedirected(Session.ShieldSides.Left);
-            RealSideStates[(Session.ShieldSides)orientation.Left] = IsSideRedirected(Session.ShieldSides.Right);
+            RealSideStates[(Session.ShieldSides)orientation.Forward] = new Session.ShieldInfo {Side = Session.ShieldSides.Forward, Redirected = IsSideRedirected(Session.ShieldSides.Forward)};
+            RealSideStates[(Session.ShieldSides)fwdReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Backward, Redirected = IsSideRedirected(Session.ShieldSides.Backward) };
 
-            //foreach (var pair in RealSideStates) Log.CleanLine($"realSide:{pair.Key} - enabled:{pair.Value}");
+            RealSideStates[(Session.ShieldSides)orientation.Up] = new Session.ShieldInfo { Side = Session.ShieldSides.Up, Redirected = IsSideRedirected(Session.ShieldSides.Up) };
+            RealSideStates[(Session.ShieldSides)upReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Down, Redirected = IsSideRedirected(Session.ShieldSides.Down) };
+
+            RealSideStates[(Session.ShieldSides)orientation.Left] = new Session.ShieldInfo { Side = Session.ShieldSides.Left, Redirected = IsSideRedirected(Session.ShieldSides.Left) };
+            RealSideStates[(Session.ShieldSides)leftReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Right, Redirected = IsSideRedirected(Session.ShieldSides.Right) };
+
+            //foreach (var pair in RealSideStates) Log.CleanLine($"RealSide:{pair.Key} - UserSide:{pair.Value.Side} - Redirected:{pair.Value.Redirected}");
         }
 
 
@@ -150,7 +160,7 @@ namespace DefenseShields
                 var side = pair.Key;
                 var draw = pair.Value;
                 
-                var redirecting = RealSideStates[side];
+                var redirecting = RealSideStates[side].Redirected;
                 var showStale = _toggle && (redirecting && !draw || !redirecting && draw);
                 var hideStale = !_toggle && draw;
 
@@ -167,7 +177,7 @@ namespace DefenseShields
             foreach (var key in RealSideStates)
             {
                 var side = key.Key;
-                var enabled = key.Value;
+                var enabled = key.Value.Redirected;
                 MyEntitySubpart part;
                 if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[side], out part))
                 {

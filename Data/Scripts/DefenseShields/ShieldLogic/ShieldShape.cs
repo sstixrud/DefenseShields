@@ -253,9 +253,9 @@ namespace DefenseShields
                 if (!_isDedicated) {                    
 
                     _shellPassive.PositionComp.SetLocalMatrix(ref zeroMatrix, null, true);  // Bug - Cannot just change X coord, so I reset first.
-                    _shellActive.PositionComp.SetLocalMatrix(ref zeroMatrix, null, true);
+                    ShellActive.PositionComp.SetLocalMatrix(ref zeroMatrix, null, true);
                     _shellPassive.PositionComp.SetLocalMatrix(ref shieldMatrix, null, true);
-                    _shellActive.PositionComp.SetLocalMatrix(ref shieldMatrix, null, true);
+                    ShellActive.PositionComp.SetLocalMatrix(ref shieldMatrix, null, true);
                 }
                 ShieldEnt.PositionComp.SetLocalMatrix(ref zeroMatrix, null, true);
                 ShieldEnt.PositionComp.SetLocalMatrix(ref shieldMatrix, null, true);

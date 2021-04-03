@@ -1,4 +1,5 @@
 ﻿using System;
+using VRage.Game.ModAPI;
 using VRageMath;
 
 namespace DefenseShields
@@ -652,6 +653,23 @@ namespace DefenseShields
 
         public static void SetRedirect(DefenseShields ds, Session.ShieldSides side, int newValue)
         {
+            if (!Session.Instance.DedicatedServer) {
+
+                var pendingChanges = ds.DsSet.Settings.ShieldRedirects != ds.ShieldRedirectState;
+                var enableText = SideEnabled(side, newValue) ? "Shunting" : "Normalizing";
+                var text = $"[{enableText} {side}] Shields in 2 seconds -- delaying previous changes: [{pendingChanges}]";
+
+                Session.Instance.HudNotify.Font = "White";
+                var oldText = Session.Instance.HudNotify.Text;
+                if (oldText != text)
+                    Session.Instance.HudNotify.Hide();
+                Session.Instance.HudNotify.Text = text;
+                Session.Instance.HudNotify.Show();
+
+                if (Session.Instance.HudNotify.Text != text)
+                    Session.Instance.HudNotify.Text = text;
+            }
+
             switch (side)
             {
                 case Session.ShieldSides.Left:

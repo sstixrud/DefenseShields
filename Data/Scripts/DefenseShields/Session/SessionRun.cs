@@ -70,6 +70,7 @@
                     if (mod.PublishedFileId == 540003236) ThyaImages = true;
 
                 ApiServer.Load();
+                HudNotify = MyAPIGateway.Utilities.CreateNotification("", 2000, "UrlHighlight"); ;
             }
             catch (Exception ex) { Log.Line($"Exception in BeforeStart: {ex}"); }
         }
