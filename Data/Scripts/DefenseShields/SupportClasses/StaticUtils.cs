@@ -584,7 +584,7 @@ namespace DefenseShields.Support
                         if (Session.Instance.AmmoCollection.ContainsKey(shot.MissileModelName)) continue;
                         Session.Instance.AmmoCollection.Add(shot.MissileModelName, new AmmoInfo(shot.IsExplosive, shot.MissileExplosionDamage, shot.MissileExplosionRadius, shot.DesiredSpeed, shot.MissileMass, shot.BackkickForce));
                     }
-                    catch (Exception ex) { Log.Line($"Exception in GetAmmoDefinitions: {def.DisplayNameString} : {ex}"); }
+                    catch (Exception ex) { Log.Line($"Exception in GetAmmoDefinitions: {def.DisplayNameString} in {def.Context.ModName} ({def.Context.ModId}) : {ex}"); }
                 }
                 if (Session.Enforced.Debug == 3) Log.Line("Definitions: Session");
             }
