@@ -69,8 +69,9 @@
                 foreach (var mod in MyAPIGateway.Session.Mods)
                     if (mod.PublishedFileId == 540003236) ThyaImages = true;
 
-                ApiServer.Load();
                 HudNotify = MyAPIGateway.Utilities.CreateNotification("", 2000, "UrlHighlight"); ;
+
+                Api.Init();
             }
             catch (Exception ex) { Log.Line($"Exception in BeforeStart: {ex}"); }
         }
@@ -190,6 +191,7 @@
         public override void LoadData()
         {
             Instance = this;
+            ApiServer.Load();
         }
 
         protected override void UnloadData()

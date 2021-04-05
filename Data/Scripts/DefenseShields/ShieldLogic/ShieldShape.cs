@@ -154,13 +154,17 @@ namespace DefenseShields
             var height = DsSet.Settings.Height;
             var depth = DsSet.Settings.Depth;
 
-            var xMax = GridIsMobile ? DsState.State.GridHalfExtents.X * 0.33333f : float.MaxValue;
-            var yMax = GridIsMobile ? DsState.State.GridHalfExtents.Y * 0.33333f : float.MaxValue;
-            var zMax = GridIsMobile ? DsState.State.GridHalfExtents.Z * 0.33333f : float.MaxValue;
+            var maxMulti = ShieldMode != ShieldType.SmallGrid ? 0.33333f : 1f;
 
-            var wOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.X, -xMax, xMax);
-            var hOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Y, -yMax, yMax);
-            var dOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Z, -zMax, zMax);
+            var xMax = GridIsMobile ? DsState.State.GridHalfExtents.X * maxMulti : float.MaxValue;
+            var yMax = GridIsMobile ? DsState.State.GridHalfExtents.Y * maxMulti : float.MaxValue;
+            var zMax = GridIsMobile ? DsState.State.GridHalfExtents.Z * maxMulti : float.MaxValue;
+
+            var offsetMulti = ShieldMode != ShieldType.SmallGrid ? 1 : 0.2f;
+
+            var wOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.X * offsetMulti, -xMax, xMax);
+            var hOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Y * offsetMulti, -yMax, yMax);
+            var dOffset = MathHelper.Clamp(DsSet.Settings.ShieldOffset.Z * offsetMulti, -zMax, zMax);
             var localOffsetMeters = new Vector3D(wOffset, hOffset, dOffset) * MyGrid.GridSize;
 
             var gridMatrix = MyGrid.PositionComp.WorldMatrixRef;

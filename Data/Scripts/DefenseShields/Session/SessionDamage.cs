@@ -24,15 +24,14 @@ namespace DefenseShields
         {
             try
             {
+                var damageType = info.Type;
+                if (damageType == MpIgnoreDamage || damageType == MyDamageType.Drill || damageType == MyDamageType.Grind || ManagedAttackers.ContainsKey(info.AttackerId)) return;
+
                 var block = target as IMySlimBlock;
                 var character = target as IMyCharacter;
                 if (block != null)
                 {
-                    var damageType = info.Type;
-                    if (damageType == MpIgnoreDamage || damageType == MyDamageType.Drill || damageType == MyDamageType.Grind) return;
-
                     var myGrid = block.CubeGrid as MyCubeGrid;
-
                     if (myGrid == null) return;
 
                     MyProtectors protectors;
@@ -81,13 +80,13 @@ namespace DefenseShields
                                 var shieldActive = shield.DsState.State.Online && !shield.DsState.State.Lowered;
                                 if (!shieldActive) continue;
                                 var intersectDist = CustomCollision.IntersectEllipsoid(shield.DetectMatrixOutsideInv, shield.DetectionMatrix, ray);
-
                                 var ellipsoid = intersectDist ?? 0;
 
-                                var notContained = isVoxelBase || ellipsoid <= 0 && shield.GridIsMobile && !CustomCollision.PointInShield(trueAttacker.PositionComp.WorldAABB.Center, MatrixD.Invert(shield.ShieldShapeMatrix * shield.MyGrid.WorldMatrix));
+                                var notContained = isVoxelBase || intersectDist <= 0 && shield.GridIsMobile && !CustomCollision.PointInShield(trueAttacker.PositionComp.WorldAABB.Center, MatrixD.Invert(shield.ShieldShapeMatrix * shield.MyGrid.WorldMatrix));
                                 if (notContained) ellipsoid = lineLength;
 
                                 var intersect = ellipsoid > 0 && lineLength + 1 >= ellipsoid;
+
                                 if (intersect && ellipsoid <= hitDist)
                                 {
                                     protectors.LastAttackerWasInside = false;

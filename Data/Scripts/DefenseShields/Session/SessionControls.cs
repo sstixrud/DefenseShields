@@ -690,7 +690,7 @@
 
         private void CreateActionDamageModRate<T>(IMyTerminalControlSlider c,
         float defaultValue = 100f, // HACK terminal controls don't have a default value built in...
-        float modifier = 1f,
+        float modifier = 10f,
         string iconReset = null,
         string iconIncrease = null,
         string iconDecrease = null,

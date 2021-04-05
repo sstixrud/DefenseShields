@@ -58,6 +58,7 @@ namespace DefenseShields
             ["GetShieldInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>(TAPI_GetShieldInfo),
             ["GetModulationInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float>>(TAPI_GetModulationInfo),
             ["GetFaceInfo"] = new Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float, float>>(TAPI_GetFaceInfo),
+            ["AddAttacker"] = new Action<long>(TAPI_AddAttacker),
         };
 
         private readonly Dictionary<string, Delegate> _terminalPbApiMethods = new Dictionary<string, Delegate>()
@@ -88,15 +89,18 @@ namespace DefenseShields
             ["GetClosestShieldPoint"] = new Func<Sandbox.ModAPI.Ingame.IMyTerminalBlock, Vector3D, Vector3D?>(TAPI_GetClosestShieldPoint),
         };
 
+        internal void PbInit()
+        {
+            var pb = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsPbAPI");
+            pb.Getter = (b) => _terminalPbApiMethods;
+            MyAPIGateway.TerminalControls.AddControl<Sandbox.ModAPI.Ingame.IMyProgrammableBlock>(pb);
+        }
+
         internal void Init()
         {
             var mod = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsAPI");
             mod.Getter = (b) => ModApiMethods;
             MyAPIGateway.TerminalControls.AddControl<IMyUpgradeModule>(mod);
-
-            var pb = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsPbAPI");
-            pb.Getter = (b) => _terminalPbApiMethods;
-            MyAPIGateway.TerminalControls.AddControl<Sandbox.ModAPI.Ingame.IMyProgrammableBlock>(pb);
         }
 
         // ModApi only methods below
@@ -908,6 +912,11 @@ namespace DefenseShields
                 closestShieldPoint = CustomCollision.ClosestEllipsoidPointToPos(logic.DetectMatrixOutsideInv, logic.DetectMatrixOutside, pos);
 
             return closestShieldPoint;
+        }
+
+        private static void TAPI_AddAttacker(long attacker)
+        {
+            Session.Instance.ManagedAttackers[attacker] = byte.MaxValue;
         }
 
         // PB overloads

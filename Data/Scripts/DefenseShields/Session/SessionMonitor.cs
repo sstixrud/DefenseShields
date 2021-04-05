@@ -353,9 +353,9 @@ namespace DefenseShields
                 {
                     if (SessionReady && GlobalProtect.Count > 0 && (IsServer || !IsServer && ClientLoadCount++ > 120))
                     {
+                        Api.PbInit();
                         UtilsStatic.GetDefinitons();
                         if (!IsServer) Players.TryAdd(MyAPIGateway.Session.Player.IdentityId, MyAPIGateway.Session.Player);
-                        Api.Init();
                         MiscLoaded = true;
                         GameLoaded = true;
                     }

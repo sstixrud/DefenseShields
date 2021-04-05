@@ -53,6 +53,7 @@ namespace DefenseShields
         private Func<MyEntity, MyTuple<bool, bool, float, float, float, int>> _getShieldInfo;
         private Func<MyEntity, MyTuple<bool, bool, float, float>> _getModulationInfo;
         private Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float, float>> _getFaceInfo;
+        private Action<long> _addAttacker;
 
         public bool ApiLoad()
         {
@@ -97,6 +98,7 @@ namespace DefenseShields
             _getShieldInfo = (Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>)delegates["GetShieldInfo"];
             _getModulationInfo = (Func<MyEntity, MyTuple<bool, bool, float, float>>)delegates["GetModulationInfo"];
             _getFaceInfo = (Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float, float>>)delegates["GetFaceInfo"];
+            _addAttacker = (Action<long>)delegates["AddAttacker"];
 
             return true;
         }
@@ -143,5 +145,7 @@ namespace DefenseShields
         public MyTuple<bool, bool, float, float, float, int> GetShieldInfo(MyEntity entity) => _getShieldInfo?.Invoke(entity) ?? new MyTuple<bool, bool, float, float, float, int>();
         public MyTuple<bool, bool, float, float> GetModulationInfo(MyEntity entity) => _getModulationInfo?.Invoke(entity) ?? new MyTuple<bool, bool, float, float>();
         public MyTuple<bool, int, int, float, float> GetFaceInfo(IMyTerminalBlock block, Vector3D pos, bool posMustBeInside = false) => _getFaceInfo?.Invoke(block, pos, posMustBeInside) ?? new MyTuple<bool, int, int, float, float>();
+        public void AddAttacker(long attacker) => _addAttacker?.Invoke(attacker);
+
     }
 }
