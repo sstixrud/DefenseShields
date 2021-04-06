@@ -260,7 +260,7 @@ namespace DefenseShields
                 if (posMustBeInside && !CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv))
                     return new MyTuple<bool, int, int, float, float>();
 
-                if (logic.DsSet.Settings.SideRedirect)
+                if (logic.DsSet.Settings.SideShunting)
                 {
                     var referenceLocalPosition = logic.MyGrid.PositionComp.LocalMatrixRef.Translation;
                     var worldDirection = pos - referenceLocalPosition;
@@ -320,18 +320,18 @@ namespace DefenseShields
 
                         //Log.Line($"face: {logic.RealSideStates[face].Side}({face}) - redirected:{logic.RealSideStates[face].Redirected}");
                         if (validFace && logic.RealSideStates[face].Redirected)
-                        {
+                        {                                                                                 
                             //Log.Line($"hit: {face}");
                             faceHit = (int)face;
                         }
 
                     }
-                    var hitRedirectedSide = faceHit != -1;
-                    var redirectedFaces = Math.Abs(logic.ShieldRedirectState.X) + Math.Abs(logic.ShieldRedirectState.Y) + Math.Abs(logic.ShieldRedirectState.Z);
-                    var redirectMod = !hitRedirectedSide ? 1 - (redirectedFaces * Session.ShieldRedirectBonus) : 0.1f;
-                    var preventBypassMod = MathHelper.Clamp(redirectedFaces * Session.ShieldBypassBonus, 0f, 1f);
+                    var hitShuntedSide = faceHit != -1;
+                    var shuntedFaces = Math.Abs(logic.ShieldRedirectState.X) + Math.Abs(logic.ShieldRedirectState.Y) + Math.Abs(logic.ShieldRedirectState.Z);
+                    var shuntMod = !hitShuntedSide ? 1 - (shuntedFaces * Session.ShieldShuntBonus) : 1f;
+                    var preventBypassMod = MathHelper.Clamp(shuntedFaces * Session.ShieldBypassBonus, 0f, 1f);
 
-                    return new MyTuple<bool, int, int, float, float>(hitRedirectedSide, faceHit, redirectedFaces, redirectMod, preventBypassMod);
+                    return new MyTuple<bool, int, int, float, float>(hitShuntedSide, faceHit, shuntedFaces, shuntMod, preventBypassMod);
                 }
             }
 
@@ -812,7 +812,7 @@ namespace DefenseShields
                         Item2 =
                         {
                             Item1 = true,
-                            Item2 = s.DsSet.Settings.SideRedirect,
+                            Item2 = s.DsSet.Settings.SideShunting,
                             Item3 = state.Charge,
                             Item4 = s.ShieldMaxCharge,
                             Item5 = state.ShieldPercent,

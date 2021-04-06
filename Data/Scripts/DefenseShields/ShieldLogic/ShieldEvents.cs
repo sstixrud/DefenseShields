@@ -225,7 +225,7 @@
                 var status = GetShieldStatus();
                 if (status == "[Shield Up]" || status == "[Shield Down]" || status == "[Shield Offline]") {
 
-                    var redirectedSides = RedirectedSideCount();
+                    var redirectedSides = ShuntedSideCount();
                     var bonusAmount = redirectedSides * 20;
                     stringBuilder.Append(status + maxString + hpValue.ToString("N0") +
                                          "\n[Shield HP__]: " + (DsState.State.Charge * ConvToHp).ToString("N0") + " (" + shieldPercent.ToString("0") + "%)" +

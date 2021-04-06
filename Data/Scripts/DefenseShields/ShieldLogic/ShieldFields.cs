@@ -242,7 +242,6 @@ namespace DefenseShields
         private string _modelActive = "\\Models\\Cubes\\ShieldActiveBaseAlt.mwm";
         private string _modelPassive = string.Empty;
 
-        private readonly Vector2D _shieldIconPos = new Vector2D(-0.89, -0.86);
         private Vector3D _localImpactPosition;
         private Vector3D _oldGridHalfExtents;
         internal uint _redirectUpdateTime;

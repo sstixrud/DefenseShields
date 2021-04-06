@@ -120,43 +120,6 @@ namespace DefenseShields
             comp.ClientUiUpdate = true;
         }
 
-        internal static bool GetSideRedirect(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            return comp?.DsSet.Settings.SideRedirect ?? false;
-        }
-
-        internal static void SetSideRedirect(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-            if (comp.DsSet.Settings.SideRedirect != newValue)
-            {
-                comp.StartRedirectTimer();
-                comp.DsSet.Settings.SideRedirect = newValue;
-                comp.FitChanged = true;
-                comp.SettingsUpdated = true;
-                comp.ClientUiUpdate = true;
-            }
-        }
-
-        internal static bool GetShowRedirect(IMyTerminalBlock block)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            return comp?.DsSet.Settings.ShowRedirect ?? false;
-        }
-
-        internal static void SetShowRedirect(IMyTerminalBlock block, bool newValue)
-        {
-            var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            if (comp == null) return;
-
-            comp.DsSet.Settings.ShowRedirect = newValue;
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
-        }
-
         internal static long GetPowerScale(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
@@ -693,7 +656,46 @@ namespace DefenseShields
             if (comp == null)
                 return false;
 
-            return comp.DsSet.Settings.SideRedirect;
+            return comp.DsSet.Settings.SideShunting;
+        }
+
+
+        internal static bool GetSideShunting(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            return comp?.DsSet.Settings.SideShunting ?? false;
+        }
+
+        internal static void SetSideShunting(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+            if (comp.DsSet.Settings.SideShunting != newValue)
+            {
+                Log.Line("test");
+                comp.StartRedirectTimer();
+                comp.DsSet.Settings.SideShunting = newValue;
+                comp.FitChanged = true;
+                comp.SettingsUpdated = true;
+                comp.ClientUiUpdate = true;
+            }
+        }
+
+        internal static bool GetShowShunting(IMyTerminalBlock block)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            return comp?.DsSet.Settings.ShowRedirect ?? false;
+        }
+
+        internal static void SetShowShunting(IMyTerminalBlock block, bool newValue)
+        {
+            var comp = block?.GameLogic?.GetAs<DefenseShields>();
+            if (comp == null) return;
+
+            comp.DsSet.Settings.ShowRedirect = newValue;
+            comp.FitChanged = true;
+            comp.SettingsUpdated = true;
+            comp.ClientUiUpdate = true;
         }
         #endregion
     }

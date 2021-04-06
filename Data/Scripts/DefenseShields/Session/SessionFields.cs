@@ -1,4 +1,6 @@
 ﻿using ParallelTasks;
+using ProtoBuf;
+using VRage.Input;
 
 namespace DefenseShields
 {
@@ -23,9 +25,12 @@ namespace DefenseShields
         internal const double TickTimeDiv = 0.0625;
         internal const double OneStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 1;
         internal const double TwoStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 2;
-        internal const float ShieldRedirectBonus = 0.1f;
+        internal const float ShieldShuntBonus = 0.12f;
         internal const float ShieldBypassBonus = 0.2f;
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
+
+        internal const int ClientCfgVersion = 5;
+        internal const string ClientCfgName = "DefenseShieldsClient.cfg";
 
         internal readonly int[] SlotCnt = new int[9];
         internal readonly Vector3D[] LosPointSphere = new Vector3D[2000];
@@ -101,6 +106,13 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<VoxelCollisionDmgThreadEvent> VoxelCollisionDmgPool = new MyConcurrentPool<VoxelCollisionDmgThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<VoxelCollisionPhysicsThreadEvent> VoxelCollisionPhysicsPool = new MyConcurrentPool<VoxelCollisionPhysicsThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<ForceDataThreadEvent> ForceDataPool = new MyConcurrentPool<ForceDataThreadEvent>(100, info => info.Clean());
+        internal ControlQuery ControlRequest;
+        internal enum ControlQuery
+        {
+            None,
+            Keyboard,
+            Mouse,
+        }
 
         internal readonly HashSet<string> DsActions = new HashSet<string>()
         {
@@ -141,7 +153,7 @@ namespace DefenseShields
             {ShieldSides.Backward, "ShieldBack" }
         };
 
-        internal readonly Dictionary<ShieldSides, string> ShieldDirectedSides = new Dictionary<ShieldSides, string>
+        internal readonly Dictionary<ShieldSides, string> ShieldShuntedSides = new Dictionary<ShieldSides, string>
         {
             {ShieldSides.Left, "RedirectLeft" },
             {ShieldSides.Right, "RedirectRight" },
@@ -150,6 +162,17 @@ namespace DefenseShields
             {ShieldSides.Forward, "RedirectFront" },
             {ShieldSides.Backward, "RedirectBack" }
         };
+
+        internal readonly Dictionary<ShieldSides, MyStringId> ShieldDirectedSidesDraw = new Dictionary<ShieldSides, MyStringId>()
+        {
+            {ShieldSides.Left, MyStringId.GetOrCompute("DS_ShieldRedirectLeft") },
+            {ShieldSides.Right,MyStringId.GetOrCompute("DS_ShieldRedirectRight") },
+            {ShieldSides.Up, MyStringId.GetOrCompute("DS_ShieldRedirectUp") },
+            {ShieldSides.Down, MyStringId.GetOrCompute("DS_ShieldRedirectDown") },
+            {ShieldSides.Forward, MyStringId.GetOrCompute("DS_ShieldRedirectFront") },
+            {ShieldSides.Backward, MyStringId.GetOrCompute("DS_ShieldRedirectBack") }
+        };
+
 
         public enum ShieldSides
         {
@@ -246,13 +269,18 @@ namespace DefenseShields
         private const int EntMaxTickAge = 36000;
 
         private static int _entSlotAssigner;
+        internal bool InMenu;
 
         internal readonly ApiBackend Api = new ApiBackend();
+        internal ShieldSettings Settings;
+        internal UiInput UiInput;
+        internal string PlayerMessage;
+        internal readonly Dictionary<string, MyKeys> KeyMap = new Dictionary<string, MyKeys>();
+        internal readonly Dictionary<string, MyMouseButtonsEnum> MouseMap = new Dictionary<string, MyMouseButtonsEnum>();
         private readonly List<MyCubeGrid> _tmpWatchGridsToRemove = new List<MyCubeGrid>();
         internal readonly ConcurrentQueue<MyEntity> EntRefreshQueue = new ConcurrentQueue<MyEntity>();
         private readonly ConcurrentDictionary<MyEntity, uint> _globalEntTmp = new ConcurrentDictionary<MyEntity, uint>();
-
-
+        private readonly List<MyKeys> _pressedKeys = new List<MyKeys>();
 
         internal Task MonitorTask = new Task();
 
@@ -261,11 +289,12 @@ namespace DefenseShields
         private int _count = -1;
         private int _lCount;
         private int _eCount;
-
+        private string _lastKeyAction;
         private bool _warEffect;
 
         public Session()
         {
+            UiInput = new UiInput(this);
             UtilsStatic.UnitSphereRandomOnly(ref LosPointSphere);
         }
 
@@ -313,6 +342,7 @@ namespace DefenseShields
         internal bool DisControl { get; set; }
         internal bool MpActive { get; set; }
         internal bool IsServer { get; set; }
+        internal bool HandlesInput { get; set; }
         internal bool DedicatedServer { get; set; }
         internal bool DsAction { get; set; }
         internal bool PsAction { get; set; }

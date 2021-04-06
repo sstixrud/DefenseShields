@@ -492,7 +492,7 @@ namespace DefenseShields
                 if (ClientUiUpdate)
                 {
                     ClientUiUpdate = false;
-                    if (!_isServer) DsSet.NetworkUpdate();
+                    DsSet.NetworkUpdate();
                 }
             }
         }

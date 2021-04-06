@@ -104,6 +104,9 @@ namespace DefenseShields
 
         private void UpdateSides()
         {
+            if (!Session.Instance.DedicatedServer && (Session.Instance.UiInput.AnyKeyPressed || Session.Instance.UiInput.KeyPrevPressed))
+                ShieldHotKeys();
+            
             if (ShieldRedirectState != DsSet.Settings.ShieldRedirects && Session.Instance.Tick >= _redirectUpdateTime)
                 UpdateRedirectState();
 
@@ -111,7 +114,75 @@ namespace DefenseShields
                 UpdateMapping();
         }
 
-        internal int RedirectedSideCount()
+        private void ShieldHotKeys()
+        {
+            var input = Session.Instance.UiInput;
+            var shuntCount = ShuntedSideCount();
+            if (input.LeftReleased)
+                QuickShuntUpdate(Session.ShieldSides.Left, shuntCount);
+            else if (input.RightReleased)
+                QuickShuntUpdate(Session.ShieldSides.Right, shuntCount);
+            else if (input.FrontReleased)
+                QuickShuntUpdate(Session.ShieldSides.Forward, shuntCount);
+            else if (input.BackReleased)
+                QuickShuntUpdate(Session.ShieldSides.Backward, shuntCount);
+            else if (input.UpReleased)
+                QuickShuntUpdate(Session.ShieldSides.Up, shuntCount);
+            else if (input.DownReleased)
+                QuickShuntUpdate(Session.ShieldSides.Down, shuntCount);
+            else if (input.ShuntReleased) 
+                DsUi.SetSideShunting(Shield, !DsSet.Settings.SideShunting);
+        }
+
+        private void QuickShuntUpdate(Session.ShieldSides side, int shuntedCount)
+        {
+            var isShunted = IsSideRedirected(side);
+            if (!isShunted) {
+                if (Session.Instance.UiInput.LongKey) {
+
+                    if (shuntedCount < 5) {
+                        foreach (var pair in Session.Instance.ShieldShuntedSides)
+                            CallSideControl(pair.Key, pair.Key != side);
+                    }
+                    else {
+                        foreach (var pair in Session.Instance.ShieldShuntedSides)
+                            CallSideControl(pair.Key, false);
+                    }
+
+                }
+                else if (shuntedCount < 5)
+                    CallSideControl(side, true);
+            }
+            else
+                CallSideControl(side, false);
+        }
+
+        private void CallSideControl(Session.ShieldSides side, bool enable)
+        {
+            switch (side)
+            {
+                case Session.ShieldSides.Left:
+                    DsUi.SetLeftShield(Shield, enable);
+                    break;
+                case Session.ShieldSides.Right:
+                    DsUi.SetRightShield(Shield, enable);
+                    break;
+                case Session.ShieldSides.Up:
+                    DsUi.SetTopShield(Shield, enable);
+                    break;
+                case Session.ShieldSides.Down:
+                    DsUi.SetBottomShield(Shield, enable);
+                    break;
+                case Session.ShieldSides.Forward:
+                    DsUi.SetFrontShield(Shield, enable);
+                    break;
+                case Session.ShieldSides.Backward:
+                    DsUi.SetBackShield(Shield, enable);
+                    break;
+            }
+        }
+
+        internal int ShuntedSideCount()
         {
             return Math.Abs(ShieldRedirectState.X) + Math.Abs(ShieldRedirectState.Y) + Math.Abs(ShieldRedirectState.Z);
         }
@@ -140,7 +211,7 @@ namespace DefenseShields
         private bool _toggle;
         public bool RedirectVisualUpdate()
         {
-            var turnedOff = !DsSet.Settings.SideRedirect || ShieldRedirectState == Vector3.Zero;
+            var turnedOff = !DsSet.Settings.SideShunting || ShieldRedirectState == Vector3.Zero;
 
             if (turnedOff && !_toggle)
                 return false;
@@ -179,7 +250,7 @@ namespace DefenseShields
                 var side = key.Key;
                 var enabled = key.Value.Redirected;
                 MyEntitySubpart part;
-                if (shellActive.TryGetSubpart(Session.Instance.ShieldDirectedSides[side], out part))
+                if (shellActive.TryGetSubpart(Session.Instance.ShieldShuntedSides[side], out part))
                 {
                     var redirecting = enabled && _toggle;
                     RenderingSides[side] = redirecting;

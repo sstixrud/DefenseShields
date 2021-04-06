@@ -358,6 +358,9 @@ namespace DefenseShields
                         if (!IsServer) Players.TryAdd(MyAPIGateway.Session.Player.IdentityId, MyAPIGateway.Session.Player);
                         MiscLoaded = true;
                         GameLoaded = true;
+
+                        if (!string.IsNullOrEmpty(PlayerMessage))
+                            MyAPIGateway.Utilities.ShowNotification(PlayerMessage, 10000, "White");
                     }
                 }
             }

@@ -365,13 +365,25 @@ namespace DefenseShields
             }
         }
 
+        private bool _toggle2;
         private void UpdateIcon(bool reInforce)
         {
-            var position = new Vector3D(_shieldIconPos.X, _shieldIconPos.Y, 0);
-            var fov = MyAPIGateway.Session.Camera.FovWithZoom;
-            double aspectratio = MyAPIGateway.Session.Camera.ViewportSize.X / MyAPIGateway.Session.Camera.ViewportSize.Y;
-            var scale = 0.075 * Math.Tan(fov * 0.5);
-            position.X *= scale * aspectratio;
+
+            var camera = MyAPIGateway.Session.Camera;
+            var cameraMatrix = camera.WorldMatrix;
+            var cameraPos = cameraMatrix.Translation;
+            var newFov = camera.FovWithZoom;
+
+            var aspectRatio = camera.ViewportSize.X / camera.ViewportSize.Y;
+            var aspectRatioInv = camera.ViewportSize.Y / camera.ViewportSize.X;
+
+            if (Session.Instance.Tick180 || Session.Instance.Tick20 && _toggle2)
+                _toggle2 = !_toggle2;
+
+            var scaleFov = Math.Tan(newFov * 0.5);
+            var scale = 0.075 * scaleFov;
+            var position = new Vector3D(Session.Instance.Settings.ClientConfig.ShieldIconPos.X, Session.Instance.Settings.ClientConfig.ShieldIconPos.Y, 0);
+            position.X *= scale * aspectRatio;
             position.Y *= scale;
             var cameraWorldMatrix = MyAPIGateway.Session.Camera.WorldMatrix;
             position = Vector3D.Transform(new Vector3D(position.X, position.Y, -.1), cameraWorldMatrix);
@@ -379,7 +391,7 @@ namespace DefenseShields
             var origin = position;
             var left = cameraWorldMatrix.Left;
             var up = cameraWorldMatrix.Up;
-            scale = 0.08 * scale;
+            scale = 0.125 * scale;
 
             var percent = DsState.State.ShieldPercent;
             var icon2FSelect = percent < 99 ? GetIconMeterfloat() : 0;
@@ -395,9 +407,23 @@ namespace DefenseShields
             else if (reInforce) color = Color.LightSkyBlue;
             else color = Color.White;
 
+            scale *= Session.Instance.Settings.ClientConfig.HudScale;
+
             MyTransparentGeometry.AddBillboardOriented(icon1, color, origin, left, up, (float)scale, BlendTypeEnum.PostPP); 
-            if (showIcon2 && icon2 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon2, Color.White, origin, left, up, (float)scale * 1.11f, BlendTypeEnum.PostPP);
-            if (icon3 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon3, Color.White, origin, left, up, (float)scale * 1.11f, BlendTypeEnum.PostPP);
+            if (showIcon2 && icon2 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon2, Color.White, origin, left, up, (float)scale, BlendTypeEnum.PostPP);
+            if (icon3 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon3, Color.White, origin, left, up, (float)scale, BlendTypeEnum.PostPP);
+
+            if (DsSet.Settings.SideShunting)
+            {
+                foreach (var pair in Session.Instance.ShieldDirectedSidesDraw)
+                {
+                    var enabled = IsSideRedirected(pair.Key);
+                    var icon = pair.Value;
+                    var sideColor = !enabled ? Color.White : _toggle2 ? new Color(255, 0, 0, 255) : new Color(25,25,25,25);
+
+                    MyTransparentGeometry.AddBillboardOriented(icon, sideColor, origin, left, up, (float)scale, BlendTypeEnum.PostPP);
+                }
+            }
         }
 
         private float GetIconMeterfloat()

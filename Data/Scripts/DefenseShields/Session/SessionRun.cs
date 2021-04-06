@@ -20,6 +20,7 @@
                 MpActive = MyAPIGateway.Multiplayer.MultiplayerActive;
                 IsServer = MyAPIGateway.Multiplayer.IsServer;
                 DedicatedServer = MyAPIGateway.Utilities.IsDedicated;
+                HandlesInput = !IsServer || IsServer && !DedicatedServer;
 
                 var env = MyDefinitionManager.Static.EnvironmentDefinition;
                 if (env.LargeShipMaxSpeed > MaxEntitySpeed) MaxEntitySpeed = env.LargeShipMaxSpeed;
@@ -70,8 +71,13 @@
                     if (mod.PublishedFileId == 540003236) ThyaImages = true;
 
                 HudNotify = MyAPIGateway.Utilities.CreateNotification("", 2000, "UrlHighlight"); ;
+                if (HandlesInput)
+                    MyAPIGateway.Utilities.MessageEntered += ChatMessageSet;
 
                 Api.Init();
+                GenerateButtonMap();
+                Settings = new ShieldSettings(this);
+
             }
             catch (Exception ex) { Log.Line($"Exception in BeforeStart: {ex}"); }
         }
@@ -186,12 +192,31 @@
             }
             catch (Exception ex) { Log.Line($"Exception in SessionDraw: {ex}"); }
         }
+
+
+        public override void HandleInput()
+        {
+            if (HandlesInput) {
+
+                if (ControlRequest != ControlQuery.None)
+                    UpdateControlKeys();
+
+                UiInput.UpdateInputState();
+                if (MpActive)
+                {
+
+                }
+            }
+        }
+
         #endregion
         #region Data
         public override void LoadData()
         {
             Instance = this;
             ApiServer.Load();
+            MyAPIGateway.Gui.GuiControlCreated += MenuOpened;
+            MyAPIGateway.Gui.GuiControlRemoved += MenuClosed;
         }
 
         protected override void UnloadData()
@@ -202,9 +227,13 @@
             Enforced = null;
             MyAPIGateway.Multiplayer.UnregisterMessageHandler(PACKET_ID, ReceivedPacket);
 
+            if (HandlesInput)
+                MyAPIGateway.Utilities.MessageEntered -= ChatMessageSet;
+
             MyVisualScriptLogicProvider.PlayerDisconnected -= PlayerDisconnected;
             MyVisualScriptLogicProvider.PlayerRespawnRequest -= PlayerConnected;
-
+            MyAPIGateway.Gui.GuiControlCreated -= MenuOpened;
+            MyAPIGateway.Gui.GuiControlRemoved -= MenuClosed;
             MyEntities.OnEntityRemove -= OnEntityRemove;
             MyAPIGateway.Session.OnSessionReady -= OnSessionReady;
 

@@ -28,8 +28,15 @@ namespace DefenseShields
                 DefenseShieldsEnforcement loadedEnforce = null;
                 var base64 = Convert.FromBase64String(rawData);
                 loadedEnforce = MyAPIGateway.Utilities.SerializeFromBinary<DefenseShieldsEnforcement>(base64);
+
                 if (Session.Enforced.Debug == 3) Log.Line($"Enforcement Loaded {loadedEnforce != null} - Version:{loadedEnforce?.Version} - ShieldId [{shield.EntityId}]");
-                if (loadedEnforce != null) return loadedEnforce;
+                if (loadedEnforce != null)
+                {
+                    if (Session.Instance.Settings != null)
+                        Session.Instance.Settings.ClientWaiting = false;
+
+                    return loadedEnforce;
+                }
             }
             return null;
         }

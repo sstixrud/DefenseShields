@@ -94,8 +94,8 @@
                 DimShieldHitsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_DimShieldHits", "Dim Incoming Hit Effects ", "Supress brightness of incoming hit effects", DsUi.GetDimShieldHits, DsUi.SetDimShieldHits);
 
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep6");
-                SideRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Shunt Shields", "Enable Shield Shunting", DsUi.GetSideRedirect, DsUi.SetSideRedirect);
-                ShowRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Shunted Shields", "Enable/Disable showing side shield states", DsUi.GetShowRedirect, DsUi.SetShowRedirect);
+                SideRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Shunt Shields", "Enable Shield Shunting", DsUi.GetSideShunting, DsUi.SetSideShunting);
+                ShowRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Shunted Shields", "Enable/Disable showing side shield states", DsUi.GetShowShunting, DsUi.SetShowShunting);
 
                 TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Shunt Top Shield", "Redirect Top shield power to others", "On", "Off", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
                 BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Shunt Bottom Shield", "Redirect bottom shield power to others", "On", "Off", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
