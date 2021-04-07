@@ -89,18 +89,15 @@ namespace DefenseShields
             ["GetClosestShieldPoint"] = new Func<Sandbox.ModAPI.Ingame.IMyTerminalBlock, Vector3D, Vector3D?>(TAPI_GetClosestShieldPoint),
         };
 
-        internal void PbInit()
-        {
-            var pb = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsPbAPI");
-            pb.Getter = (b) => _terminalPbApiMethods;
-            MyAPIGateway.TerminalControls.AddControl<Sandbox.ModAPI.Ingame.IMyProgrammableBlock>(pb);
-        }
-
         internal void Init()
         {
             var mod = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsAPI");
             mod.Getter = (b) => ModApiMethods;
             MyAPIGateway.TerminalControls.AddControl<IMyUpgradeModule>(mod);
+
+            var pb = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsPbAPI");
+            pb.Getter = (b) => _terminalPbApiMethods;
+            MyAPIGateway.TerminalControls.AddControl<Sandbox.ModAPI.Ingame.IMyProgrammableBlock>(pb);
         }
 
         // ModApi only methods below
@@ -134,8 +131,15 @@ namespace DefenseShields
                 logic.ImpactSize = damage;
                 logic.WorldImpactPosition = hitPos;
             }
+
+            if (energy)
+                logic.EnergyDamage += damage;
+            else
+                logic.KineticDamage += damage;
+
             logic.WebDamage = true;
             logic.Absorb += damage;
+
 
             return hitPos;
         }
@@ -173,6 +177,12 @@ namespace DefenseShields
                 logic.ImpactSize = damage;
                 logic.WorldImpactPosition = hitPos;
             }
+
+            if (energy)
+                logic.EnergyDamage += damage;
+            else
+                logic.KineticDamage += damage;
+
             logic.WebDamage = true;
             logic.Absorb += damage;
 
@@ -203,6 +213,11 @@ namespace DefenseShields
             if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
             else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
             else logic.EnergyHit = DefenseShields.HitType.Kinetic;
+
+            if (energy)
+                logic.EnergyDamage += damage;
+            else
+                logic.KineticDamage += damage;
 
             logic.WebDamage = true;
             logic.Absorb += damage;
@@ -242,6 +257,11 @@ namespace DefenseShields
             if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
             else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
             else logic.EnergyHit = DefenseShields.HitType.Kinetic;
+
+            if (energy)
+                logic.EnergyDamage += damage;
+            else
+                logic.KineticDamage += damage;
 
             logic.WebDamage = true;
             logic.Absorb += damage;
@@ -397,6 +417,11 @@ namespace DefenseShields
             if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
             else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
             else logic.EnergyHit = DefenseShields.HitType.Kinetic;
+
+            if (energy)
+                logic.EnergyDamage += damage;
+            else
+                logic.KineticDamage += damage;
 
             logic.WebDamage = true;
             logic.Absorb += damage;

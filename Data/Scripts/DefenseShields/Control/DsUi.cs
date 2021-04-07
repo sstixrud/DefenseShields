@@ -616,21 +616,12 @@ namespace DefenseShields
 
         public static void SetRedirect(DefenseShields ds, Session.ShieldSides side, int newValue)
         {
-            if (!Session.Instance.DedicatedServer) {
+            if (!Session.Instance.DedicatedServer && Session.Instance.Settings.ClientConfig.Notices) {
 
                 var pendingChanges = ds.DsSet.Settings.ShieldRedirects != ds.ShieldRedirectState;
                 var enableText = SideEnabled(side, newValue) ? "Shunting" : "Normalizing";
                 var text = $"[{enableText} {side}] Shields in 2 seconds -- delaying previous changes: [{pendingChanges}]";
-
-                Session.Instance.HudNotify.Font = "White";
-                var oldText = Session.Instance.HudNotify.Text;
-                if (oldText != text)
-                    Session.Instance.HudNotify.Hide();
-                Session.Instance.HudNotify.Text = text;
-                Session.Instance.HudNotify.Show();
-
-                if (Session.Instance.HudNotify.Text != text)
-                    Session.Instance.HudNotify.Text = text;
+                Session.Instance.SendNotice(text);
             }
 
             switch (side)
@@ -672,7 +663,6 @@ namespace DefenseShields
             if (comp == null) return;
             if (comp.DsSet.Settings.SideShunting != newValue)
             {
-                Log.Line("test");
                 comp.StartRedirectTimer();
                 comp.DsSet.Settings.SideShunting = newValue;
                 comp.FitChanged = true;

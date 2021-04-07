@@ -61,7 +61,8 @@ namespace DefenseShields
             {Session.ShieldSides.Forward, false },
             {Session.ShieldSides.Backward, false }
         };
-
+        internal readonly RunningAverage KineticAverage = new RunningAverage(60);
+        internal readonly RunningAverage EnergyAverage = new RunningAverage(60);
         internal readonly object MatrixLock = new object();
 
         internal const int ConvToHp = 100;
@@ -93,9 +94,13 @@ namespace DefenseShields
         internal MyStorageData TmpStorage = new MyStorageData();
         internal MyEntity ShellActive;
         internal MyCockpit LastCockpit;
+        internal float KineticDamage;
+        internal float EnergyDamage;
         internal bool InControlPanel => MyAPIGateway.Gui.GetCurrentScreen == MyTerminalPageEnum.ControlPanel;
         internal bool InThisTerminal => Session.Instance.LastTerminalId == Shield.EntityId;
-
+       
+        internal int KineticAvg;
+        internal int EnergyAvg;
         private const int ReModulationCount = 300;
         private const int ShieldDownCount = 2700;
         private const int EmpDownCount = 3600;
@@ -144,7 +149,7 @@ namespace DefenseShields
         private uint _heatVentingTick = uint.MaxValue;
         private uint _lastSendDamageTick = uint.MaxValue;
         private uint _subUpdatedTick = uint.MaxValue;
-
+        private uint _lastDamageTick = uint.MaxValue;
         private float _power = 0.001f;
         private float _powerNeeded;
         private float _otherPower;
@@ -163,7 +168,7 @@ namespace DefenseShields
         private float _runningHeal;
         private float _sizeScaler;
         private float _shieldTypeRatio = 100f;
-
+        private float _damageTypeBalance;
         private double _oldEllipsoidAdjust;
         private double _ellipsoidSurfaceArea;
 

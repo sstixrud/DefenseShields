@@ -74,7 +74,6 @@
                 if (HandlesInput)
                     MyAPIGateway.Utilities.MessageEntered += ChatMessageSet;
 
-                Api.Init();
                 GenerateButtonMap();
                 Settings = new ShieldSettings(this);
 

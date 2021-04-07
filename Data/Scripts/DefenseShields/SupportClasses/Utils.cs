@@ -458,5 +458,11 @@ namespace DefenseShields.Support
 
             return _sum / _valueCount;
         }
+
+        internal void Clear()
+        {
+            for (int i = 0; i < _values.Length; i++)
+                _values[i] = 0;
+        }
     }
 }

@@ -47,6 +47,20 @@ namespace DefenseShields
             }
         }
 
+
+        private void SetModulatorQuickKey()
+        {
+            if (ShieldComp.Modulator != null && ShieldComp.Modulator.ModState.State.Online) {
+
+                if (Session.Instance.UiInput.KineticReleased)
+                    Session.Instance.ActionAddDamageMod(ShieldComp.Modulator.Modulator);
+                else if (Session.Instance.UiInput.EnergyReleased)
+                    Session.Instance.ActionSubtractDamageMod(ShieldComp.Modulator.Modulator);
+                if (Session.Instance.Settings.ClientConfig.Notices)
+                    Session.Instance.SendNotice($"Shield modulation -- Kinetic [{ShieldComp.Modulator.ModState.State.ModulateKinetic}] - Energy [{ShieldComp.Modulator.ModState.State.ModulateEnergy}]");
+            }
+        }
+
         public void GetEnhancernInfo()
         {
             var update = false;
@@ -116,6 +130,9 @@ namespace DefenseShields
 
         private void ShieldHotKeys()
         {
+            if (Session.Instance.HudComp != this || !Shield.HasPlayerAccess(MyAPIGateway.Session.Player.IdentityId))
+                return;
+
             var input = Session.Instance.UiInput;
             var shuntCount = ShuntedSideCount();
             if (input.LeftReleased)
@@ -132,11 +149,15 @@ namespace DefenseShields
                 QuickShuntUpdate(Session.ShieldSides.Down, shuntCount);
             else if (input.ShuntReleased) 
                 DsUi.SetSideShunting(Shield, !DsSet.Settings.SideShunting);
+            else if (input.KineticReleased || input.EnergyReleased)
+                SetModulatorQuickKey();
         }
+
+
 
         private void QuickShuntUpdate(Session.ShieldSides side, int shuntedCount)
         {
-            var isShunted = IsSideRedirected(side);
+            var isShunted = IsSideShunted(side);
             if (!isShunted) {
                 if (Session.Instance.UiInput.LongKey) {
 
@@ -195,14 +216,14 @@ namespace DefenseShields
             var upReverse = Base6Directions.GetOppositeDirection(orientation.Up);
             var leftReverse = Base6Directions.GetOppositeDirection(orientation.Left);
 
-            RealSideStates[(Session.ShieldSides)orientation.Forward] = new Session.ShieldInfo {Side = Session.ShieldSides.Forward, Redirected = IsSideRedirected(Session.ShieldSides.Forward)};
-            RealSideStates[(Session.ShieldSides)fwdReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Backward, Redirected = IsSideRedirected(Session.ShieldSides.Backward) };
+            RealSideStates[(Session.ShieldSides)orientation.Forward] = new Session.ShieldInfo {Side = Session.ShieldSides.Forward, Redirected = IsSideShunted(Session.ShieldSides.Forward)};
+            RealSideStates[(Session.ShieldSides)fwdReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Backward, Redirected = IsSideShunted(Session.ShieldSides.Backward) };
 
-            RealSideStates[(Session.ShieldSides)orientation.Up] = new Session.ShieldInfo { Side = Session.ShieldSides.Up, Redirected = IsSideRedirected(Session.ShieldSides.Up) };
-            RealSideStates[(Session.ShieldSides)upReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Down, Redirected = IsSideRedirected(Session.ShieldSides.Down) };
+            RealSideStates[(Session.ShieldSides)orientation.Up] = new Session.ShieldInfo { Side = Session.ShieldSides.Up, Redirected = IsSideShunted(Session.ShieldSides.Up) };
+            RealSideStates[(Session.ShieldSides)upReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Down, Redirected = IsSideShunted(Session.ShieldSides.Down) };
 
-            RealSideStates[(Session.ShieldSides)orientation.Left] = new Session.ShieldInfo { Side = Session.ShieldSides.Left, Redirected = IsSideRedirected(Session.ShieldSides.Left) };
-            RealSideStates[(Session.ShieldSides)leftReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Right, Redirected = IsSideRedirected(Session.ShieldSides.Right) };
+            RealSideStates[(Session.ShieldSides)orientation.Left] = new Session.ShieldInfo { Side = Session.ShieldSides.Left, Redirected = IsSideShunted(Session.ShieldSides.Left) };
+            RealSideStates[(Session.ShieldSides)leftReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Right, Redirected = IsSideShunted(Session.ShieldSides.Right) };
 
             //foreach (var pair in RealSideStates) Log.CleanLine($"RealSide:{pair.Key} - UserSide:{pair.Value.Side} - Redirected:{pair.Value.Redirected}");
         }
@@ -259,7 +280,7 @@ namespace DefenseShields
             }
         }
 
-        public bool IsSideRedirected(Session.ShieldSides side)
+        public bool IsSideShunted(Session.ShieldSides side)
         {
             switch (side)
             {
@@ -383,7 +404,11 @@ namespace DefenseShields
                     ImpactSize = hit.Amount;
                     WorldImpactPosition = hit.HitPos;
                     EnergyHit = HitType.Energy;
-                    Absorb += hit.Amount * ConvToWatts;
+
+                    var damage = hit.Amount * ConvToWatts;
+                    EnergyDamage += damage;
+                    Absorb += damage;
+
                     UtilsStatic.CreateFakeSmallExplosion(WorldImpactPosition);
                     if (hit.Attacker != null)
                     {
@@ -396,7 +421,10 @@ namespace DefenseShields
                     ImpactSize = hit.Amount;
                     WorldImpactPosition = hit.HitPos;
                     EnergyHit = HitType.Kinetic;
-                    Absorb += hit.Amount * ConvToWatts;
+                    var damage = hit.Amount * ConvToWatts;
+                    
+                    KineticDamage += damage;
+                    Absorb += damage;
                     continue;
                 }
                 if (damageType == Session.Instance.MPEnergy)
@@ -404,7 +432,10 @@ namespace DefenseShields
                     ImpactSize = hit.Amount;
                     WorldImpactPosition = hit.HitPos;
                     EnergyHit = HitType.Energy;
-                    Absorb += hit.Amount * ConvToWatts;
+
+                    var damage = hit.Amount * ConvToWatts;
+                    EnergyDamage += damage;
+                    Absorb += damage;
                     continue;
                 }
                 if (damageType == Session.Instance.MPEMP)
@@ -412,7 +443,10 @@ namespace DefenseShields
                     ImpactSize = hit.Amount;
                     WorldImpactPosition = hit.HitPos;
                     EnergyHit = HitType.Energy;
-                    Absorb += hit.Amount * ConvToWatts;
+
+                    var damage = hit.Amount * ConvToWatts;
+                    EnergyDamage += damage;
+                    Absorb += damage;
                 }
             }
             ShieldHits.Clear();

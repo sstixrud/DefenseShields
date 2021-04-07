@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using DefenseShields.Support;
+﻿using System.IO;
 using ProtoBuf;
 using Sandbox.Game;
 using VRage.Input;
@@ -39,12 +36,24 @@ namespace DefenseShields
             [ProtoMember(9)] public string Back = MyKeys.NumPad2.ToString();
             [ProtoMember(10)] public Vector2D ShieldIconPos = new Vector2D(-0.92, -0.80);
             [ProtoMember(11)] public float HudScale = 1f;
+            [ProtoMember(12)] public string Kinetic = MyKeys.NumPad7.ToString();
+            [ProtoMember(13)] public string Energy = MyKeys.NumPad1.ToString();
+            [ProtoMember(14)] public bool Notices = true;
+
 
             internal void UpdateKey(MyKeys key, string value, UiInput uiInput)
             {
                 var keyString = key.ToString();
                 switch (value)
                 {
+                    case "kinetic":
+                        ActionKey = keyString;
+                        uiInput.Kinetic = key;
+                        break;
+                    case "energy":
+                        ActionKey = keyString;
+                        uiInput.Energy = key;
+                        break;
                     case "action":
                         ActionKey = keyString;
                         uiInput.ActionKey = key;
@@ -102,18 +111,8 @@ namespace DefenseShields
 
                 if (xmlData?.Version == Session.ClientCfgVersion)
                 {
-
                     Core.ClientConfig = xmlData;
-                    Core.Session.UiInput.ActionKey = Core.Session.KeyMap[xmlData.ActionKey];
-
-                    Core.Session.UiInput.Shunting = Core.Session.KeyMap[xmlData.NoShunting];
-
-                    Core.Session.UiInput.Left = Core.Session.KeyMap[xmlData.Left];
-                    Core.Session.UiInput.Right = Core.Session.KeyMap[xmlData.Right];
-                    Core.Session.UiInput.Front = Core.Session.KeyMap[xmlData.Front];
-                    Core.Session.UiInput.Back = Core.Session.KeyMap[xmlData.Back];
-                    Core.Session.UiInput.Up = Core.Session.KeyMap[xmlData.Up];
-                    Core.Session.UiInput.Down = Core.Session.KeyMap[xmlData.Down];
+                    InitKeys(xmlData);
                 }
                 else
                     WriteNewClientCfg();
@@ -131,8 +130,10 @@ namespace DefenseShields
             VersionChange = true;
             MyAPIGateway.Utilities.DeleteFileInGlobalStorage(Session.ClientCfgName);
             Core.ClientConfig = new ShieldSettings.ClientSettings { Version = Session.ClientCfgVersion };
+            InitKeys(Core.ClientConfig);
             var writer = MyAPIGateway.Utilities.WriteFileInGlobalStorage(Session.ClientCfgName);
             var data = MyAPIGateway.Utilities.SerializeToXML(Core.ClientConfig);
+
             Write(writer, data);
         }
 
@@ -149,6 +150,22 @@ namespace DefenseShields
             writer.Write(data);
             writer.Flush();
             writer.Dispose();
+        }
+
+        private void InitKeys(ShieldSettings.ClientSettings data)
+        {
+            Core.Session.UiInput.ActionKey = Core.Session.KeyMap[data.ActionKey];
+            Core.Session.UiInput.Shunting = Core.Session.KeyMap[data.NoShunting];
+
+            Core.Session.UiInput.Left = Core.Session.KeyMap[data.Left];
+            Core.Session.UiInput.Right = Core.Session.KeyMap[data.Right];
+            Core.Session.UiInput.Front = Core.Session.KeyMap[data.Front];
+            Core.Session.UiInput.Back = Core.Session.KeyMap[data.Back];
+            Core.Session.UiInput.Up = Core.Session.KeyMap[data.Up];
+            Core.Session.UiInput.Down = Core.Session.KeyMap[data.Down];
+
+            Core.Session.UiInput.Kinetic = Core.Session.KeyMap[data.Kinetic];
+            Core.Session.UiInput.Energy = Core.Session.KeyMap[data.Energy];
         }
     }
 
@@ -194,7 +211,8 @@ namespace DefenseShields
         internal MyKeys Back;
         internal MyKeys Up;
         internal MyKeys Down;
-
+        internal MyKeys Kinetic;
+        internal MyKeys Energy;
         internal bool ShuntReleased;
         internal bool LeftReleased;
         internal bool RightReleased;
@@ -202,6 +220,8 @@ namespace DefenseShields
         internal bool BackReleased;
         internal bool UpReleased;
         internal bool DownReleased;
+        internal bool KineticReleased;
+        internal bool EnergyReleased;
 
         internal UiInput(Session session)
         {
@@ -280,6 +300,10 @@ namespace DefenseShields
                     UpReleased = MyAPIGateway.Input.IsNewKeyReleased(Up);
                     DownReleased = MyAPIGateway.Input.IsNewKeyReleased(Down);
                     ShuntReleased = MyAPIGateway.Input.IsNewKeyReleased(Shunting);
+
+                    KineticReleased = MyAPIGateway.Input.IsNewKeyReleased(Kinetic);
+                    EnergyReleased = MyAPIGateway.Input.IsNewKeyReleased(Energy);
+
                 }
                 else {
 
@@ -290,6 +314,8 @@ namespace DefenseShields
                     UpReleased = false;
                     DownReleased = false;
                     ShuntReleased = false;
+                    KineticReleased = false;
+                    EnergyReleased = false;
                     KeyTime = 0;
                     LongKey = false;
                 }
@@ -351,6 +377,8 @@ namespace DefenseShields
                 UpReleased = false;
                 DownReleased = false;
                 ShuntReleased = false;
+                KineticReleased = false;
+                EnergyReleased = false;
                 KeyTime = 0;
                 LongKey = false;
             }

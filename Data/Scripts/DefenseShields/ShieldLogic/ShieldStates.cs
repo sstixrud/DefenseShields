@@ -208,6 +208,8 @@ namespace DefenseShields
             }
 
             Absorb = 0f;
+            ClearDamageTypeInfo();
+
             EnergyHit = HitType.Kinetic;
             WorldImpactPosition = Vector3D.NegativeInfinity;
             ShieldEnt.Render.Visible = false;

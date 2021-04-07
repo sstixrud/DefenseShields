@@ -73,6 +73,7 @@ namespace DefenseShields
             }
             return false;
         }
+
         private void UpdateControlKeys()
         {
             if (ControlRequest == ControlQuery.Keyboard) {
@@ -97,7 +98,13 @@ namespace DefenseShields
             {
                 switch (message)
                 {
+                    case "/ds remap noshunt":
+                        ControlRequest = ControlQuery.Keyboard;
+                        somethingUpdated = true;
+                        _lastKeyAction = "noshunt";
 
+                        MyAPIGateway.Utilities.ShowNotification($"Press the key you want to use for the shield NoShunt key - Current: {Settings.ClientConfig.NoShunting.ToString()}", 10000);
+                        break;
                     case "/ds remap action":
                         ControlRequest = ControlQuery.Keyboard;
                         somethingUpdated = true;
@@ -150,7 +157,6 @@ namespace DefenseShields
                         ControlRequest = ControlQuery.Mouse;
                         somethingUpdated = true;
                         _lastKeyAction = "mouse";
-
                         MyAPIGateway.Utilities.ShowNotification($"Press the mouse button you want to use to open and close the Shield Menu", 10000);
                         break;
                 }
@@ -180,10 +186,10 @@ namespace DefenseShields
 
                                     break;
                                 }
-                            case "TEMP2":
-                                //Settings.ClientConfig.ShowHudTargetSizes = !Settings.ClientConfig.ShowHudTargetSizes;
+                            case "notices":
+                                Settings.ClientConfig.Notices = !Settings.ClientConfig.Notices;
                                 somethingUpdated = true;
-                                //MyAPIGateway.Utilities.ShowNotification($"Shipsize icons have been set to: {Settings.ClientConfig.ShowHudTargetSizes}", 10000);
+                                MyAPIGateway.Utilities.ShowNotification($"Screen text notices set to: {Settings.ClientConfig.Notices}", 10000);
                                 Settings.VersionControl.UpdateClientCfgFile();
                                 //FovChanged();
                                 break;
@@ -194,13 +200,13 @@ namespace DefenseShields
                 if (!somethingUpdated)
                 {
                     if (message.Length <= 3)
-                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information", 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices", 10000, "Red");
                     else if (message.StartsWith("/ds hud"))
                         MyAPIGateway.Utilities.ShowNotification($"Hold Action key ({Settings.ClientConfig.ActionKey}) and use arrow keys to move hud\n Hold Action key ({Settings.ClientConfig.ActionKey}) and use +/- keys to change scale of hud", 10000, "Red");
                     else if (message.StartsWith("/ds remap"))
-                        MyAPIGateway.Utilities.ShowNotification("'/ds remap action'  -- Remaps Action key (default numpad0)\n '/ds remap noshunt'  -- Remaps NoShunting key (numpad5)\n '/ds remap left'  -- Remaps Left shield key (default numpad4)\n '/ds remap right'  -- Remaps Right shield key (default numpad6)\n '/ds remap forward'  -- Remaps Forward shield key (default numpad8)\n '/ds remap backward'  -- Remaps Backward shield key (default numpad2)\n '/ds remap up'  -- Remaps Up shield key (default numpad9)\n '/ds remap down'  -- Remaps Down shield key (default numpad1)\n", 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification("'/ds remap action'  -- Remaps Action key (default numpad0)\n '/ds remap noshunt'  -- Remaps NoShunting key (numpad5)\n '/ds remap left'  -- Remaps Left shield key (default numpad4)\n '/ds remap right'  -- Remaps Right shield key (default numpad6)\n '/ds remap front'  -- Remaps Forward shield key (default numpad8)\n '/ds remap back'  -- Remaps Backward shield key (default numpad2)\n '/ds remap up'  -- Remaps Up shield key (default numpad9)\n '/ds remap down'  -- Remaps Down shield key (default numpad1)", 10000, "Red");
                     else if (message.StartsWith("/ds info"))
-                        MyAPIGateway.Utilities.ShowNotification("Short key presses toggle shunting state for that direction only\n Long presses toggles shunting for all directions\n", 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification("Short key presses toggle shunting state for that direction only\n Long presses toggles shunting for all directions", 10000, "Red");
                 }
                 sendToOthers = false;
             }
@@ -226,6 +232,19 @@ namespace DefenseShields
                 var button = buttons[i];
                 MouseMap[button.ToString()] = button;
             }
+        }
+
+        internal void SendNotice(string message)
+        {
+            Instance.HudNotify.Font = "White";
+            var oldText = Instance.HudNotify.Text;
+            if (oldText != message)
+                Instance.HudNotify.Hide();
+            Instance.HudNotify.Text = message;
+            Instance.HudNotify.Show();
+
+            if (Instance.HudNotify.Text != message)
+                Instance.HudNotify.Text = message;
         }
 
         private void MenuOpened(object obj)

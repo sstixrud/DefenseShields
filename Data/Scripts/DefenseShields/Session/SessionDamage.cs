@@ -161,6 +161,12 @@ namespace DefenseShields
                                 }
                             }
                             if (isDeformationDmg && trueAttacker != null) protectors.IgnoreAttackerId = attackerId;
+
+                            if (!bullet)
+                                shield.EnergyDamage += info.Amount;
+                            else
+                                shield.KineticDamage += info.Amount;
+
                             shield.Absorb += info.Amount;
                             info.Amount = 0f;
                             return;
@@ -190,6 +196,8 @@ namespace DefenseShields
                             {
                                 iShield.AddShieldHit(attackerId, dmgAmount, damageType, block, false);
                                 iShield.Absorb += dmgAmount;
+                                iShield.KineticDamage += dmgAmount;
+
                             }
                             info.Amount = 0;
                             return;

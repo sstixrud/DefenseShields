@@ -401,11 +401,9 @@ namespace DefenseShields
             var icon3 = GetHudIcon3FromInt(heat, _count < 30);
             var showIcon2 = DsState.State.Online;
             Color color;
-            var flashRed = (percent > 0 && percent < 10 & !reInforce)  && _count < 30;
-            
-            if (flashRed) color = Color.Red;
-            else if (reInforce) color = Color.LightSkyBlue;
-            else color = Color.White;
+
+            if (reInforce) color = Color.Orange;
+            else color = GetDamageTypeColor();
 
             scale *= Session.Instance.Settings.ClientConfig.HudScale;
 
@@ -417,13 +415,53 @@ namespace DefenseShields
             {
                 foreach (var pair in Session.Instance.ShieldDirectedSidesDraw)
                 {
-                    var enabled = IsSideRedirected(pair.Key);
+                    var shunted = IsSideShunted(pair.Key);
                     var icon = pair.Value;
-                    var sideColor = !enabled ? Color.White : _toggle2 ? new Color(255, 0, 0, 255) : new Color(25,25,25,25);
+                    var sideColor = !shunted ? new Vector4(1f,1f,1f,1f) : _toggle2 ? new Vector4(1, 0, 0, 1) : new Vector4(0.01f, 0.01f, 0.01f, 0.01f);
 
                     MyTransparentGeometry.AddBillboardOriented(icon, sideColor, origin, left, up, (float)scale, BlendTypeEnum.PostPP);
                 }
             }
+        }
+
+        private Vector4 GetDamageTypeColor()
+        {
+            if (_damageTypeBalance < 0) {
+                var max = (float)EnergyAvg;
+                var min = (float)KineticAvg;
+                if (min <= 0)
+                    return new Vector4(0f, 0, 1f, 1f);
+
+                var value = (float)Math.Round(max / min);
+                if (value < 1)
+                    return Color.White;
+
+                if (value >= 5)
+                    return new Vector4(0f, 0, 1f, 1f);
+
+                var mod = value * 0.2f;
+                return new Vector4(mod, mod, 1f, 1f);
+            }
+
+            if (_damageTypeBalance > 0) {
+                var max = (float)KineticAvg;
+                var min = (float)EnergyAvg;
+                if (min <= 0)
+                    return new Vector4(1f, 0.5f, 0f, 1f);
+
+                var value = (float)Math.Round(max / min);
+                if (value < 1)
+                    return Color.White;
+
+                if (value >= 5)
+                    return new Vector4(1f, 0.5f, 0f, 1f);
+
+                var mod = value * 0.2f;
+                var newColor = new Vector4(1f, 0.5f + (mod * 0.5f), mod, 1f);
+
+                return newColor;
+            }
+            return Color.White;
         }
 
         private float GetIconMeterfloat()

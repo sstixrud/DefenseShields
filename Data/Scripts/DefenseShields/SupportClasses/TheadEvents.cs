@@ -52,6 +52,7 @@ namespace DefenseShields.Support
             }
             Shield.WebDamage = true;
             Shield.Absorb += Damage;
+            Shield.EnergyDamage += Damage;
             Session.Instance.ShieldEventPool.Return(this);
         }
     }
@@ -104,6 +105,8 @@ namespace DefenseShields.Support
             }
             Shield.WebDamage = true;
             Shield.Absorb += damage;
+            Shield.EnergyDamage += damage;
+
             Session.Instance.MissilePool.Return(this);
         }
     }
@@ -387,6 +390,8 @@ namespace DefenseShields.Support
             }
             Shield.WebDamage = true;
             Shield.Absorb += Damage;
+            Shield.KineticDamage += Damage;
+
             AccelSet.Clear();
             Session.Instance.SetCubeAccelPool.Return(AccelSet);
             Session.Instance.ManyBlocksPool.Return(this);
@@ -430,6 +435,8 @@ namespace DefenseShields.Support
             }
             Shield.WebDamage = true;
             Shield.Absorb += Damage;
+            Shield.KineticDamage += Damage;
+
             Session.Instance.VoxelCollisionDmgPool.Return(this);
         }
     }
@@ -496,6 +503,7 @@ namespace DefenseShields.Support
             }
             Shield.WebDamage = true;
             Shield.Absorb += damage;
+            Shield.KineticDamage += damage;
             Session.Instance.MeteorPool.Return(this);
         }
     }

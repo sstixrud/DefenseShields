@@ -35,6 +35,12 @@ namespace DefenseShields
             if (Absorb > 0) {
 
                 _damageReadOut += Absorb;
+                KineticAvg = KineticAverage.Add((int) KineticDamage);
+                EnergyAvg = EnergyAverage.Add((int)EnergyDamage);
+
+                _damageTypeBalance = KineticAvg - EnergyAvg;
+                _lastDamageTick = _tick;
+
                 EffectsCleanTick = _tick;
                 DsState.State.Charge -= Absorb * ConvToWatts;
             }
@@ -48,8 +54,25 @@ namespace DefenseShields
                 else _empOverLoadLoop = 0;
             }
 
+            if (_tick - _lastDamageTick > 600 && (EnergyAvg > 0 || KineticAvg > 0))
+                ClearDamageTypeInfo();
+            
             Absorb = 0f;
+            KineticDamage = 0;
+            EnergyDamage = 0;
+
             return DsState.State.Charge > 0;
+        }
+
+        private void ClearDamageTypeInfo()
+        {
+            KineticAverage.Clear();
+            EnergyAverage.Clear();
+            KineticDamage = 0;
+            EnergyDamage = 0;
+            KineticAvg = 0;
+            EnergyAvg = 0;
+            _damageTypeBalance = 0;
         }
 
         private void CalculatePowerCharge()

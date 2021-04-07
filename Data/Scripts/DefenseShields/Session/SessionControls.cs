@@ -1,4 +1,6 @@
-﻿namespace DefenseShields
+﻿using VRageMath;
+
+namespace DefenseShields
 {
     using System;
     using System.Collections.Generic;
@@ -745,7 +747,7 @@
             catch (Exception ex) { Log.Line($"Exception in CreateActionDamageModRate: {ex}"); }
         }
 
-        private void ActionAddDamageMod(IMyTerminalBlock b)
+        internal void ActionAddDamageMod(IMyTerminalBlock b)
         {
             try
             {
@@ -753,17 +755,13 @@
                 MyAPIGateway.TerminalControls.GetControls<IMyUpgradeModule>(out controls);
                 var damageMod = controls.First((x) => x.Id.ToString() == "DS-M_DamageModulation");
                 var c = (IMyTerminalControlSlider)damageMod;
-                if (c.Getter(b) > 179)
-                {
-                    c.Setter(b, 180f);
-                    return;
-                }
-                c.Setter(b, c.Getter(b) + 1f);
+                var newValue = MathHelper.Clamp(Math.Round(c.Getter(b) + 10f), 20f, 180f);
+                c.Setter(b, (float) newValue);
             }
             catch (Exception ex) { Log.Line($"Exception in ActionAddDamageMod: {ex}"); }
         }
 
-        private void ActionSubtractDamageMod(IMyTerminalBlock b)
+        internal void ActionSubtractDamageMod(IMyTerminalBlock b)
         {
             try
             {
@@ -771,12 +769,8 @@
                 MyAPIGateway.TerminalControls.GetControls<IMyUpgradeModule>(out controls);
                 var chargeRate = controls.First((x) => x.Id.ToString() == "DS-M_DamageModulation");
                 var c = (IMyTerminalControlSlider)chargeRate;
-                if (c.Getter(b) < 21)
-                {
-                    c.Setter(b, 20f);
-                    return;
-                }
-                c.Setter(b, c.Getter(b) - 1f);
+                var newValue = MathHelper.Clamp(Math.Round(c.Getter(b) - 10f), 20f, 180f);
+                c.Setter(b, (float)newValue);
             }
             catch (Exception ex) { Log.Line($"Exception in ActionSubtractDamageMod: {ex}"); }
         }
