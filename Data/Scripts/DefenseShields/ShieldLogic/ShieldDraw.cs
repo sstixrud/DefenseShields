@@ -71,12 +71,14 @@ namespace DefenseShields
             }
             else if (_shapeChanged) _updateRender = true;
 
-            var updated = Session.Instance.Tick300 || Session.Instance.Tick20 && _toggle;
+            var startPulse = Session.Instance.Tick20 && _toggle;
+            var updated = Session.Instance.Tick300 || startPulse;
 
             if (updated && ShellActive != null && RedirectVisualUpdate())
-            {
-                UpdateShieldRedirectVisuals(ShellActive);
-            }
+                UpdateShieldRedirectVisuals();
+
+            if (ShellActive != null && _sidePulsing)
+                SidePulseRender();
 
             if (hitAnim && sphereOnCamera && DsState.State.Online) Icosphere.Draw(renderId);
         }
@@ -426,9 +428,9 @@ namespace DefenseShields
 
         private Vector4 GetDamageTypeColor()
         {
-            if (_damageTypeBalance < 0) {
-                var max = (float)EnergyAvg;
-                var min = (float)KineticAvg;
+            if (_damageTypeBalance > 0) {
+                var max = (float)KineticAvg;
+                var min = (float)EnergyAvg;
                 if (min <= 0)
                     return new Vector4(0f, 0, 1f, 1f);
 
@@ -443,9 +445,10 @@ namespace DefenseShields
                 return new Vector4(mod, mod, 1f, 1f);
             }
 
-            if (_damageTypeBalance > 0) {
-                var max = (float)KineticAvg;
-                var min = (float)EnergyAvg;
+            if (_damageTypeBalance < 0) {
+                var max = (float)EnergyAvg;
+                var min = (float)KineticAvg;
+
                 if (min <= 0)
                     return new Vector4(1f, 0.5f, 0f, 1f);
 

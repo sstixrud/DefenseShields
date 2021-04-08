@@ -264,18 +264,56 @@ namespace DefenseShields
             return false;
         }
 
-        public void UpdateShieldRedirectVisuals(MyEntity shellActive)
+        public void UpdateShieldRedirectVisuals()
         {
+            bool shunting = false;
             foreach (var key in RealSideStates)
             {
                 var side = key.Key;
                 var enabled = key.Value.Redirected;
                 MyEntitySubpart part;
-                if (shellActive.TryGetSubpart(Session.Instance.ShieldShuntedSides[side], out part))
+                if (ShellActive.TryGetSubpart(Session.Instance.ShieldShuntedSides[side], out part))
                 {
-                    var redirecting = enabled && _toggle;
-                    RenderingSides[side] = redirecting;
-                    part.Render.UpdateRenderObject(redirecting);
+                    var shunted = enabled && _toggle;
+                    if (shunted)
+                        shunting = true;
+
+                    RenderingSides[side] = shunted;
+                    part.Render.UpdateRenderObject(shunted);
+                }
+            }
+            _sidePulsing = shunting;
+        }
+
+        private int _pulseCounter = 10;
+        private bool _pulseIncrease;
+        private bool _sidePulsing;
+        private void SidePulseRender()
+        {
+            if (!_pulseIncrease && _pulseCounter-- <= 0)
+            {
+                _pulseIncrease = true;
+                _pulseCounter = 0;
+            }
+            else if (_pulseIncrease && _pulseCounter++ >= 9) {
+                _pulseIncrease = false;
+                _pulseCounter = 9;
+            }
+
+            foreach (var key in RealSideStates)
+            {
+                var side = key.Key;
+                var enabled = key.Value.Redirected;
+                MyEntitySubpart part;
+                if (ShellActive.TryGetSubpart(Session.Instance.ShieldShuntedSides[side], out part))
+                {
+                    if (enabled)
+                    {
+                        //part.Render.UpdateRenderObject(false);
+                        part.Render.Transparency = _pulseCounter * 0.1f;
+                        //part.Render.UpdateRenderObject(true);
+                        part.Render.UpdateTransparency();
+                    }
                 }
             }
         }

@@ -363,13 +363,13 @@
         <W>0</W>
       </Color>
       <ColorAdd>
-        <X>0.1</X>
-        <Y>0.1</Y>
-        <Z>0.1</Z>
-        <W>0.9</W>
+        <X>0.4</X>
+        <Y>0.0</Y>
+        <Z>0.0</Z>
+        <W>0.175</W>
       </ColorAdd>
       <ShadowMultiplier>
-        <X>0</X>
+        <X>0</X>  
         <Y>0</Y>
         <Z>0</Z>
         <W>0</W>
