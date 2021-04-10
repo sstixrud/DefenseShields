@@ -29,7 +29,7 @@ namespace DefenseShields
         internal const float ShieldBypassBonus = 0.2f;
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
 
-        internal const int ClientCfgVersion = 7;
+        internal const int ClientCfgVersion = 8;
         internal const string ClientCfgName = "DefenseShieldsClient.cfg";
 
         internal readonly int[] SlotCnt = new int[9];

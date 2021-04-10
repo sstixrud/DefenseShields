@@ -51,7 +51,6 @@
     <Compile Include="Data\Scripts\DefenseShields\API\ApiServer.cs" />
     <Compile Include="Data\Scripts\DefenseShields\API\TapiBackend.cs" />
     <Compile Include="Data\Scripts\DefenseShields\API\PbApiWrapper.cs" />
-    <Compile Include="Data\Scripts\DefenseShields\API\ModTermWrapper.cs" />
     <Compile Include="Data\Scripts\DefenseShields\Config\EmitterData.cs" />
     <Compile Include="Data\Scripts\DefenseShields\Config\PlanetShieldData.cs" />
     <Compile Include="Data\Scripts\DefenseShields\Config\O2GeneratorData.cs" />

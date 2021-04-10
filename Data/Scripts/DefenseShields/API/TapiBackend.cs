@@ -566,7 +566,7 @@ namespace DefenseShields
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
             if (logic == null) return -1;
 
-            return logic.ShieldMaxHpBase * DefenseShields.ConvToDec;
+            return logic.ShieldMaxCharge * DefenseShields.ConvToDec;
         }
 
         private static bool TAPI_IsShieldUp(IMyTerminalBlock block)

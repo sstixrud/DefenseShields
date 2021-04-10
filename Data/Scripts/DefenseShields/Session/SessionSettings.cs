@@ -34,7 +34,7 @@ namespace DefenseShields
             [ProtoMember(7)] public string Down = MyKeys.NumPad3.ToString();
             [ProtoMember(8)] public string Front = MyKeys.NumPad8.ToString();
             [ProtoMember(9)] public string Back = MyKeys.NumPad2.ToString();
-            [ProtoMember(10)] public Vector2D ShieldIconPos = new Vector2D(-0.92, -0.80);
+            [ProtoMember(10)] public Vector2D ShieldIconPos = new Vector2D(-0.87, -0.80);
             [ProtoMember(11)] public float HudScale = 1f;
             [ProtoMember(12)] public string Kinetic = MyKeys.NumPad7.ToString();
             [ProtoMember(13)] public string Energy = MyKeys.NumPad1.ToString();

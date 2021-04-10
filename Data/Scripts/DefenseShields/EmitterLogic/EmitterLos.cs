@@ -56,7 +56,7 @@ namespace DefenseShields
             else
             {
                 UpdateLosState();
-                EmiState.State.Los = _blocksLos.Count <= 1900;
+                EmiState.State.Los = _blocksLos.Count <= 1950;
 
                 if (!EmiState.State.Los) ShieldComp.EmitterEvent = true;
                 else LosScaledCloud.Clear();
@@ -143,7 +143,7 @@ namespace DefenseShields
                     }
 
                     var blocked = _blocksLos.Count;
-                    var needed = -100 + _vertsSighted.Count;
+                    var needed = -50 + _vertsSighted.Count;
                     if (_count == 0) BroadCastLosMessage(blocked, needed, controller);
                 }
             }
