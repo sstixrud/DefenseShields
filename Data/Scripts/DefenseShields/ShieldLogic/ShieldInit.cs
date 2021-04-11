@@ -544,10 +544,11 @@ namespace DefenseShields
 
                     var term = cube as IMyTerminalBlock;
                     var sensor = cube as IMySensorBlock;
-                    var iLight = cube as IMyInteriorLight;
+                    var camera = cube as IMyCameraBlock;
+                    var light = cube as IMyLightingBlock;
                     var sound = cube as IMySoundBlock;
-                    var controlPanel = cube as IMyControlPanel;
-                    if (term == null || sensor != null || iLight != null || sound != null || controlPanel != null) continue;
+                    var buttonPanel = term != null && cube.BlockDefinition != null && cube.BlockDefinition.Id.TypeId == typeof(MyObjectBuilder_TerminalBlock);
+                    if (buttonPanel || term == null || sensor != null || sound != null || camera != null || light != null) continue;
                     Vector3I translatedPos;
 
                     if (!isRootGrid)
