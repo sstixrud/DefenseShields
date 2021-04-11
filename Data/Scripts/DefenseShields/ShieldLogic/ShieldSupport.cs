@@ -130,7 +130,7 @@ namespace DefenseShields
 
         private void ShieldHotKeys()
         {
-            if (Session.Instance.HudComp != this || !Shield.HasPlayerAccess(MyAPIGateway.Session.Player.IdentityId))
+            if (Session.Instance.HudComp != this || !Shield.HasPlayerAccess(MyAPIGateway.Session.Player.IdentityId) || Session.Instance.Settings.ClientConfig.DisableKeys)
                 return;
 
             var input = Session.Instance.UiInput;

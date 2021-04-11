@@ -271,6 +271,10 @@ namespace DefenseShields
         private static int _entSlotAssigner;
         internal bool InMenu;
 
+        internal ulong MultiplayerId;
+        internal long PlayerId;
+        internal bool PlayersLoaded;
+
         internal readonly ApiBackend Api = new ApiBackend();
         internal ShieldSettings Settings;
         internal UiInput UiInput;

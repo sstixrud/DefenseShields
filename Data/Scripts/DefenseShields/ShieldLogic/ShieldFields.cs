@@ -63,7 +63,6 @@ namespace DefenseShields
         };
         internal readonly RunningAverage KineticAverage = new RunningAverage(60);
         internal readonly RunningAverage EnergyAverage = new RunningAverage(60);
-        internal readonly object MatrixLock = new object();
 
         internal const int ConvToHp = 100;
         internal const float ConvToDec = 0.01f;
@@ -415,11 +414,8 @@ namespace DefenseShields
 
             set
             {
-                lock (MatrixLock)
-                {
-                    DetectMatrixOutside = value;
-                    DetectMatrixOutsideInv = MatrixD.Invert(value);
-                }
+                DetectMatrixOutside = value;
+                DetectMatrixOutsideInv = MatrixD.Invert(value);
             }
         }
     }

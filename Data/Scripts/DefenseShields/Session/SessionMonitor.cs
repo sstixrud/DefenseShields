@@ -365,6 +365,9 @@ namespace DefenseShields
                 }
             }
 
+            if (!PlayersLoaded && KeenFuckery())
+                PlayersLoaded = true;
+
             if (Tick20)
             {
                 Scale();

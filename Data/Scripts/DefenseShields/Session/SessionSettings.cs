@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using DefenseShields.Support;
 using ProtoBuf;
 using Sandbox.Game;
 using VRage.Input;
@@ -39,7 +42,7 @@ namespace DefenseShields
             [ProtoMember(12)] public string Kinetic = MyKeys.NumPad7.ToString();
             [ProtoMember(13)] public string Energy = MyKeys.NumPad1.ToString();
             [ProtoMember(14)] public bool Notices = true;
-
+            [ProtoMember(15)] public bool DisableKeys = false;
 
             internal void UpdateKey(MyKeys key, string value, UiInput uiInput)
             {
@@ -201,7 +204,9 @@ namespace DefenseShields
         internal bool PlayerCamera;
         internal bool FirstPersonView;
         internal bool Debug = true;
-        internal bool BlackListActive;
+        internal bool BlackListActive1;
+        internal bool BlackListActive2;
+        internal bool NumPadNumKeyPressed;
         private readonly Session _session;
         internal MyKeys ActionKey;
         internal MyKeys Shunting;
@@ -222,6 +227,21 @@ namespace DefenseShields
         internal bool DownReleased;
         internal bool KineticReleased;
         internal bool EnergyReleased;
+
+
+        internal readonly List<MyKeys> NumPadNumbers = new List<MyKeys>()
+        {
+            MyKeys.NumPad0,
+            MyKeys.NumPad1,
+            MyKeys.NumPad2,
+            MyKeys.NumPad3,
+            MyKeys.NumPad4,
+            MyKeys.NumPad5,
+            MyKeys.NumPad6,
+            MyKeys.NumPad7,
+            MyKeys.NumPad8,
+            MyKeys.NumPad9,
+        };
 
         internal UiInput(Session session)
         {
@@ -265,6 +285,7 @@ namespace DefenseShields
                 ShiftPressed = MyAPIGateway.Input.IsKeyPress(MyKeys.LeftShift);
                 ActionKeyReleased = MyAPIGateway.Input.IsNewKeyReleased(ActionKey);
 
+                
                 if (ShiftPressed)
                 {
                     ShiftTime++;
@@ -290,6 +311,7 @@ namespace DefenseShields
                     KeyTime++;
                     LongKey = KeyTime > 39;
                 }
+
 
                 if (KeyPrevPressed) {
 
@@ -327,11 +349,14 @@ namespace DefenseShields
                 }
 
                 ActionKeyPressed = MyAPIGateway.Input.IsKeyPress(ActionKey);
+                NumPadNumKeyPressed = DirectionKeyPressed();
+                if (NumPadNumKeyPressed && !BlackListActive2 && !_session.Settings.ClientConfig.DisableKeys)
+                    BlackList2(true);
 
-                if (ActionKeyPressed) {
+                if (ActionKeyPressed && !_session.Settings.ClientConfig.DisableKeys) {
 
-                    if (!BlackListActive)
-                        BlackList(true);
+                    if (!BlackListActive1)
+                        BlackList1(true);
 
                     var evenTicks = _session.Tick % 2 == 0;
                     if (evenTicks) {
@@ -383,8 +408,11 @@ namespace DefenseShields
                 LongKey = false;
             }
 
-            if (!ActionKeyPressed && BlackListActive)
-                BlackList(false);
+            if (!ActionKeyPressed && BlackListActive1)
+                BlackList1(false);
+
+            if (!NumPadNumKeyPressed && BlackListActive2)
+                BlackList2(false);
 
             if (_session.MpActive)
             {
@@ -397,15 +425,121 @@ namespace DefenseShields
                 WheelBackward = true;
         }
 
-        private void BlackList(bool activate)
+        private void BlackList1(bool activate)
         {
-            MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(MyAPIGateway.Input.GetControl(MyKeys.Up).GetGameControlEnum().String, MyAPIGateway.Session.Player.IdentityId, !activate);
-            MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(MyAPIGateway.Input.GetControl(MyKeys.Down).GetGameControlEnum().String, MyAPIGateway.Session.Player.IdentityId, !activate);
-            MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(MyAPIGateway.Input.GetControl(MyKeys.Left).GetGameControlEnum().String, MyAPIGateway.Session.Player.IdentityId, !activate);
-            MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(MyAPIGateway.Input.GetControl(MyKeys.Right).GetGameControlEnum().String, MyAPIGateway.Session.Player.IdentityId, !activate);
-            MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(MyAPIGateway.Input.GetControl(MyKeys.Add).GetGameControlEnum().String, MyAPIGateway.Session.Player.IdentityId, !activate);
-            MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(MyAPIGateway.Input.GetControl(MyKeys.Subtract).GetGameControlEnum().String, MyAPIGateway.Session.Player.IdentityId, !activate);
-            BlackListActive = activate;
+            try
+            {
+                var upKey = MyAPIGateway.Input.GetControl(MyKeys.Up);
+                var downKey = MyAPIGateway.Input.GetControl(MyKeys.Down);
+                var leftKey = MyAPIGateway.Input.GetControl(MyKeys.Left);
+                var rightkey = MyAPIGateway.Input.GetControl(MyKeys.Right);
+                var addKey = MyAPIGateway.Input.GetControl(MyKeys.Add);
+                var subKey = MyAPIGateway.Input.GetControl(MyKeys.Subtract);
+
+                if (upKey != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(upKey.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (downKey != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(downKey.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (leftKey != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(leftKey.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (rightkey != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(rightkey.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (addKey != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(addKey.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (subKey != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(subKey.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+
+                BlackListActive1 = activate;
+            }
+            catch (Exception ex) { Log.Line($"Exception in BlackList1: {ex}"); }
+        }
+
+        private void BlackList2(bool activate)
+        {
+            try
+            {
+                var numPad0 = MyAPIGateway.Input.GetControl(MyKeys.NumPad0);
+                var numPad1 = MyAPIGateway.Input.GetControl(MyKeys.NumPad1);
+                var numPad2 = MyAPIGateway.Input.GetControl(MyKeys.NumPad2);
+                var numPad3 = MyAPIGateway.Input.GetControl(MyKeys.NumPad3);
+                var numPad4 = MyAPIGateway.Input.GetControl(MyKeys.NumPad4);
+                var numPad5 = MyAPIGateway.Input.GetControl(MyKeys.NumPad5);
+                var numPad6 = MyAPIGateway.Input.GetControl(MyKeys.NumPad6);
+                var numPad7 = MyAPIGateway.Input.GetControl(MyKeys.NumPad7);
+                var numPad8 = MyAPIGateway.Input.GetControl(MyKeys.NumPad8);
+                var numPad9 = MyAPIGateway.Input.GetControl(MyKeys.NumPad9);
+
+                if (numPad0 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad0.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (numPad1 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad1.GetGameControlEnum().String, _session.PlayerId, !activate);
+
+                }
+                if (numPad2 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad2.GetGameControlEnum().String, _session.PlayerId, !activate);
+
+                }
+                if (numPad3 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad3.GetGameControlEnum().String, _session.PlayerId, !activate);
+
+                }
+                if (numPad4 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad4.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (numPad5 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad5.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (numPad6 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad6.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (numPad7 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad7.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (numPad8 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad8.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                if (numPad9 != null)
+                {
+                    MyVisualScriptLogicProvider.SetPlayerInputBlacklistState(numPad9.GetGameControlEnum().String, _session.PlayerId, !activate);
+                }
+                BlackListActive2 = activate;
+            }
+            catch (Exception ex) { Log.Line($"Exception in BlackList2: {ex}"); }
+        }
+
+        private bool DirectionKeyPressed()
+        {
+            if (AnyKeyPressed)
+            {
+                foreach (var num in NumPadNumbers) {
+                    if (MyAPIGateway.Input.IsKeyPress(num))
+                        return true;
+                }
+            }
+
+            return false;
         }
     }
 }

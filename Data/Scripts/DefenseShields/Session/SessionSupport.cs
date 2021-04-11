@@ -90,6 +90,24 @@ namespace DefenseShields
             }
         }
 
+        internal bool KeenFuckery()
+        {
+            try
+            {
+                if (HandlesInput)
+                {
+                    if (Session?.Player == null) return false;
+                    MultiplayerId = MyAPIGateway.Multiplayer.MyId;
+                    PlayerId = Session.Player.IdentityId;
+                }
+
+                return true;
+            }
+            catch (Exception ex) { Log.Line($"KeenFuckery in UpdatingStopped: {ex}"); }
+
+            return false;
+        }
+
         private void ChatMessageSet(string message, ref bool sendToOthers)
         {
             var somethingUpdated = false;
@@ -191,7 +209,18 @@ namespace DefenseShields
                                 somethingUpdated = true;
                                 MyAPIGateway.Utilities.ShowNotification($"Screen text notices set to: {Settings.ClientConfig.Notices}", 10000);
                                 Settings.VersionControl.UpdateClientCfgFile();
-                                //FovChanged();
+                                break;
+                            case "disablehotkeys":
+                                Settings.ClientConfig.DisableKeys = !Settings.ClientConfig.DisableKeys;
+                                somethingUpdated = true;
+                                MyAPIGateway.Utilities.ShowNotification($"Hot Keys have been disabled: {Settings.ClientConfig.DisableKeys}", 10000);
+                                Settings.VersionControl.UpdateClientCfgFile();
+                                break;
+                            case "setdefaults":
+                                Settings.ClientConfig = new ShieldSettings.ClientSettings();
+                                somethingUpdated = true;
+                                MyAPIGateway.Utilities.ShowNotification($"Client configuration has been set to defaults", 10000);
+                                Settings.VersionControl.UpdateClientCfgFile();
                                 break;
                         }
                     }
@@ -200,7 +229,7 @@ namespace DefenseShields
                 if (!somethingUpdated)
                 {
                     if (message.Length <= 3)
-                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices", 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices\n  '/ds disablehotkeys' -- Disables all shield hotkeys\n  '/ds setdefaults' -- Resets shield client configs to default values\n" , 10000, "Red");
                     else if (message.StartsWith("/ds hud"))
                         MyAPIGateway.Utilities.ShowNotification($"Hold Action key ({Settings.ClientConfig.ActionKey}) and use arrow keys to move hud\n Hold Action key ({Settings.ClientConfig.ActionKey}) and use +/- keys to change scale of hud", 10000, "Red");
                     else if (message.StartsWith("/ds remap"))
