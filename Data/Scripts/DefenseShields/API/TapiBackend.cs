@@ -59,6 +59,8 @@ namespace DefenseShields
             ["GetModulationInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float>>(TAPI_GetModulationInfo),
             ["GetFaceInfo"] = new Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float, float>>(TAPI_GetFaceInfo),
             ["AddAttacker"] = new Action<long>(TAPI_AddAttacker),
+            ["IsBlockProtected"] = new Func<IMySlimBlock, bool>(TAPI_IsBlockProtected),
+
         };
 
         private readonly Dictionary<string, Delegate> _terminalPbApiMethods = new Dictionary<string, Delegate>()
@@ -942,6 +944,22 @@ namespace DefenseShields
         private static void TAPI_AddAttacker(long attacker)
         {
             Session.Instance.ManagedAttackers[attacker] = byte.MaxValue;
+        }
+
+        private static bool TAPI_IsBlockProtected(IMySlimBlock block)
+        {
+
+            if (block == null) return false;
+            var grid = (MyCubeGrid)block.CubeGrid;
+            ShieldGridComponent c;
+            if (Session.Instance.IdToBus.TryGetValue(grid.EntityId, out c) && c?.DefenseShields != null)
+            {
+                bool pointInShield;
+                var ds = c.DefenseShields;
+                lock (ds.MatrixLock) pointInShield = Vector3D.Transform(grid.GridIntegerToWorld(block.Position), ref ds.DetectMatrixOutsideInv).LengthSquared() <= 1;
+                return pointInShield;
+            }
+            return false;
         }
 
         // PB overloads

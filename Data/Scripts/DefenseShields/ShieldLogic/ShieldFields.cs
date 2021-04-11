@@ -384,7 +384,7 @@ namespace DefenseShields
         internal Vector3D MyGridCenter { get; set; }
         internal Vector3D DetectionCenter { get; set; }
 
-        internal MatrixD DetectMatrixOutsideInv { get; set; }
+        internal MatrixD DetectMatrixOutsideInv;
         internal MatrixD ShieldShapeMatrix { get; set; }
         internal MatrixD DetectMatrixOutside { get; set; }
         internal MatrixD ShieldMatrix { get; set; }
