@@ -158,24 +158,28 @@ namespace DefenseShields
         private void QuickShuntUpdate(Session.ShieldSides side, int shuntedCount)
         {
             var isShunted = IsSideShunted(side);
-            if (!isShunted) {
-                if (Session.Instance.UiInput.LongKey) {
+            if (Session.Instance.UiInput.LongKey) {
 
-                    if (shuntedCount < 5) {
-                        foreach (var pair in Session.Instance.ShieldShuntedSides)
-                            CallSideControl(pair.Key, pair.Key != side);
-                    }
-                    else {
-                        foreach (var pair in Session.Instance.ShieldShuntedSides)
+                if (!isShunted && shuntedCount >= 5) {
+
+                    foreach (var pair in Session.Instance.ShieldShuntedSides) { 
+
+                        if (pair.Key != side)
                             CallSideControl(pair.Key, false);
                     }
-
                 }
-                else if (shuntedCount < 5)
-                    CallSideControl(side, true);
+                else {
+
+                    CallSideControl(side, false);
+                    foreach (var pair in Session.Instance.ShieldShuntedSides) {
+
+                        if (pair.Key != side) 
+                            CallSideControl(pair.Key, true);
+                    }
+                }
             }
             else
-                CallSideControl(side, false);
+                CallSideControl(side, !isShunted);
         }
 
         private void CallSideControl(Session.ShieldSides side, bool enable)
