@@ -318,6 +318,12 @@ namespace DefenseShields
             }
         }
 
+        private void ClearSidePulse()
+        {
+            _pulseCounter = 10;
+            _pulseIncrease = false;
+        }
+
         public bool IsSideShunted(Session.ShieldSides side)
         {
             switch (side)

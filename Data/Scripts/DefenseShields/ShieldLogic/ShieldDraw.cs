@@ -3,6 +3,7 @@ using DefenseShields.Support;
 using Sandbox.ModAPI;
 using VRage.Game;
 using VRage.Game.Entity;
+using VRage.Game.ModAPI;
 using VRage.Utils;
 using VRageMath;
 using BlendTypeEnum = VRageRender.MyBillboard.BlendTypeEnum;
@@ -73,12 +74,16 @@ namespace DefenseShields
 
             var startPulse = Session.Instance.Tick20 && _toggle;
             var updated = Session.Instance.Tick300 || startPulse;
+            var wasPulsing = _sidePulsing;
 
             if (updated && ShellActive != null && RedirectVisualUpdate())
                 UpdateShieldRedirectVisuals();
 
             if (ShellActive != null && _sidePulsing)
                 SidePulseRender();
+
+            if (wasPulsing && !_sidePulsing)
+                ClearSidePulse();
 
             if (hitAnim && sphereOnCamera && DsState.State.Online) Icosphere.Draw(renderId);
         }
@@ -175,19 +180,24 @@ namespace DefenseShields
                 _hideShield = false;
             }
 
-            var enemy = false;
+            var forceShow = false;
             var relation = MyAPIGateway.Session.Player.GetRelationTo(MyCube.OwnerId);
-            if (relation == MyRelationsBetweenPlayerAndBlock.Neutral || relation == MyRelationsBetweenPlayerAndBlock.Enemies) enemy = true;
-
+            var promotionLevel = MyAPIGateway.Session.Player.PromoteLevel;
+            var hostile = relation == MyRelationsBetweenPlayerAndBlock.Neutral || relation == MyRelationsBetweenPlayerAndBlock.Enemies || relation == MyRelationsBetweenPlayerAndBlock.NoOwnership;
+            var friend = relation == MyRelationsBetweenPlayerAndBlock.Owner || relation == MyRelationsBetweenPlayerAndBlock.Friends || relation == MyRelationsBetweenPlayerAndBlock.FactionShare;
+            if (hostile || !friend && (promotionLevel == MyPromoteLevel.Moderator || promotionLevel == MyPromoteLevel.SpaceMaster || promotionLevel == MyPromoteLevel.Admin))
+                forceShow = true;
+            
             var config = MyAPIGateway.Session.Config;
-            var drawIcon = !enemy && DsSet.Settings.SendToHud && !config.MinimalHud && Session.Instance.HudComp == this && !MyAPIGateway.Gui.IsCursorVisible;
+            var drawIcon = !forceShow && DsSet.Settings.SendToHud && !config.MinimalHud && Session.Instance.HudComp == this && !MyAPIGateway.Gui.IsCursorVisible;
             if (drawIcon) UpdateIcon(reInforce);
 
             var clearView = !GridIsMobile || !_viewInShield;
             var activeInvisible = DsSet.Settings.ActiveInvisible;
-            var activeVisible = !reInforce && ((!activeInvisible && clearView) || enemy);
+            var activeVisible = !reInforce && ((!activeInvisible && clearView) || forceShow);
+            var forceToVisOnHit = DsSet.Settings.Visible == 1 && forceShow;
 
-            var visible = !reInforce ? DsSet.Settings.Visible : 1;
+            var visible = reInforce ? 1 : forceToVisOnHit ? 2 : DsSet.Settings.Visible;
 
             CalcualteVisibility(visible, activeVisible);
 

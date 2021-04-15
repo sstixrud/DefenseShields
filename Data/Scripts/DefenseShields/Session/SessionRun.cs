@@ -195,17 +195,22 @@
 
         public override void HandleInput()
         {
-            if (HandlesInput) {
-
-                if (ControlRequest != ControlQuery.None)
-                    UpdateControlKeys();
-
-                UiInput.UpdateInputState();
-                if (MpActive)
+            try
+            {
+                if (HandlesInput && PlayersLoaded)
                 {
 
+                    if (ControlRequest != ControlQuery.None)
+                        UpdateControlKeys();
+
+                    UiInput.UpdateInputState();
+                    if (MpActive)
+                    {
+
+                    }
                 }
             }
+            catch (Exception ex) { Log.Line($"Exception in HandleInput: {ex}"); }
         }
 
         #endregion

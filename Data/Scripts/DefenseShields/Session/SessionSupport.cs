@@ -96,7 +96,7 @@ namespace DefenseShields
             {
                 if (HandlesInput)
                 {
-                    if (Session?.Player == null) return false;
+                    if (Session?.Player == null || Settings?.ClientConfig == null) return false;
                     MultiplayerId = MyAPIGateway.Multiplayer.MyId;
                     PlayerId = Session.Player.IdentityId;
                 }
