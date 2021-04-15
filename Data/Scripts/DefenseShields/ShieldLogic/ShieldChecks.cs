@@ -183,7 +183,6 @@ namespace DefenseShields
                 _powerSources.Clear();
                 _functionalBlocks.Clear();
                 _batteryBlocks.Clear();
-                _displayBlocks.Clear();
 
                 foreach (var grid in ShieldComp.LinkedGrids.Keys)
                 {
@@ -209,11 +208,7 @@ namespace DefenseShields
                         }
 
                         if (!_isDedicated)
-                        {
                             _functionalBlocks.Add(block);
-                            var display = block as IMyTextPanel;
-                            if (display != null) _displayBlocks.Add(display);
-                        }
 
                         var battery = block as IMyBatteryBlock;
                         if (battery != null) _batteryBlocks.Add(battery);

@@ -61,8 +61,8 @@ namespace DefenseShields
             {Session.ShieldSides.Forward, false },
             {Session.ShieldSides.Backward, false }
         };
-        internal readonly RunningAverage KineticAverage = new RunningAverage(60);
-        internal readonly RunningAverage EnergyAverage = new RunningAverage(60);
+        internal readonly RunningAverage KineticAverage = new RunningAverage(180);
+        internal readonly RunningAverage EnergyAverage = new RunningAverage(180);
 
         internal const int ConvToHp = 100;
         internal const float ConvToDec = 0.01f;
@@ -131,7 +131,6 @@ namespace DefenseShields
         private readonly List<MyResourceSourceComponent> _powerSources = new List<MyResourceSourceComponent>();
         private readonly List<MyCubeBlock> _functionalBlocks = new List<MyCubeBlock>();
         private readonly List<IMyBatteryBlock> _batteryBlocks = new List<IMyBatteryBlock>();
-        private readonly List<IMyTextPanel> _displayBlocks = new List<IMyTextPanel>();
         private readonly RunningAverage _dpsAvg = new RunningAverage(2);
         private readonly RunningAverage _hpsAvg = new RunningAverage(2);
         private readonly EllipsoidOxygenProvider _ellipsoidOxyProvider = new EllipsoidOxygenProvider(Matrix.Zero);
@@ -285,12 +284,6 @@ namespace DefenseShields
             VoxelBase,
             Authenticated,
             Floater
-        }
-        internal enum SideState
-        {
-            Unknown,
-            Normal,
-            Redirect,
         }
 
         internal enum State
