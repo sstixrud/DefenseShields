@@ -70,7 +70,6 @@ namespace DefenseShields
         {
             try
             {
-
                 if (!EntityAlive() || !_isServer && !ClientInitPacket) return;
 
                 if (!_isDedicated && _clientMessageCount < DsState.State.MessageCount)

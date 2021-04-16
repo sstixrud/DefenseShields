@@ -10,7 +10,6 @@ namespace DefenseShields
     using Support;
     using Sandbox.Common.ObjectBuilders;
     using Sandbox.Game.Entities;
-    using Sandbox.ModAPI;
     using Sandbox.ModAPI.Interfaces.Terminal;
     using VRage.Collections;
     using VRage.Game;
@@ -23,13 +22,12 @@ namespace DefenseShields
     {
         internal const ushort PACKET_ID = 62520;
         internal const double TickTimeDiv = 0.0625;
-        internal const double OneStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 1;
         internal const double TwoStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 2;
         internal const float ShieldShuntBonus = 0.12f;
         internal const float ShieldBypassBonus = 0.2f;
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
 
-        internal const int ClientCfgVersion = 8;
+        internal const int ClientCfgVersion = 9;
         internal const string ClientCfgName = "DefenseShieldsClient.cfg";
 
         internal readonly int[] SlotCnt = new int[9];
@@ -40,9 +38,6 @@ namespace DefenseShields
         internal readonly MyStringHash MPKinetic = MyStringHash.GetOrCompute("MPKinetic");
         internal readonly MyStringHash MPEMP = MyStringHash.GetOrCompute("MPEMP");
         internal readonly MyStringHash MpIgnoreDamage = MyStringHash.GetOrCompute("MpIgnoreDamage");
-        internal readonly MyStringHash DSdamage = MyStringHash.GetOrCompute("DSdamage");
-        internal readonly MyStringHash DSheal = MyStringHash.GetOrCompute("DSheal");
-        internal readonly MyStringHash DSbypass = MyStringHash.GetOrCompute("DSbypass");
         internal readonly MyStringHash Bypass = MyStringHash.GetOrCompute("bypass");
         internal readonly MyStringId Password = MyStringId.GetOrCompute("Shield Access Frequency");
         internal readonly MyStringId PasswordTooltip = MyStringId.GetOrCompute("Match a shield's modulation frequency/code");
@@ -288,13 +283,10 @@ namespace DefenseShields
 
         internal Task MonitorTask = new Task();
 
-        private MyParticleEffect _effect = new MyParticleEffect();
-
         private int _count = -1;
         private int _lCount;
         private int _eCount;
         private string _lastKeyAction;
-        private bool _warEffect;
 
         public Session()
         {
@@ -343,7 +335,6 @@ namespace DefenseShields
         internal bool PsControl { get; set; }
         internal bool ModControl { get; set; }
         internal bool O2Control { get; set; }
-        internal bool DisControl { get; set; }
         internal bool MpActive { get; set; }
         internal bool IsServer { get; set; }
         internal bool HandlesInput { get; set; }
@@ -365,11 +356,10 @@ namespace DefenseShields
         internal IMyTerminalControlSlider OffsetWidthSlider { get; set; }
         internal IMyTerminalControlSlider OffsetHeightSlider { get; set; }
         internal IMyTerminalControlSlider OffsetDepthSlider { get; set; }
-        internal IMyTerminalControlSlider ChargeSlider { get; set; }
         internal IMyTerminalControlSlider Fit { get; set; }
         internal IMyTerminalControlCheckbox SphereFit { get; set; }
-        internal IMyTerminalControlCheckbox SideRedirect { get; set; }
-        internal IMyTerminalControlCheckbox ShowRedirect { get; set; }
+        internal IMyTerminalControlCheckbox SideShunting { get; set; }
+        internal IMyTerminalControlCheckbox ShowShunting { get; set; }
 
         internal IMyTerminalControlCheckbox FortifyShield { get; set; }
         internal IMyTerminalControlCheckbox BatteryBoostCheckBox { get; set; }
@@ -412,8 +402,6 @@ namespace DefenseShields
 
         internal IMyTerminalControlCheckbox PsSendToHudCheckBox { get; set; }
         internal IMyTerminalControlOnOffSwitch PsToggleShield { get; set; }
-
-        internal IMyTerminalBlock WarTerminalReset { get; set; }
 
         internal GetFitSeq[] FitSeq = new GetFitSeq[]
         {

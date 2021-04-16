@@ -96,7 +96,7 @@ namespace DefenseShields
             {
                 if (HandlesInput)
                 {
-                    if (Session?.Player == null || Settings?.ClientConfig == null) return false;
+                    if (Session?.Player == null || Settings?.ClientConfig == null || Session.CameraController == null || MyAPIGateway.Input == null) return false;
                     MultiplayerId = MyAPIGateway.Multiplayer.MyId;
                     PlayerId = Session.Player.IdentityId;
                 }
@@ -194,11 +194,7 @@ namespace DefenseShields
                                     int maxDrawCount;
                                     if (tokenLength > 2 && int.TryParse(tokens[2], out maxDrawCount))
                                     {
-                                        //Settings.ClientConfig.MaxProjectiles = maxDrawCount;
-                                        var enabled = maxDrawCount != 0;
-                                        //Settings.ClientConfig.ClientOptimizations = enabled;
                                         somethingUpdated = true;
-                                        //MyAPIGateway.Utilities.ShowNotification($"The maximum onscreen projectiles is now set to {maxDrawCount} and is Enabled:{enabled}", 10000);
                                         Settings.VersionControl.UpdateClientCfgFile();
                                     }
 

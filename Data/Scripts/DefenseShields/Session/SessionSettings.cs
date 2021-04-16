@@ -42,7 +42,7 @@ namespace DefenseShields
             [ProtoMember(12)] public string Kinetic = MyKeys.NumPad7.ToString();
             [ProtoMember(13)] public string Energy = MyKeys.NumPad1.ToString();
             [ProtoMember(14)] public bool Notices = true;
-            [ProtoMember(15)] public bool DisableKeys = false;
+            [ProtoMember(15)] public bool DisableKeys = true;
 
             internal void UpdateKey(MyKeys key, string value, UiInput uiInput)
             {
@@ -118,7 +118,7 @@ namespace DefenseShields
                     InitKeys(xmlData);
                 }
                 else
-                    WriteNewClientCfg();
+                    WriteNewClientCfg(xmlData);
             }
             else WriteNewClientCfg();
 
@@ -128,12 +128,15 @@ namespace DefenseShields
             }
         }
 
-        private void WriteNewClientCfg()
+        private void WriteNewClientCfg(ShieldSettings.ClientSettings oldSettings = null)
         {
             VersionChange = true;
             MyAPIGateway.Utilities.DeleteFileInGlobalStorage(Session.ClientCfgName);
             Core.ClientConfig = new ShieldSettings.ClientSettings { Version = Session.ClientCfgVersion };
+            
+            RetainSettings(Core.ClientConfig, oldSettings);
             InitKeys(Core.ClientConfig);
+
             var writer = MyAPIGateway.Utilities.WriteFileInGlobalStorage(Session.ClientCfgName);
             var data = MyAPIGateway.Utilities.SerializeToXML(Core.ClientConfig);
 
@@ -153,6 +156,32 @@ namespace DefenseShields
             writer.Write(data);
             writer.Flush();
             writer.Dispose();
+        }
+
+        private static void RetainSettings(ShieldSettings.ClientSettings newSettings, ShieldSettings.ClientSettings oldSettings)
+        {
+            if (oldSettings == null || newSettings == null)
+                return;
+
+            newSettings.Left = oldSettings.Left;
+            newSettings.Right = oldSettings.Right;
+            newSettings.Up = oldSettings.Up;
+            newSettings.Down = oldSettings.Down;
+            newSettings.Front = oldSettings.Front;
+            newSettings.Back = oldSettings.Back;
+
+            newSettings.NoShunting = oldSettings.NoShunting;
+            newSettings.ActionKey = oldSettings.ActionKey;
+
+            newSettings.Notices = oldSettings.Notices;
+
+            newSettings.DisableKeys = oldSettings.DisableKeys;
+
+            newSettings.Energy = oldSettings.Energy;
+            newSettings.Kinetic = oldSettings.Kinetic;
+
+            newSettings.HudScale = oldSettings.HudScale;
+            newSettings.ShieldIconPos = oldSettings.ShieldIconPos;
         }
 
         private void InitKeys(ShieldSettings.ClientSettings data)
@@ -250,11 +279,10 @@ namespace DefenseShields
 
         internal void UpdateInputState()
         {
-            var s = _session;
             WheelForward = false;
             WheelBackward = false;
 
-            if (!s.InMenu)
+            if (!_session.InMenu)
             {
                 MouseButtonPressed = MyAPIGateway.Input.IsAnyMousePressed();
 

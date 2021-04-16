@@ -169,6 +169,7 @@ namespace DefenseShields
         private void BeforeInit()
         {
             if (Shield.CubeGrid.Physics == null) return;
+
             _isServer = Session.Instance.IsServer;
             _isDedicated = Session.Instance.DedicatedServer;
             _mpActive = Session.Instance.MpActive;

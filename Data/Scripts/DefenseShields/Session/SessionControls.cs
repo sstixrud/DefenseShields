@@ -96,15 +96,15 @@ namespace DefenseShields
                 DimShieldHitsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_DimShieldHits", "Dim Incoming Hit Effects ", "Supress brightness of incoming hit effects", DsUi.GetDimShieldHits, DsUi.SetDimShieldHits);
 
                 TerminalHelpers.Separator(comp?.Shield, "DS-C_sep6");
-                SideRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Shunt Shields", "Enable Shield Shunting", DsUi.GetSideShunting, DsUi.SetSideShunting);
-                ShowRedirect = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Shunted Shields", "Enable/Disable showing side shield states", DsUi.GetShowShunting, DsUi.SetShowShunting);
+                SideShunting = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_SideRedirect", "Shunt Shields", "Enable Shield Shunting", DsUi.GetSideShunting, DsUi.SetSideShunting);
+                ShowShunting = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_ShowRedirect", "Show Shunted Shields", "Enable/Disable showing side shield states", DsUi.GetShowShunting, DsUi.SetShowShunting);
 
-                TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Shunt Top Shield", "Redirect Top shield power to others", "On", "Off", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
-                BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Shunt Bottom Shield", "Redirect bottom shield power to others", "On", "Off", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
-                LeftShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_LeftShield", "Shunt Left Shield", "Redirect Left shield power to others", "On", "Off", DsUi.GetLeftShield, DsUi.SetLeftShield, DsUi.RedirectEnabled);
-                RightShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_RightShield", "Shunt Right Shield", "Redirect Right shield power to others", "On", "Off", DsUi.GetRightShield, DsUi.SetRightShield, DsUi.RedirectEnabled);
-                FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Shunt Front Shield", "Redirect Front shield power to others", "On", "Off", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.RedirectEnabled);
-                BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Shunt Back Shield", "Redirect Back shield power to others", "On", "Off", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.RedirectEnabled);
+                TopShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_TopShield", "Shunt Top Shield", "Redirect Top shield power to others", "Push", "Pull", DsUi.GeTopShield, DsUi.SetTopShield, DsUi.RedirectEnabled);
+                BottomShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BottomShield", "Shunt Bottom Shield", "Redirect bottom shield power to others", "Push", "Pull", DsUi.GetBottomShield, DsUi.SetBottomShield, DsUi.RedirectEnabled);
+                LeftShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_LeftShield", "Shunt Left Shield", "Redirect Left shield power to others", "Push", "Pull", DsUi.GetLeftShield, DsUi.SetLeftShield, DsUi.RedirectEnabled);
+                RightShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_RightShield", "Shunt Right Shield", "Redirect Right shield power to others", "Push", "Pull", DsUi.GetRightShield, DsUi.SetRightShield, DsUi.RedirectEnabled);
+                FrontShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_FrontShield", "Shunt Front Shield", "Redirect Front shield power to others", "Push", "Pull", DsUi.GetFrontShield, DsUi.SetFrontShield, DsUi.RedirectEnabled);
+                BackShield = TerminalHelpers.AddOnOff(comp?.Shield, "DS-C_BackShield", "Shunt Back Shield", "Redirect Back shield power to others", "Push", "Pull", DsUi.GetBackShield, DsUi.SetBackShield, DsUi.RedirectEnabled);
 
 
                 CreateAction<IMyUpgradeModule>(ToggleShield);
@@ -123,14 +123,14 @@ namespace DefenseShields
                 CreateWidthAction<IMyUpgradeModule>(WidthSlider);
                 CreateHeightAction<IMyUpgradeModule>(HeightSlider);
 
-                CreateAction<IMyUpgradeModule>(TopShield);
-                CreateAction<IMyUpgradeModule>(BottomShield);
-                CreateAction<IMyUpgradeModule>(LeftShield);
-                CreateAction<IMyUpgradeModule>(RightShield);
-                CreateAction<IMyUpgradeModule>(FrontShield);
-                CreateAction<IMyUpgradeModule>(BackShield);
+                CreateShuntAction<IMyUpgradeModule>(TopShield);
+                CreateShuntAction<IMyUpgradeModule>(BottomShield);
+                CreateShuntAction<IMyUpgradeModule>(LeftShield);
+                CreateShuntAction<IMyUpgradeModule>(RightShield);
+                CreateShuntAction<IMyUpgradeModule>(FrontShield);
+                CreateShuntAction<IMyUpgradeModule>(BackShield);
 
-                CreateAction<IMyUpgradeModule>(SideRedirect);
+                CreateAction<IMyUpgradeModule>(SideShunting);
 
                 DsControl = true;
             }
@@ -446,6 +446,50 @@ namespace DefenseShields
             }
             catch (Exception ex) { Log.Line($"Exception in CreateAction: {ex}"); }
         }
+
+        public void CreateShuntAction<T>(IMyTerminalControlOnOffSwitch c)
+        {
+            try
+            {
+                var id = ((IMyTerminalControl)c).Id;
+                var gamePath = MyAPIGateway.Utilities.GamePaths.ContentPath;
+                Action<IMyTerminalBlock, StringBuilder> writer = (b, s) => s.Append(c.Getter(b) ? c.OnText : c.OffText);
+                {
+                    var a = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_ShuntToggle");
+                    a.Name = new StringBuilder(c.Title.String).Append(" - ").Append(" Push").Append(" /").Append(" Pull");
+
+                    a.Icon = gamePath + @"\Textures\GUI\Icons\Actions\SmallShipToggle.dds";
+
+                    a.ValidForGroups = true;
+                    a.Action = (b) => c.Setter(b, !c.Getter(b));
+                    a.Writer = writer;
+
+                    MyAPIGateway.TerminalControls.AddAction<T>(a);
+                }
+                {
+                    var a = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_ShuntOn");
+                    a.Name = new StringBuilder(c.Title.String).Append(" - ").Append(" Push");
+                    a.Icon = gamePath + @"\Textures\GUI\Icons\Actions\SmallShipSwitchOn.dds";
+                    a.ValidForGroups = true;
+                    a.Action = (b) => c.Setter(b, true);
+                    a.Writer = writer;
+
+                    MyAPIGateway.TerminalControls.AddAction<T>(a);
+                }
+                {
+                    var a = MyAPIGateway.TerminalControls.CreateAction<T>(id + "_ShuntOff");
+                    a.Name = new StringBuilder(c.Title.String).Append(" - ").Append(" Pull");
+                    a.Icon = gamePath + @"\Textures\GUI\Icons\Actions\LargeShipSwitchOn.dds";
+                    a.ValidForGroups = true;
+                    a.Action = (b) => c.Setter(b, false);
+                    a.Writer = writer;
+
+                    MyAPIGateway.TerminalControls.AddAction<T>(a);
+                }
+            }
+            catch (Exception ex) { Log.Line($"Exception in CreateAction: {ex}"); }
+        }
+
 
         private void CustomControls(IMyTerminalBlock tBlock, List<IMyTerminalControl> myTerminalControls)
         {

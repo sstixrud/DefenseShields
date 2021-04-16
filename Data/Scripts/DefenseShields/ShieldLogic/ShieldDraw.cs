@@ -414,7 +414,7 @@ namespace DefenseShields
             var showIcon2 = DsState.State.Online;
             Color color;
 
-            if (reInforce) color = Color.Orange;
+            if (reInforce) color = Color.Green;
             else color = GetDamageTypeColor();
 
             scale *= Session.Instance.Settings.ClientConfig.HudScale;

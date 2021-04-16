@@ -93,7 +93,6 @@ namespace DefenseShields
             var bufferMaxScaler = (baseScaler * shieldTypeRatio) / _sizeScaler;
 
             ShieldMaxHpBase = ShieldMaxPower * bufferMaxScaler;
-
             var powerCap = DsState.State.GridIntegrity;
             if (capScaler > 0) {
 
@@ -110,18 +109,21 @@ namespace DefenseShields
             if (DsState.State.Lowered) 
                 shieldMaintainPercent *= 0.25f;
 
-            var maxHpScaler = ShieldMaxHpBase > powerCap ? powerCap / ShieldMaxHpBase : 1f;
+            _shieldCapped = ShieldMaxHpBase > powerCap;
+            var maxHpScaler = _shieldCapped ? powerCap / ShieldMaxHpBase : 1f;
 
             _shieldMaintaintPower = ShieldMaxPower * maxHpScaler * shieldMaintainPercent;
 
             ShieldMaxCharge = ShieldMaxHpBase * maxHpScaler;
-
             var powerForShield = PowerNeeded(hpsEfficiency);
 
             if (!WarmedUp) return;
 
-            if (DsState.State.Charge > ShieldMaxCharge) 
+            if (DsState.State.Charge > ShieldMaxCharge && ++_overChargeCount >= 120)
+            {
                 DsState.State.Charge = ShieldMaxCharge;
+                _overChargeCount = 0;
+            }
 
             if (_isServer) {
 
@@ -296,11 +298,13 @@ namespace DefenseShields
                 GridAvailablePower -= _batteryCurrentInput;
             }
 
-            var reserveScaler = ReserveScaler[DsSet.Settings.PowerScale];
+            var powerScale = Session.Instance.GameLoaded ? DsSet.Settings.PowerScale : 0;
+            var reserveScaler = ReserveScaler[powerScale];
             var userPowerCap = DsSet.Settings.PowerWatts * reserveScaler;
             var shieldMax = GridMaxPower > userPowerCap && reserveScaler > 0 ? userPowerCap : GridMaxPower;
             ShieldMaxPower = shieldMax;
             ShieldAvailablePower = ShieldMaxPower - GridCurrentPower;
+
             _shieldPowered = ShieldMaxPower > 0;
         }
 

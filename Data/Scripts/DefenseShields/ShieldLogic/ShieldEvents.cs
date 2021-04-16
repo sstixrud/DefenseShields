@@ -193,6 +193,9 @@
         }
 
         internal uint LastCustomInfoUpdate;
+        internal const string MaxString = ": MaxHp: ";
+        internal const string CapString = ": CapHp: ";
+
         private void AppendingCustomInfo(IMyTerminalBlock block, StringBuilder stringBuilder)
         {
             try
@@ -218,7 +221,7 @@
                 if (WarmedUp) initStage = 4;
                 else if (Warming) initStage = 3;
                 else if (_allInited) initStage = 2;
-                const string maxString = " MaxHp: ";
+                var  maxString = _shieldCapped ? CapString : MaxString;
                 var hpValue = (ShieldMaxCharge * ConvToHp);
 
 
@@ -227,7 +230,7 @@
 
                     var redirectedSides = ShuntedSideCount();
                     var bonusAmount = redirectedSides * 20;
-                    stringBuilder.Append(status + maxString + hpValue.ToString("N0") +
+                    stringBuilder.Append(status + maxString +  hpValue.ToString("N0") +
                                          "\n[Shield HP__]: " + (DsState.State.Charge * ConvToHp).ToString("N0") + " (" + shieldPercent.ToString("0") + "%)" +
                                          "\n[HP Per Sec_]: " + (ShieldChargeRate * ConvToHp).ToString("N0") +
                                          "\n[Damage In__]: " + _damageReadOut.ToString("N0") +

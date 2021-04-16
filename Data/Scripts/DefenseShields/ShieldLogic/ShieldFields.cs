@@ -113,7 +113,6 @@ namespace DefenseShields
         private const float MagicCapRatio = 2000;
         private const float MagicEllipsoidRatio = 1000;
 
-        private const float ChargeRatio = 1.25f;
         private const int SyncCount = 60;
 
         private const string SpaceWolf = "Space_Wolf";
@@ -170,6 +169,7 @@ namespace DefenseShields
         private double _oldEllipsoidAdjust;
         private double _ellipsoidSurfaceArea;
 
+        private int _overChargeCount;
         private int _linkedGridCount = -1;
         private int _count = -1;
         private int _powerNoticeLoop;
@@ -194,6 +194,7 @@ namespace DefenseShields
 
         private bool _firstLoop = true;
         private bool _enablePhysics = true;
+        private bool _shieldCapped;
         private bool _needPhysics;
         private bool _allInited;
         private bool _containerInited;
@@ -338,8 +339,6 @@ namespace DefenseShields
         internal uint TicksWithNoActivity { get; set; }
         internal uint EffectsCleanTick { get; set; }
         internal uint InitTick { get; set; }
-
-        internal int ReserveScale { get; set; }
 
         internal float ShieldChargeRate { get; set; }
         internal float ShieldMaxCharge { get; set; }
