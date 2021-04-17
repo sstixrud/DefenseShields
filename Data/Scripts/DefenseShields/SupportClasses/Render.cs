@@ -7,6 +7,7 @@
     using VRage.Utils;
     using VRageMath;
     using static VRageMath.MathHelper;
+    using BlendTypeEnum = VRageRender.MyBillboard.BlendTypeEnum;
 
     public class Icosphere 
     {   
@@ -160,6 +161,18 @@
             private bool _flash;
             private MyStringId _faceMaterial;
 
+            private static readonly MyStringId _impactRingMaterial = MyStringId.GetOrCompute("DS_ImpactRing");
+            private static readonly Vector4 _impactRingColor = new Color(0.2f, 0.5f, 1f, 0.5f).ToVector4();
+
+            private int ImpactRingExpandTicks = 20;
+            private int ImpactRingFadeTicks = 5;
+
+            private List<ImpactRingEffectData> _impactRings = new List<ImpactRingEffectData>();
+            Vector4 currentImpactRingColor = new Vector4();
+            Vector2 halfShift = new Vector2(0.5f, 0.5f);
+
+            private Random rnd = new Random();
+
             internal Instance(Icosphere backing)
             {
                 _backing = backing;
@@ -234,6 +247,10 @@
                 else return;
                 _matrix = Shield.ShieldShapeMatrix;
 
+                if (impactPos != Vector3D.NegativeInfinity && impactPos != Vector3D.PositiveInfinity)
+                {
+                    CreateImpactRing(shield, impactPos, _lod);
+                }
 
                 _flash = shieldPercent <= 10;
                 if (_flash && _mainLoop < 30) shieldPercent += 10;
@@ -269,6 +286,126 @@
                 // Dot product is the cosine of the angle between them
                 // Acos gives you that angle in radians
                 // Multiplying by the sphere radius(1 for the unit sphere in question) gives the arc length.
+            }
+
+            internal void CreateImpactRing(DefenseShields shield, Vector3D impactPosition, int lod)
+            {
+                try
+                {
+                    double shortestSide = Math.Min(shield.DetectMatrixOutside.Scale.X, Math.Min(shield.DetectMatrixOutside.Scale.Y, shield.DetectMatrixOutside.Scale.Z));
+                    double hitPercent = shield.Absorb / shield.ShieldMaxCharge;
+
+                    double lengthLimit = shortestSide * Math.Max(Math.Min(hitPercent, 1), 0.5);
+                    double divHalfLengthLimit = 1.0 / lengthLimit;
+
+                    Vector3D impactNormal = Vector3D.Normalize(impactPosition - _matrix.Translation);
+                    MatrixD impactRingPosTransform = MatrixD.Transpose(MatrixD.CreateWorld(Vector3D.Zero, Vector3D.Forward, impactNormal));
+
+                    ImpactRingEffectData ring = new ImpactRingEffectData();
+
+                    ring.LODLevel = lod;
+                    ring.AnimationStartClock = 1;
+                    ring.ImpactPosition = impactPosition;
+                    ring.ImpactMaxDistance = lengthLimit;
+                    ring.RingTriangles = new List<TriangleData>();
+
+                    var ib = _backing.IndexBuffer[_lod];
+                    
+                    for (int i = 0, j = 0; i < ib.Length; i += 3, j++)
+                    {
+                        var i0 = ib[i];
+                        var i1 = ib[i + 1];
+                        var i2 = ib[i + 2];
+
+                        var v0 = _vertexBuffer[i0];
+                        var v1 = _vertexBuffer[i1];
+                        var v2 = _vertexBuffer[i2];
+                        
+                        double dv0 = (v0 - impactPosition).LengthSquared();
+                        double dv1 = (v1 - impactPosition).LengthSquared();
+                        double dv2 = (v2 - impactPosition).LengthSquared();
+
+                        double checkDistSq = Math.Min(dv0, Math.Min(dv1, dv2));
+
+                        if (checkDistSq <= lengthLimit * lengthLimit)
+                        {
+                            Vector3D ringV0 = (v0 - impactPosition) * divHalfLengthLimit;
+                            Vector3D ringV1 = (v1 - impactPosition) * divHalfLengthLimit;
+                            Vector3D ringV2 = (v2 - impactPosition) * divHalfLengthLimit;
+
+                            Vector3D.TransformNormal(ref ringV0, ref impactRingPosTransform, out ringV0);
+                            Vector3D.TransformNormal(ref ringV1, ref impactRingPosTransform, out ringV1);
+                            Vector3D.TransformNormal(ref ringV2, ref impactRingPosTransform, out ringV2);
+
+                            ring.RingTriangles.Add(new TriangleData()
+                            {
+                                TriangleIndex = j,
+                                UVInfoV0 = new Vector2((float)ringV0.X, (float)ringV0.Z),
+                                UVInfoV1 = new Vector2((float)ringV1.X, (float)ringV1.Z),
+                                UVInfoV2 = new Vector2((float)ringV2.X, (float)ringV2.Z)
+                            });
+                        }
+                    }
+
+                    lock (_impactRings)
+                    {
+                        if (_impactRings.Count >= Session.Instance.ShieldImpactRingMaxCount)
+                        {
+                            int indexInside = -1;
+                            double maxInsideSq = double.MaxValue;
+                            int indexOutside = -1;
+                            double maxOutsideSq = double.MaxValue;
+                            
+                            for (int i = 0; i < _impactRings.Count; i++)
+                            {
+                                double lengthSq = (_impactRings[i].ImpactPosition - impactPosition).LengthSquared();
+                                
+                                if (_impactRings[i].ImpactMaxDistance * _impactRings[i].ImpactMaxDistance >= lengthSq)
+                                {
+                                    if (lengthSq < maxInsideSq)
+                                    {
+                                        maxInsideSq = lengthSq;
+                                        indexInside = i;
+                                    }
+                                }
+                                else
+                                {
+                                    if (lengthSq < maxOutsideSq)
+                                    {
+                                        maxOutsideSq = lengthSq;
+                                        indexOutside = i;
+                                    }
+                                }
+                            }
+
+                            if (indexInside > -1)
+                            {
+                                ring.AnimationStartClock = Math.Min(_impactRings[indexInside].AnimationStartClock, ImpactRingExpandTicks);
+                                _impactRings[indexInside] = ring;
+                            }
+                            else if (indexOutside > -1)
+                            {
+                                ring.AnimationStartClock = Math.Min(_impactRings[indexOutside].AnimationStartClock, ImpactRingExpandTicks);
+                                _impactRings[indexOutside] = ring;
+                            }
+                            else
+                            {
+                                
+                                int randomIdex = rnd.Next(0, _impactRings.Count);
+                                ring.AnimationStartClock = Math.Min(_impactRings[randomIdex].AnimationStartClock, ImpactRingExpandTicks);
+                                _impactRings[randomIdex] = ring;
+                            }
+                        }
+                        else
+                        {
+                            _impactRings.Add(ring);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Line($"Exception in CreateImpactRing {ex}" + ex.StackTrace);
+                }
             }
 
             internal void StepEffects()
@@ -329,6 +466,97 @@
             {
                 try
                 {
+                    var ib = _backing.IndexBuffer[_lod];
+
+                    int index = 0;
+                    while (index < _impactRings.Count)
+                    {
+                        bool retain = false;
+                        
+                        ImpactRingEffectData impactRingData;
+                        
+                        lock (_impactRings)
+                        {
+                            impactRingData = _impactRings[index];
+                        }
+
+                        float progress;
+                        float ringIntesity;
+                        float ringSize;
+                        float ringSizeCofficient;
+
+                        if (impactRingData.AnimationStartClock <= ImpactRingExpandTicks)
+                        {
+                            progress = ((float)impactRingData.AnimationStartClock / ImpactRingExpandTicks) * 0.75f + 0.25f;
+                            ringIntesity = (progress * 0.5f) + 0.5f;
+                            ringSize = 1 - ((1 - progress) * (1 - progress));
+                            ringSizeCofficient = 0.5f / ringSize;
+                        }
+                        else
+                        {
+                            progress = 1 - (((float)impactRingData.AnimationStartClock - ImpactRingExpandTicks) / ImpactRingFadeTicks);
+                            ringIntesity = (progress * 0.5f) + 0.5f;
+                            ringSize = 1;
+                            ringSizeCofficient = 0.5f;
+                        }
+
+                        impactRingData.AnimationStartClock++;
+
+                        currentImpactRingColor.W = _impactRingColor.W;
+                        currentImpactRingColor.X = _impactRingColor.X * 2f * ringIntesity;
+                        currentImpactRingColor.Y = _impactRingColor.Y * 2f * ringIntesity;
+                        currentImpactRingColor.Z = _impactRingColor.Z * 2f * ringIntesity;
+
+                        if (impactRingData.LODLevel == _lod)
+                        {
+                            for (int x = 0; x < impactRingData.RingTriangles.Count; x++)
+                            {
+                                TriangleData triangleData = impactRingData.RingTriangles[x];
+
+                                int i = triangleData.TriangleIndex * 3;
+
+                                var i0 = ib[i];
+                                var i1 = ib[i + 1];
+                                var i2 = ib[i + 2];
+
+                                var v0 = _vertexBuffer[i0];
+                                var v1 = _vertexBuffer[i1];
+                                var v2 = _vertexBuffer[i2];
+
+                                var n0 = _normalBuffer[i0];
+                                var n1 = _normalBuffer[i1];
+                                var n2 = _normalBuffer[i2];
+
+                                MyTransparentGeometry.AddTriangleBillboard(v0, v1, v2,
+                                    n0, n1, n2,
+                                    triangleData.UVInfoV0 * ringSizeCofficient + halfShift,
+                                    triangleData.UVInfoV1 * ringSizeCofficient + halfShift,
+                                    triangleData.UVInfoV2 * ringSizeCofficient + halfShift,
+                                    _impactRingMaterial, renderId, (v0 + v1 + v2) / 3, currentImpactRingColor, BlendTypeEnum.PostPP);
+
+                            }
+
+                            if (impactRingData.AnimationStartClock <= ImpactRingExpandTicks + ImpactRingFadeTicks)
+                            {
+                                retain = true;
+                            }
+                        }
+
+                        if (retain)
+                        {
+                            index++;
+                        }
+                        else
+                        {
+							lock (_impactRings)
+							{
+								_impactRings[index] = _impactRings[_impactRings.Count - 1];
+								_impactRings.RemoveAt(_impactRings.Count - 1);
+							}
+                        }
+                    }
+                    
+                    /* Superseded
                     if (ImpactsFinished && !_refresh) return;
                     var ib = _backing.IndexBuffer[_lod];
                     Vector4 color;
@@ -361,6 +589,7 @@
 
                         MyTransparentGeometry.AddTriangleBillboard(v0, v1, v2, n0, n1, n2, _v20, _v21, _v22, _faceMaterial, renderId, (v0 + v1 + v2) / 3, color);
                     }
+                    */
                 }
                 catch (Exception ex) { Log.Line($"Exception in IcoSphere Draw - renderId {renderId.ToString()}: {ex}"); }
             }
@@ -600,5 +829,22 @@
                 shellSide.SetEmissiveParts(ShieldHealthEmissive, _activeColor, 100f);
             }
         }
+    }
+
+    public class ImpactRingEffectData
+    {
+        public int LODLevel;
+        public List<TriangleData> RingTriangles;
+        public int AnimationStartClock;
+        public Vector3D ImpactPosition;
+        public double ImpactMaxDistance;
+    }
+
+    public struct TriangleData
+    {
+        public int TriangleIndex;
+        public Vector2 UVInfoV0;
+        public Vector2 UVInfoV1;
+        public Vector2 UVInfoV2;
     }
 }

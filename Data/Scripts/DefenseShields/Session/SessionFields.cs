@@ -33,6 +33,8 @@ namespace DefenseShields
         internal readonly int[] SlotCnt = new int[9];
         internal readonly Vector3D[] LosPointSphere = new Vector3D[2000];
 
+        internal readonly int ShieldImpactRingMaxCount = 5;
+
         internal readonly MyStringHash MPExplosion = MyStringHash.GetOrCompute("MPExplosion");
         internal readonly MyStringHash MPEnergy = MyStringHash.GetOrCompute("MPEnergy");
         internal readonly MyStringHash MPKinetic = MyStringHash.GetOrCompute("MPKinetic");
