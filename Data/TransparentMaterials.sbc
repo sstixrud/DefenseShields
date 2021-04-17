@@ -3510,6 +3510,26 @@
   <SpecularColorFactor>0</SpecularColorFactor>
   <IsFlareOccluder>false</IsFlareOccluder>
 </TransparentMaterial>
-
-  </TransparentMaterials>
+<TransparentMaterial>
+  <Id>
+    <TypeId>TransparentMaterialDefinition</TypeId>
+    <SubtypeId>DS_ImpactRing</SubtypeId>
+  </Id>
+  <AlphaMistingEnable>false</AlphaMistingEnable>
+  <AlphaSaturation>1</AlphaSaturation>
+  <CanBeAffectedByOtherLights>false</CanBeAffectedByOtherLights>
+  <IgnoreDepth>true</IgnoreDepth>
+  <SoftParticleDistanceScale>0</SoftParticleDistanceScale>
+  <Texture>Textures\DS_ImpactRing.dds</Texture>
+  <UseAtlas>false</UseAtlas>
+  <UVOffset>
+    <X>0</X>
+    <Y>0</Y>
+  </UVOffset>
+  <UVSize>
+    <X>1</X>
+    <Y>1</Y>
+  </UVSize>
+</TransparentMaterial>
+</TransparentMaterials>
 </Definitions>
