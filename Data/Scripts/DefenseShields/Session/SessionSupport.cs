@@ -225,13 +225,15 @@ namespace DefenseShields
                 if (!somethingUpdated)
                 {
                     if (message.Length <= 3)
-                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices\n  '/ds disablehotkeys' -- Disables all shield hotkeys\n  '/ds setdefaults' -- Resets shield client configs to default values\n" , 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices\n  '/ds disablehotkeys' -- Disables all shield hotkeys\n  '/ds setdefaults' -- Resets shield client configs to default values\n '/ds bug' -- How to report issues\n", 10000, "White");
                     else if (message.StartsWith("/ds hud"))
-                        MyAPIGateway.Utilities.ShowNotification($"Hold Action key ({Settings.ClientConfig.ActionKey}) and use arrow keys to move hud\n Hold Action key ({Settings.ClientConfig.ActionKey}) and use +/- keys to change scale of hud", 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification($"Hold Action key ({Settings.ClientConfig.ActionKey}) and use arrow keys to move hud\n Hold Action key ({Settings.ClientConfig.ActionKey}) and use +/- keys to change scale of hud", 10000, "White");
                     else if (message.StartsWith("/ds remap"))
-                        MyAPIGateway.Utilities.ShowNotification("'/ds remap action'  -- Remaps Action key (default numpad0)\n '/ds remap noshunt'  -- Remaps NoShunting key (numpad5)\n '/ds remap left'  -- Remaps Left shield key (default numpad4)\n '/ds remap right'  -- Remaps Right shield key (default numpad6)\n '/ds remap front'  -- Remaps Forward shield key (default numpad8)\n '/ds remap back'  -- Remaps Backward shield key (default numpad2)\n '/ds remap up'  -- Remaps Up shield key (default numpad9)\n '/ds remap down'  -- Remaps Down shield key (default numpad1)", 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification("'/ds remap action'  -- Remaps Action key (default numpad0)\n '/ds remap noshunt'  -- Remaps NoShunting key (numpad5)\n '/ds remap left'  -- Remaps Left shield key (default numpad4)\n '/ds remap right'  -- Remaps Right shield key (default numpad6)\n '/ds remap front'  -- Remaps Forward shield key (default numpad8)\n '/ds remap back'  -- Remaps Backward shield key (default numpad2)\n '/ds remap up'  -- Remaps Up shield key (default numpad9)\n '/ds remap down'  -- Remaps Down shield key (default numpad1)", 10000, "White");
                     else if (message.StartsWith("/ds info"))
-                        MyAPIGateway.Utilities.ShowNotification("Short key presses toggle shunting state for that direction only\n Long presses toggles shunting for all directions", 10000, "Red");
+                        MyAPIGateway.Utilities.ShowNotification("Short key presses toggle shunting state for that direction only\n Long presses toggles shunting for all directions", 10000, "White");
+                    else if (message.StartsWith("/ds bug"))
+                        MyAPIGateway.Utilities.ShowNotification("If you have an issue you cannot resolve please report the issue to me on discord `darkstar#7293`, or you can find me on the Sigma Draconis server", 10000, "White");
                 }
                 sendToOthers = false;
             }

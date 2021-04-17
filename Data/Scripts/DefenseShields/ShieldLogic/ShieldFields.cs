@@ -160,7 +160,7 @@ namespace DefenseShields
         private float _shieldMaintaintPower;
         private float _shieldConsumptionRate;
         private float _oldShieldFudge;
-        private float _empScaleHp = 1f;
+        private float _heatScaleHp = 1f;
         private float _runningDamage;
         private float _runningHeal;
         private float _sizeScaler;
@@ -180,7 +180,7 @@ namespace DefenseShields
         private int _heatCycle = -1;
         private int _fallbackCycle;
         private int _currentHeatStep;
-        private int _empScaleTime = 1;
+        private int _heatScaleTime = 1;
         private int _prevLod;
         private int _onCount;
         private int _expChargeReduction;

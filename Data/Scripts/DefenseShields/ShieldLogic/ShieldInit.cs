@@ -443,7 +443,7 @@ namespace DefenseShields
                     _updateMobileShape = true;
                     break;
                 case ShieldType.SmallGrid:
-                    _modelActive = "\\Models\\Cubes\\ShieldActiveBase_LOD4.mwm";
+                    //_modelActive = "\\Models\\Cubes\\ShieldActiveBase_LOD4.mwm";
                     _updateMobileShape = true;
                     break;
             }

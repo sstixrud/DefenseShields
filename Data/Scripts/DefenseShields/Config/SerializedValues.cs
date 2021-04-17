@@ -58,7 +58,7 @@
         [ProtoMember(26)] public int Heat;
         [ProtoMember(27), DefaultValue(-1)] public float ShieldPercent;
         [ProtoMember(28)] public bool EmpOverLoad = false;
-        [ProtoMember(29)] public bool EmpProtection = false;
+        [ProtoMember(29)] public bool EwarProtection = false;
         [ProtoMember(30)] public float GridIntegrity;
         [ProtoMember(31)] public bool ReInforce = false;
         [ProtoMember(32)] public long ActiveEmitterId;

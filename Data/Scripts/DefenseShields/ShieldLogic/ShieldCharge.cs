@@ -119,11 +119,12 @@ namespace DefenseShields
 
             if (!WarmedUp) return;
 
-            if (DsState.State.Charge > ShieldMaxCharge && ++_overChargeCount >= 120)
-            {
+            if (DsState.State.Charge > ShieldMaxCharge && ++_overChargeCount >= 120) {
                 DsState.State.Charge = ShieldMaxCharge;
                 _overChargeCount = 0;
             }
+            else 
+                _overChargeCount = 0;
 
             if (_isServer) {
 

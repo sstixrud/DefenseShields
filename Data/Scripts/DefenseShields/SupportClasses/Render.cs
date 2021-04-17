@@ -228,7 +228,9 @@
             {
                 Shield = shield;
                 if (Shield?.ShellActive != null)
+                {
                     ComputeSides();
+                }
                 else return;
                 _matrix = Shield.ShieldShapeMatrix;
 

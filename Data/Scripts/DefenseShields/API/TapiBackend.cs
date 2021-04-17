@@ -799,7 +799,7 @@ namespace DefenseShields
                 var s = c.DefenseShields;
                 var state = s.DsState.State;
                 info.Item1 = state.ReInforce;
-                info.Item2 = state.EmpProtection;
+                info.Item2 = state.EwarProtection;
                 info.Item3 = state.ModulateKinetic;
                 info.Item4 = state.ModulateEnergy;
             }

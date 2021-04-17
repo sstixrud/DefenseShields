@@ -32,7 +32,6 @@
 
         private void Heating()
         {
-            //var hp = ShieldMinMaxCharge * ConvToHp;
             var hp = ShieldMaxCharge * ConvToHp;
 
             var oldHeat = DsState.State.Heat;
@@ -47,25 +46,25 @@
                 _heatCycle++;
             }
 
-            var empProt = DsState.State.EmpProtection && ShieldMode != ShieldType.Station;
-            if (empProt && _heatCycle == 0)
+            var ewarProt = DsState.State.EwarProtection && ShieldMode != ShieldType.Station;
+            if (ewarProt && _heatCycle == 0)
             {
-                _empScaleHp = 0.1f;
-                _empScaleTime = 5;
+                _heatScaleHp = 0.1f;
+                _heatScaleTime = 5;
             }
-            else if (!empProt && _heatCycle == 0)
+            else if (!ewarProt && _heatCycle == 0)
             {
-                _empScaleHp = 1f;
-                _empScaleTime = 1;
+                _heatScaleHp = 1f;
+                _heatScaleTime = 1;
             }
             var heatScale = ShieldMode == ShieldType.Station && DsState.State.Enhancer ? Session.Enforced.HeatScaler * 2f : Session.Enforced.HeatScaler * 1f;
-            var thresholdAmount = heatScale * _empScaleHp;
+            var thresholdAmount = heatScale * _heatScaleHp;
             var nextThreshold = hp * thresholdAmount * (_currentHeatStep + 1);
             var currentThreshold = hp * thresholdAmount * _currentHeatStep;
-            var scaledOverHeat = OverHeat / _empScaleTime;
+            var scaledOverHeat = OverHeat / _heatScaleTime;
             var lastStep = _currentHeatStep == 10;
             var overloadStep = _heatCycle == scaledOverHeat;
-            var scaledHeatingSteps = HeatingStep / _empScaleTime;
+            var scaledHeatingSteps = HeatingStep / _heatScaleTime;
             var afterOverload = _heatCycle > scaledOverHeat;
             var nextCycle = _heatCycle == (_currentHeatStep * scaledHeatingSteps) + scaledOverHeat;
             var overload = _accumulatedHeat > hp * thresholdAmount * 2;
@@ -97,7 +96,7 @@
             }
             else if (nextCycle && afterOverload && !lastStep)
             {
-                if (_empScaleTime == 5)
+                if (_heatScaleTime == 5)
                 {
                     if (_accumulatedHeat > 0)
                     {
@@ -124,7 +123,7 @@
                 }
                 else _heatCycle = backOneCycles;
 
-                if ((empProt && _fallbackCycle == FallBackStep) || (!empProt && underThreshold))
+                if ((ewarProt && _fallbackCycle == FallBackStep) || (!ewarProt && underThreshold))
                 {
                     if (_currentHeatStep == 0)
                     {

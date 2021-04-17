@@ -24,12 +24,12 @@ namespace DefenseShields
             {
                 var modEnergyRatio = ShieldComp.Modulator.ModState.State.ModulateEnergy * 0.01f;
                 var modKineticRatio = ShieldComp.Modulator.ModState.State.ModulateKinetic * 0.01f;
-                if (!DsState.State.ModulateEnergy.Equals(modEnergyRatio) || !DsState.State.ModulateKinetic.Equals(modKineticRatio) || !DsState.State.EmpProtection.Equals(ShieldComp.Modulator.ModSet.Settings.EmpEnabled) || !DsState.State.ReInforce.Equals(ShieldComp.Modulator.ModSet.Settings.ReInforceEnabled)) update = true;
+                if (!DsState.State.ModulateEnergy.Equals(modEnergyRatio) || !DsState.State.ModulateKinetic.Equals(modKineticRatio) || !DsState.State.EwarProtection.Equals(ShieldComp.Modulator.ModSet.Settings.EmpEnabled) || !DsState.State.ReInforce.Equals(ShieldComp.Modulator.ModSet.Settings.ReInforceEnabled)) update = true;
                 DsState.State.ModulateEnergy = modEnergyRatio;
                 DsState.State.ModulateKinetic = modKineticRatio;
                 if (DsState.State.Enhancer)
                 {
-                    DsState.State.EmpProtection = ShieldComp.Modulator.ModSet.Settings.EmpEnabled;
+                    DsState.State.EwarProtection = ShieldComp.Modulator.ModSet.Settings.EmpEnabled;
                     DsState.State.ReInforce = ShieldComp.Modulator.ModSet.Settings.ReInforceEnabled;
                 }
 
@@ -37,10 +37,10 @@ namespace DefenseShields
             }
             else if (_tick - InitTick > 30)
             {
-                if (!DsState.State.ModulateEnergy.Equals(1f) || !DsState.State.ModulateKinetic.Equals(1f) || DsState.State.EmpProtection || DsState.State.ReInforce) update = true;
+                if (!DsState.State.ModulateEnergy.Equals(1f) || !DsState.State.ModulateKinetic.Equals(1f) || DsState.State.EwarProtection || DsState.State.ReInforce) update = true;
                 DsState.State.ModulateEnergy = 1f;
                 DsState.State.ModulateKinetic = 1f;
-                DsState.State.EmpProtection = false;
+                DsState.State.EwarProtection = false;
                 DsState.State.ReInforce = false;
                 if (_isServer && update) ShieldChangeState();
 
