@@ -1,5 +1,6 @@
 ﻿using VRageMath;
 using System;
+using System.Diagnostics.Eventing.Reader;
 using DefenseShields.Support;
 using Sandbox.ModAPI;
 using VRage;
@@ -119,11 +120,12 @@ namespace DefenseShields
 
             if (!WarmedUp) return;
 
-            if (DsState.State.Charge > ShieldMaxCharge && ++_overChargeCount >= 120) {
+            var overCharged = DsState.State.Charge > ShieldMaxCharge;
+            if (overCharged && ++_overChargeCount >= 120) {
                 DsState.State.Charge = ShieldMaxCharge;
                 _overChargeCount = 0;
             }
-            else 
+            else if (!overCharged)
                 _overChargeCount = 0;
 
             if (_isServer) {
