@@ -27,13 +27,11 @@ namespace DefenseShields
         internal const float ShieldBypassBonus = 0.2f;
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
 
-        internal const int ClientCfgVersion = 9;
+        internal const int ClientCfgVersion = 10;
         internal const string ClientCfgName = "DefenseShieldsClient.cfg";
 
         internal readonly int[] SlotCnt = new int[9];
         internal readonly Vector3D[] LosPointSphere = new Vector3D[2000];
-
-        internal readonly int ShieldImpactRingMaxCount = 5;
 
         internal readonly MyStringHash MPExplosion = MyStringHash.GetOrCompute("MPExplosion");
         internal readonly MyStringHash MPEnergy = MyStringHash.GetOrCompute("MPEnergy");
@@ -90,6 +88,7 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<List<CubeAccel>> ListCubeAccelPool = new MyConcurrentPool<List<CubeAccel>>(100);
         internal readonly MyConcurrentPool<EntIntersectInfo> EntIntersectInfoPool = new MyConcurrentPool<EntIntersectInfo>(100, info => info.Clean());
 
+        internal readonly MyConcurrentPool<ImpactRingEffectData> RingPool = new MyConcurrentPool<ImpactRingEffectData>(100);
         internal readonly MyConcurrentPool<ProtectCache> ProtectCachePool = new MyConcurrentPool<ProtectCache>(100, info => info.Clean());
         internal readonly MyConcurrentPool<ShieldVsShieldThreadEvent> ShieldEventPool = new MyConcurrentPool<ShieldVsShieldThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<FloaterThreadEvent> FloaterPool = new MyConcurrentPool<FloaterThreadEvent>(100, info => info.Clean());

@@ -90,8 +90,8 @@ namespace DefenseShields
 
                 HideActiveCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_HideActive", "Hide Shield Health On Hit  ", "Hide Shield Health Grid On Hit", DsUi.GetHideActive, DsUi.SetHideActive);
 
-                RefreshAnimationCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_RefreshAnimation", "Show Refresh Animation  ", "Show Random Refresh Animation", DsUi.GetRefreshAnimation, DsUi.SetRefreshAnimation);
-                HitWaveAnimationCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_HitWaveAnimation", "Show Hit Wave Animation", "Show Wave Effect On Shield Damage", DsUi.GetHitWaveAnimation, DsUi.SetHitWaveAnimation);
+                //RefreshAnimationCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_RefreshAnimation", "Show Refresh Animation  ", "Show Random Refresh Animation", DsUi.GetRefreshAnimation, DsUi.SetRefreshAnimation);
+                //HitWaveAnimationCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_HitWaveAnimation", "Show Hit Wave Animation", "Show Wave Effect On Shield Damage", DsUi.GetHitWaveAnimation, DsUi.SetHitWaveAnimation);
                 NoWarningSoundsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_NoWarningSounds", "Disable audio warnings    ", "Supress shield audio warnings", DsUi.GetNoWarningSounds, DsUi.SetNoWarningSounds);
                 DimShieldHitsCheckBox = TerminalHelpers.AddCheckbox(comp?.Shield, "DS-C_DimShieldHits", "Dim Incoming Hit Effects ", "Supress brightness of incoming hit effects", DsUi.GetDimShieldHits, DsUi.SetDimShieldHits);
 
@@ -115,8 +115,8 @@ namespace DefenseShields
 
 
                 CreateAction<IMyUpgradeModule>(HideActiveCheckBox);
-                CreateAction<IMyUpgradeModule>(RefreshAnimationCheckBox);
-                CreateAction<IMyUpgradeModule>(HitWaveAnimationCheckBox);
+                //CreateAction<IMyUpgradeModule>(RefreshAnimationCheckBox);
+                //CreateAction<IMyUpgradeModule>(HitWaveAnimationCheckBox);
                 CreateAction<IMyUpgradeModule>(SendToHudCheckBox);
                 CreateAction<IMyUpgradeModule>(BatteryBoostCheckBox);
                 CreateDepthAction<IMyUpgradeModule>(DepthSlider);

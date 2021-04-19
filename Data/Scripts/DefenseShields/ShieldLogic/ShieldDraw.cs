@@ -18,8 +18,7 @@ namespace DefenseShields
             var renderId = MyGrid.Render.GetRenderObjectID();
             var percent = DsState.State.ShieldPercent;
             var reInforce = DsState.State.ReInforce;
-            var hitAnim = !reInforce && DsSet.Settings.HitWaveAnimation;
-            var refreshAnim = !reInforce && DsSet.Settings.RefreshAnimation;
+            //var hitAnim = !reInforce && DsSet.Settings.HitWaveAnimation;
 
             Vector3D impactPos;
             lock (HandlerImpact) impactPos = HandlerImpact.Active ? ComputeHandlerImpact() : WorldImpactPosition;
@@ -67,7 +66,7 @@ namespace DefenseShields
                     Icosphere.CalculateTransform(ShieldShapeMatrix, lod);
                     if (!GridIsMobile) Icosphere.ReturnPhysicsVerts(DetectionMatrix, ShieldComp.PhysicsOutside);
                 }
-                Icosphere.ComputeEffects(this, _localImpactPosition,  prevlod, percent, activeVisible, refreshAnim);
+                Icosphere.ComputeEffects(this, _localImpactPosition,  prevlod, percent, activeVisible);
 
             }
             else if (_shapeChanged) _updateRender = true;
@@ -85,7 +84,11 @@ namespace DefenseShields
             if (wasPulsing && !_sidePulsing)
                 ClearSidePulse();
 
-            if (hitAnim && sphereOnCamera && DsState.State.Online) Icosphere.Draw(renderId);
+
+            if (sphereOnCamera && DsState.State.Online && Session.Instance.Settings.ClientConfig.ShowHitRings)
+            {
+                Icosphere.Draw(renderId, this);
+            }
         }
 
         public void DrawShieldDownIcon()
@@ -436,7 +439,7 @@ namespace DefenseShields
             }
         }
 
-        private Vector4 GetDamageTypeColor()
+        internal Vector4 GetDamageTypeColor()
         {
             if (_damageTypeBalance > 0) {
                 var max = (float)KineticAvg;
@@ -474,6 +477,37 @@ namespace DefenseShields
 
                 return newColor;
             }
+            return Color.White;
+        }
+
+        internal Vector4 GetModulatorColor()
+        {
+
+            if (ShieldComp.Modulator != null && ShieldComp.Modulator.ModState.State.Online)
+            {
+                var damageMod = ShieldComp.Modulator.ModSet.Settings.ModulateDamage;
+                if (damageMod > 100)
+                {
+                    var diff = Math.Abs(100f - (damageMod));
+                    var ratio = diff / 80;
+
+                    var mod = 1 - ratio;
+                    return new Vector4(mod, mod, 1f, 1f);
+                }
+
+                if (damageMod < 100)
+                {
+                    var diff = Math.Abs(100f - (damageMod));
+                    var ratio = diff / 80;
+
+                    var mod = 1 - ratio;
+                    var newColor = new Vector4(1f, 0.5f + (mod * 0.5f), mod, 1f);
+
+                    return newColor;
+                }
+                return Color.White;
+            }
+
             return Color.White;
         }
 

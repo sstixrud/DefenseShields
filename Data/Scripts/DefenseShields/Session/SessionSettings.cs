@@ -43,6 +43,8 @@ namespace DefenseShields
             [ProtoMember(13)] public string Energy = MyKeys.NumPad1.ToString();
             [ProtoMember(14)] public bool Notices = true;
             [ProtoMember(15)] public bool DisableKeys = true;
+            [ProtoMember(16)] public int MaxHitRings = 5;
+            [ProtoMember(17)] public bool ShowHitRings = true;
 
             internal void UpdateKey(MyKeys key, string value, UiInput uiInput)
             {
@@ -182,6 +184,9 @@ namespace DefenseShields
 
             newSettings.HudScale = oldSettings.HudScale;
             newSettings.ShieldIconPos = oldSettings.ShieldIconPos;
+
+            newSettings.MaxHitRings = oldSettings.MaxHitRings;
+            newSettings.ShowHitRings = oldSettings.ShowHitRings;
         }
 
         private void InitKeys(ShieldSettings.ClientSettings data)
