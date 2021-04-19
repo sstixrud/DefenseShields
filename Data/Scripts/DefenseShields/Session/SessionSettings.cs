@@ -44,7 +44,7 @@ namespace DefenseShields
             [ProtoMember(14)] public bool Notices = true;
             [ProtoMember(15)] public bool DisableKeys = true;
             [ProtoMember(16)] public int MaxHitRings = 5;
-            [ProtoMember(17)] public bool ShowHitRings = true;
+            [ProtoMember(17)] public bool ShowHitRings = false;
 
             internal void UpdateKey(MyKeys key, string value, UiInput uiInput)
             {

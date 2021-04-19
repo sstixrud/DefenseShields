@@ -27,6 +27,7 @@ namespace DefenseShields
             var activeVisible = DetermineVisualState(reInforce);
             WorldImpactPosition = Vector3D.NegativeInfinity;
 
+            var vanillaHit = EnergyHit != HitType.Other;
             var kineticHit = EnergyHit == HitType.Kinetic;
             _localImpactPosition = Vector3D.NegativeInfinity;
 
@@ -85,7 +86,7 @@ namespace DefenseShields
                 ClearSidePulse();
 
 
-            if (sphereOnCamera && DsState.State.Online && Session.Instance.Settings.ClientConfig.ShowHitRings)
+            if (sphereOnCamera && DsState.State.Online && Session.Instance.Settings.ClientConfig.ShowHitRings || vanillaHit)
             {
                 Icosphere.Draw(renderId, this);
             }
