@@ -164,6 +164,7 @@
             private static readonly MyStringId _impactRingMaterial = MyStringId.GetOrCompute("DS_ImpactRing");
             private static readonly Vector4 _impactRingColor = new Color(0.2f, 0.5f, 1f, 0.5f).ToVector4();
 
+            private double ImpactRingMinSize = 15;
             private int ImpactRingExpandTicks = 20;
             private int ImpactRingFadeTicks = 5;
 
@@ -296,11 +297,12 @@
                     double shortestSide = Math.Min(shield.DetectMatrixOutside.Scale.X, Math.Min(shield.DetectMatrixOutside.Scale.Y, shield.DetectMatrixOutside.Scale.Z));
                     double hitPercent = shield.Absorb / shield.ShieldMaxCharge;
 
-                    double lengthLimit = shortestSide * Math.Max(Math.Min(hitPercent, 1), 0.5);
-                    double divHalfLengthLimit = 1.0 / lengthLimit;
+                    double lengthLimit = Math.Max(shortestSide * Math.Min(hitPercent, 1), ImpactRingMinSize);
+                    double divHalfLengthLimit = 1.25 / lengthLimit;
 
                     Vector3D impactNormal = Vector3D.Normalize(impactPosition - _matrix.Translation);
-                    MatrixD impactRingPosTransform = MatrixD.Transpose(MatrixD.CreateWorld(Vector3D.Zero, Vector3D.Forward, impactNormal));
+                    Vector3D impactForwardVec = Vector3D.Normalize(Vector3D.Cross(impactNormal, Vector3D.Forward));
+                    MatrixD impactRingPosTransform = MatrixD.Transpose(MatrixD.CreateWorld(Vector3D.Zero, impactForwardVec, impactNormal));
 
                     var ring = Session.Instance.RingPool.Get();
 
