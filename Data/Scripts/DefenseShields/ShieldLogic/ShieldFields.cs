@@ -101,7 +101,6 @@ namespace DefenseShields
         internal int KineticAvg;
         internal int EnergyAvg;
         private const int ReModulationCount = 300;
-        private const int ShieldDownCount = 2700;
         private const int EmpDownCount = 3600;
         private const int PowerNoticeCount = 600;
         private const int CapacitorDrainCount = 60;

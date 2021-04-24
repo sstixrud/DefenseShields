@@ -34,12 +34,13 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 78;
+            const int Version = 79;
             const float CapScaler = 1f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
             const int DisableBlockDamage = 0;
             const int DisableLineOfSight = 0;
+            const int OverloadTime = 2700;
 
             var dsCfgExists = MyAPIGateway.Utilities.FileExistsInGlobalStorage("DefenseShields.cfg");
             if (dsCfgExists)
@@ -74,15 +75,11 @@ namespace DefenseShields.Support
                 Session.Enforced.MaintenanceCost = !unPackedData.MaintenanceCost.Equals(-1f) ? unPackedData.MaintenanceCost : MaintenanceCost;
                 Session.Enforced.DisableBlockDamage = !unPackedData.DisableBlockDamage.Equals(-1) ? unPackedData.DisableBlockDamage : DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
-                if (unPackedData.Version <= 77)
+                Session.Enforced.OverloadTime = !unPackedData.OverloadTime.Equals(-1) ? unPackedData.OverloadTime : OverloadTime;
+
+                if (unPackedData.Version <= 78)
                 {
-                    Session.Enforced.CapScaler = 1f;
-                    Session.Enforced.BaseScaler = 175;
-                    Session.Enforced.HpsEfficiency = 0.25f;
-                    Session.Enforced.HeatScaler = 0.004f;
-                    Session.Enforced.LargeShipRatio = 100;
-                    Session.Enforced.StationRatio = 100;
-                    Session.Enforced.SmallShipRatio = 100;
+                    Session.Enforced.OverloadTime = 2700;
                 }
                 Session.Enforced.Version = Version;
                 UpdateConfigFile(unPackCfg);
@@ -105,6 +102,7 @@ namespace DefenseShields.Support
                 Session.Enforced.Version = Version;
                 Session.Enforced.DisableBlockDamage = DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = DisableLineOfSight;
+                Session.Enforced.OverloadTime = OverloadTime;
 
                 WriteNewConfigFile();
 

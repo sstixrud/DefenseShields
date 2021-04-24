@@ -8,6 +8,7 @@ using VRage;
 using VRage.Game;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
+using VRage.Utils;
 using VRageMath;
 
 namespace DefenseShields
@@ -282,7 +283,7 @@ namespace DefenseShields
                     var ds = shieldComponent.DefenseShields;
                     var otherSize = ds.MyGrid.PositionComp.LocalAABB.Size.Volume;
                     var otherEntityId = ds.MyGrid.EntityId;
-                    if ((!IsStatic && ds.IsStatic) || mySize < otherSize || (mySize.Equals(otherEntityId) && myEntityId < otherEntityId))
+                    if ((!IsStatic && ds.IsStatic) || mySize < otherSize || MyUtils.IsEqual(mySize, otherSize) && myEntityId < otherEntityId)
                     {
                         _slavedToGrid = ds.MyGrid;
                         if (_slavedToGrid != null) return true;
@@ -365,8 +366,8 @@ namespace DefenseShields
             if (_overLoadLoop > -1)
             {
                 _overLoadLoop++;
-                if (_overLoadLoop == ShieldDownCount - 1) ShieldComp.CheckEmitters = true;
-                if (_overLoadLoop == ShieldDownCount)
+                if (_overLoadLoop == Session.Enforced.OverloadTime - 1) ShieldComp.CheckEmitters = true;
+                if (_overLoadLoop == Session.Enforced.OverloadTime)
                 {
                     if (!DsState.State.EmitterLos)
                     {
@@ -377,7 +378,7 @@ namespace DefenseShields
                     {
                         DsState.State.Overload = false;
                         _overLoadLoop = -1;
-                        var recharged = (_shieldPeakRate * ShieldDownCount) / 60;
+                        var recharged = (_shieldPeakRate * Session.Enforced.OverloadTime) / 60;
                         DsState.State.Charge = MathHelper.Clamp(recharged, ShieldMaxCharge * 0.05f, ShieldMaxCharge * 0.30f);
                     }
                 }
