@@ -575,11 +575,16 @@ namespace DefenseShields.Support
                 {
                     if (!(def is MyAmmoMagazineDefinition)) continue;
                     var ammoDef = def as MyAmmoMagazineDefinition;
-                    var ammo = MyDefinitionManager.Static.GetAmmoDefinition(ammoDef.AmmoDefinitionId);
-                    if (!(ammo is MyMissileAmmoDefinition)) continue;
-                    var shot = ammo as MyMissileAmmoDefinition;
-                    if (Session.Instance.AmmoCollection.ContainsKey(shot.MissileModelName)) continue;
-                    Session.Instance.AmmoCollection.Add(shot.MissileModelName, new AmmoInfo(shot.IsExplosive, shot.MissileExplosionDamage, shot.MissileExplosionRadius, shot.DesiredSpeed, shot.MissileMass, shot.BackkickForce));
+                    try
+                    {
+                        var ammo = MyDefinitionManager.Static.GetAmmoDefinition(ammoDef.AmmoDefinitionId);
+                    
+                        if (!(ammo is MyMissileAmmoDefinition)) continue;
+                        var shot = ammo as MyMissileAmmoDefinition;
+                        if (Session.Instance.AmmoCollection.ContainsKey(shot.MissileModelName)) continue;
+                        Session.Instance.AmmoCollection.Add(shot.MissileModelName, new AmmoInfo(shot.IsExplosive, shot.MissileExplosionDamage, shot.MissileExplosionRadius, shot.DesiredSpeed, shot.MissileMass, shot.BackkickForce));
+                    }
+                    catch (Exception ex) { Log.Line($"Exception in GetAmmoDefinitions: {def.DisplayNameString} in {def.Context.ModName} ({def.Context.ModId}) : {ex}"); }
                 }
                 if (Session.Enforced.Debug == 3) Log.Line("Definitions: Session");
             }
