@@ -25,6 +25,8 @@ namespace DefenseShields
         internal const double TwoStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 2;
         internal const float ShieldShuntBonus = 0.12f;
         internal const float ShieldBypassBonus = 0.2f;
+        internal const int RingOverFlowLimit = 15;
+
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
 
         internal const int ClientCfgVersion = 11;
@@ -284,6 +286,8 @@ namespace DefenseShields
 
         internal Task MonitorTask = new Task();
         internal int ActiveShieldRings;
+        internal int RingOverFlows;
+
         private int _count = -1;
         private int _lCount;
         private int _eCount;

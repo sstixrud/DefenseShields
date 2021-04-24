@@ -126,6 +126,9 @@
                 var compCount = Controllers.Count;
                 if (compCount == 0) return;
 
+                if (Tick180)
+                    ShellSortControllers(Controllers);
+                
                 if (SphereOnCamera.Length != compCount) Array.Resize(ref SphereOnCamera, compCount);
 
                 if (_count == 0 && _lCount == 0) OnCountThrottle = false;
@@ -133,6 +136,7 @@
                 for (int i = 0; i < compCount; i++)
                 {
                     var s = Controllers[i];
+
                     if (s.DsState.State.Suspended) continue;
 
 

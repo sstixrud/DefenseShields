@@ -247,10 +247,15 @@
                 else return;
                 _matrix = Shield.ShieldShapeMatrix;
 
-                var newImpactReady = Session.Instance.Settings.ClientConfig.ShowHitRings && Session.Instance.ActiveShieldRings < Session.Instance.Settings.ClientConfig.MaxHitRings * 2.5;
-                if (newImpactReady && sphereOnCamera && impactPos != Vector3D.NegativeInfinity && impactPos != Vector3D.PositiveInfinity)
+                if (sphereOnCamera && impactPos != Vector3D.NegativeInfinity && impactPos != Vector3D.PositiveInfinity)
                 {
-                    CreateImpactRing(shield, impactPos, _lod);
+                    var newImpactReady = Session.Instance.Settings.ClientConfig.ShowHitRings && Session.Instance.ActiveShieldRings < Session.Instance.Settings.ClientConfig.MaxHitRings * 2.5;
+                    var atLimit = ImpactRings.Count >= Session.Instance.Settings.ClientConfig.MaxHitRings;
+
+                    if (newImpactReady || atLimit && Session.Instance.RingOverFlows++ < Session.RingOverFlowLimit) 
+                    {
+                        CreateImpactRing(shield, impactPos, _lod, atLimit);
+                    }
                 }
 
                 _flash = shieldPercent <= 10;
@@ -291,7 +296,7 @@
                 // Multiplying by the sphere radius(1 for the unit sphere in question) gives the arc length.
             }
 
-            internal void CreateImpactRing(DefenseShields shield, Vector3D impactPosition, int lod)
+            internal void CreateImpactRing(DefenseShields shield, Vector3D impactPosition, int lod, bool atLimit)
             {
                 try
                 {
@@ -351,7 +356,7 @@
                         }
                     }
 
-                    if (ImpactRings.Count >= Session.Instance.Settings.ClientConfig.MaxHitRings)
+                    if (atLimit)
                     {
                         int indexInside = -1;
                         double maxInsideSq = double.MaxValue;

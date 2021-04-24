@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ParallelTasks;
 using VRage.Input;
+using VRage.Utils;
+using VRageMath;
 
 namespace DefenseShields
 {
@@ -244,6 +246,27 @@ namespace DefenseShields
                         MyAPIGateway.Utilities.ShowNotification("'/ds showrings'  -- Toggle show hit effect rings, color is based on shield modulation\n '/ds maxrings'  -- Sets the max number of hit rings to show\n ", 10000, "White");
                 }
                 sendToOthers = false;
+            }
+        }
+        static void ShellSortControllers(List<DefenseShields> list)
+        {
+            var cameraPos = MyAPIGateway.Session.Camera.Position;
+            int length = list.Count;
+            for (int h = length / 2; h > 0; h /= 2)
+            {
+                for (int i = h; i < length; i += 1)
+                {
+                    var tempValue = list[i];
+                    var temp = MyUtils.GetSmallestDistanceToSphere(ref cameraPos, ref tempValue.ShieldSphere);
+
+                    int j;
+                    for (j = i; j >= h && MyUtils.GetSmallestDistanceToSphere(ref cameraPos, ref list[j - h].ShieldSphere) > temp; j -= h)
+                    {
+                        list[j] = list[j - h];
+                    }
+
+                    list[j] = tempValue;
+                }
             }
         }
 

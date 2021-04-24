@@ -332,6 +332,9 @@ namespace DefenseShields
             Tick600 = Tick % 600 == 0;
             Tick1800 = Tick % 1800 == 0;
 
+            if (Tick10 && RingOverFlows > 0)
+                RingOverFlows--;
+
             if (_count++ == 59)
             {
                 _count = 0;

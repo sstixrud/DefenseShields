@@ -217,7 +217,7 @@ namespace DefenseShields
         internal int PreviousWheel;
         internal int CurrentWheel;
         internal int ShiftTime;
-        internal int KeyTime;
+        internal int ShuntKeyTime;
         internal bool MouseButtonPressed;
         internal bool InputChanged;
         internal bool MouseButtonLeftWasPressed;
@@ -232,7 +232,7 @@ namespace DefenseShields
         internal bool ShiftReleased;
         internal bool ShiftPressed;
         internal bool LongShift;
-        internal bool LongKey;
+        internal bool LongShuntKey;
         internal bool AltPressed;
         internal bool ActionKeyPressed;
         internal bool ActionKeyReleased;
@@ -241,6 +241,8 @@ namespace DefenseShields
         internal bool KeyPrevPressed;
         internal bool UiKeyPressed;
         internal bool UiKeyWasPressed;
+        internal bool ShuntKeyPressed;
+        internal bool ShuntKeyWasPressed;
         internal bool PlayerCamera;
         internal bool FirstPersonView;
         internal bool Debug = true;
@@ -346,12 +348,28 @@ namespace DefenseShields
                 PlayerCamera = MyAPIGateway.Session.IsCameraControlledObject;
                 FirstPersonView = PlayerCamera && MyAPIGateway.Session.CameraController.IsInFirstPersonView;
 
+                ShuntKeyWasPressed = ShuntKeyPressed;
+
                 if (AnyKeyPressed) {
-                    KeyTime++;
-                    LongKey = KeyTime > 39;
+
+                    ShuntKeyPressed = MyAPIGateway.Input.IsKeyPress(Left) || MyAPIGateway.Input.IsKeyPress(Right) || MyAPIGateway.Input.IsKeyPress(Front) || MyAPIGateway.Input.IsKeyPress(Back) || MyAPIGateway.Input.IsKeyPress(Up) || MyAPIGateway.Input.IsKeyPress(Down);
+                    
+                    if (ShuntKeyPressed) {
+                        ShuntKeyTime++;
+                        LongShuntKey = ShuntKeyTime > 39;
+                    }
+                    else 
+                        ShuntKeyTime = 0;
+                }
+                else {
+                    ShuntKeyPressed = false;
                 }
 
-
+                if (!ShuntKeyPressed && !ShuntKeyWasPressed) { 
+                    ShuntKeyTime = 0;
+                    LongShuntKey = false;
+                }
+                
                 if (KeyPrevPressed) {
 
                     LeftReleased = MyAPIGateway.Input.IsNewKeyReleased(Left);
@@ -360,6 +378,7 @@ namespace DefenseShields
                     BackReleased = MyAPIGateway.Input.IsNewKeyReleased(Back);
                     UpReleased = MyAPIGateway.Input.IsNewKeyReleased(Up);
                     DownReleased = MyAPIGateway.Input.IsNewKeyReleased(Down);
+
                     ShuntReleased = MyAPIGateway.Input.IsNewKeyReleased(Shunting);
 
                     KineticReleased = MyAPIGateway.Input.IsNewKeyReleased(Kinetic);
@@ -377,8 +396,6 @@ namespace DefenseShields
                     ShuntReleased = false;
                     KineticReleased = false;
                     EnergyReleased = false;
-                    KeyTime = 0;
-                    LongKey = false;
                 }
 
                 if ((!UiKeyPressed && !UiKeyWasPressed) || !AltPressed && CtrlPressed && !FirstPersonView)
@@ -443,8 +460,8 @@ namespace DefenseShields
                 ShuntReleased = false;
                 KineticReleased = false;
                 EnergyReleased = false;
-                KeyTime = 0;
-                LongKey = false;
+                ShuntKeyTime = 0;
+                LongShuntKey = false;
             }
 
             if (!ActionKeyPressed && BlackListActive1)

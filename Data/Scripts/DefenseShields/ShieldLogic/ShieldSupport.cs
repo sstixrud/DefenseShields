@@ -158,7 +158,7 @@ namespace DefenseShields
         private void QuickShuntUpdate(Session.ShieldSides side, int shuntedCount)
         {
             var isShunted = IsSideShunted(side);
-            if (Session.Instance.UiInput.LongKey) {
+            if (Session.Instance.UiInput.LongShuntKey) {
 
                 if (!isShunted && shuntedCount >= 5) {
 
