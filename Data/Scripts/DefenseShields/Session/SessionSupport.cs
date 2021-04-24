@@ -208,10 +208,10 @@ namespace DefenseShields
                                 MyAPIGateway.Utilities.ShowNotification($"Screen text notices set to: {Settings.ClientConfig.Notices}", 10000);
                                 Settings.VersionControl.UpdateClientCfgFile();
                                 break;
-                            case "disablehotkeys":
+                            case "togglehotkeys":
                                 Settings.ClientConfig.DisableKeys = !Settings.ClientConfig.DisableKeys;
                                 somethingUpdated = true;
-                                MyAPIGateway.Utilities.ShowNotification($"Hot Keys have been disabled: {Settings.ClientConfig.DisableKeys}", 10000);
+                                MyAPIGateway.Utilities.ShowNotification($"Hot Keys are now: {!Settings.ClientConfig.DisableKeys}", 10000);
                                 Settings.VersionControl.UpdateClientCfgFile();
                                 break;
                             case "setdefaults":
@@ -233,7 +233,7 @@ namespace DefenseShields
                 if (!somethingUpdated)
                 {
                     if (message.Length <= 3)
-                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices\n  '/ds disablehotkeys' -- Disables all shield hotkeys\n  '/ds setdefaults' -- Resets shield client configs to default values\n '/ds effects' -- How to report issues\n", 10000, "White");
+                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices\n  '/ds togglehotkeys' -- Toggles all shield hotkeys\n  '/ds setdefaults' -- Resets shield client configs to default values\n '/ds effects' -- How to report issues\n", 10000, "White");
                     else if (message.StartsWith("/ds hud"))
                         MyAPIGateway.Utilities.ShowNotification($"Hold Action key ({Settings.ClientConfig.ActionKey}) and use arrow keys to move hud\n Hold Action key ({Settings.ClientConfig.ActionKey}) and use +/- keys to change scale of hud", 10000, "White");
                     else if (message.StartsWith("/ds remap"))

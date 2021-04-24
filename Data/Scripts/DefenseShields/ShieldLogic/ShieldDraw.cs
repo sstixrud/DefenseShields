@@ -18,20 +18,17 @@ namespace DefenseShields
             var renderId = MyGrid.Render.GetRenderObjectID();
             var percent = DsState.State.ShieldPercent;
             var reInforce = DsState.State.ReInforce;
-            //var hitAnim = !reInforce && DsSet.Settings.HitWaveAnimation;
 
             Vector3D impactPos;
             lock (HandlerImpact) impactPos = HandlerImpact.Active ? ComputeHandlerImpact() : WorldImpactPosition;
-            var intersected = WorldImpactPosition != Vector3D.NegativeInfinity && impactPos != Vector3D.Zero;
             WorldImpactPosition = impactPos;
             var activeVisible = DetermineVisualState(reInforce);
             WorldImpactPosition = Vector3D.NegativeInfinity;
 
-            var vanillaHit = EnergyHit != HitType.Other;
             var kineticHit = EnergyHit == HitType.Kinetic;
             _localImpactPosition = Vector3D.NegativeInfinity;
 
-            if (impactPos != Vector3D.NegativeInfinity && (kineticHit && KineticCoolDown < 0 || EnergyHit == HitType.Energy && EnergyCoolDown < 0 || EnergyHit == HitType.Other))
+            if (impactPos != Vector3D.NegativeInfinity)
             {
                 if (_isServer && WebDamage && GridIsMobile)
                 {
@@ -43,8 +40,6 @@ namespace DefenseShields
 
                 if (kineticHit) KineticCoolDown = 0;
                 else if (EnergyHit == HitType.Energy) EnergyCoolDown = 0;
-
-                if (EnergyHit != HitType.Other) HitParticleStart(impactPos, intersected);
 
                 var cubeBlockLocalMatrix = MyGrid.PositionComp.LocalMatrixRef;
                 var referenceWorldPosition = cubeBlockLocalMatrix.Translation;
@@ -67,7 +62,7 @@ namespace DefenseShields
                     Icosphere.CalculateTransform(ShieldShapeMatrix, lod);
                     if (!GridIsMobile) Icosphere.ReturnPhysicsVerts(DetectionMatrix, ShieldComp.PhysicsOutside);
                 }
-                Icosphere.ComputeEffects(this, _localImpactPosition,  prevlod, percent, activeVisible);
+                Icosphere.ComputeEffects(this, _localImpactPosition, sphereOnCamera, prevlod, percent, activeVisible);
 
             }
             else if (_shapeChanged) _updateRender = true;
@@ -86,10 +81,13 @@ namespace DefenseShields
                 ClearSidePulse();
 
 
-            if (sphereOnCamera && DsState.State.Online && Session.Instance.Settings.ClientConfig.ShowHitRings || vanillaHit)
+            if (Session.Instance.Settings.ClientConfig.ShowHitRings && Icosphere.ImpactRings.Count > 0)
             {
-                Icosphere.Draw(renderId, this);
+                var draw = sphereOnCamera && DsState.State.Online;
+                Icosphere.Draw(renderId, draw, this);
             }
+
+            HitWave = false;
         }
 
         public void DrawShieldDownIcon()
@@ -275,7 +273,7 @@ namespace DefenseShields
             _prevLod = lod;
             return lod;
         }
-
+        /*
         private void HitParticleStart(Vector3D pos, bool intersected)
         {
             var scale = 0.0075;
@@ -343,7 +341,7 @@ namespace DefenseShields
                 _effect2.Play();
             }
         }
-
+        */
         public void HudCheck()
         {
             var playerEnt = MyAPIGateway.Session.ControlledObject?.Entity as MyEntity;

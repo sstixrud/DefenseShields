@@ -43,8 +43,8 @@ namespace DefenseShields
             [ProtoMember(13)] public string Energy = MyKeys.NumPad1.ToString();
             [ProtoMember(14)] public bool Notices = true;
             [ProtoMember(15)] public bool DisableKeys = true;
-            [ProtoMember(16)] public int MaxHitRings = 5;
-            [ProtoMember(17)] public bool ShowHitRings = false;
+            [ProtoMember(16)] public int MaxHitRings = 7;
+            [ProtoMember(17)] public bool ShowHitRings = true;
 
             internal void UpdateKey(MyKeys key, string value, UiInput uiInput)
             {
@@ -187,6 +187,12 @@ namespace DefenseShields
 
             newSettings.MaxHitRings = oldSettings.MaxHitRings;
             newSettings.ShowHitRings = oldSettings.ShowHitRings;
+
+            if (oldSettings.Version <= 10)
+            {
+                newSettings.ShowHitRings = true;
+                newSettings.MaxHitRings = 7;
+            }
         }
 
         private void InitKeys(ShieldSettings.ClientSettings data)

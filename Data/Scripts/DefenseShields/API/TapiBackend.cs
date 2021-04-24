@@ -125,8 +125,8 @@ namespace DefenseShields
             }
             else
             {
-                if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
-                else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
+                logic.HitWave = drawParticle;
+                if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
                 else logic.EnergyHit = DefenseShields.HitType.Kinetic;
 
                 logic.ImpactSize = damage;
@@ -169,8 +169,8 @@ namespace DefenseShields
             }
             else
             {
-                if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
-                else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
+                logic.HitWave = drawParticle;
+                if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
                 else logic.EnergyHit = DefenseShields.HitType.Kinetic;
 
                 logic.ImpactSize = damage;
@@ -209,8 +209,8 @@ namespace DefenseShields
                 logic.WorldImpactPosition = pos;
             }
 
-            if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
-            else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
+            logic.HitWave = drawParticle;
+            if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
             else logic.EnergyHit = DefenseShields.HitType.Kinetic;
 
             if (energy)
@@ -253,8 +253,8 @@ namespace DefenseShields
                 logic.WorldImpactPosition = pos;
             }
 
-            if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
-            else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
+            logic.HitWave = drawParticle;
+            if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
             else logic.EnergyHit = DefenseShields.HitType.Kinetic;
 
             if (energy)
@@ -408,8 +408,8 @@ namespace DefenseShields
                 logic.WorldImpactPosition = pos;
             }
 
-            if (!drawParticle) logic.EnergyHit = DefenseShields.HitType.Other;
-            else if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
+            logic.HitWave = drawParticle;
+            if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
             else logic.EnergyHit = DefenseShields.HitType.Kinetic;
 
             if (energy)

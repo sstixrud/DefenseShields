@@ -135,14 +135,13 @@
                     var s = Controllers[i];
                     if (s.DsState.State.Suspended) continue;
 
-                    if (s.KineticCoolDown > -1)
-                    {
+
+                    if (s.KineticCoolDown > -1) {
                         s.KineticCoolDown++;
                         if (s.KineticCoolDown == 6) s.KineticCoolDown = -1;
                     }
 
-                    if (s.EnergyCoolDown > -1)
-                    {
+                    if (s.EnergyCoolDown > -1) {
                         s.EnergyCoolDown++;
                         if (s.EnergyCoolDown == 9) s.EnergyCoolDown = -1;
                     }
@@ -175,12 +174,12 @@
 
                     if (s.DsState.State.Online)
                     {
-                        if (SphereOnCamera[i]) s.Draw(OnCount, SphereOnCamera[i]);
+                        if (SphereOnCamera[i] || s.Icosphere.ImpactRings.Count > 0) s.Draw(OnCount, SphereOnCamera[i]);
                         else if (s.Icosphere.ImpactsFinished)
                         {
                             if (s.WorldImpactPosition != Vector3D.NegativeInfinity)
                             {
-                                s.Draw(OnCount, true);
+                                s.Draw(OnCount, false);
                                 s.Icosphere.ImpactPosState = Vector3D.NegativeInfinity;
                             }
                         }

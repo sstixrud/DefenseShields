@@ -366,6 +366,7 @@ namespace DefenseShields
         internal bool IsStatic { get; set; }
         internal bool WebDamage { get; set; }
         internal bool EntCleanUpTime { get; set; }
+        internal bool HitWave { get; set; }
         internal HitType EnergyHit { get; set; }
         internal bool EffectsDirty { get; set; }
         internal bool ShieldActive { get; set; }

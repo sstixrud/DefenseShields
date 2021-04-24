@@ -168,7 +168,7 @@
             private int ImpactRingExpandTicks = 20;
             private int ImpactRingFadeTicks = 5;
 
-            private readonly List<ImpactRingEffectData> _impactRings = new List<ImpactRingEffectData>();
+            internal readonly List<ImpactRingEffectData> ImpactRings = new List<ImpactRingEffectData>();
             internal Vector2 HalfShift = new Vector2(0.5f, 0.5f);
 
             private Random rnd = new Random();
@@ -237,7 +237,7 @@
                 }
             }
 
-            internal void ComputeEffects(DefenseShields shield, Vector3D impactPos, int prevLod, float shieldPercent, bool activeVisible)
+            internal void ComputeEffects(DefenseShields shield, Vector3D impactPos, bool sphereOnCamera, int prevLod, float shieldPercent, bool activeVisible)
             {
                 Shield = shield;
                 if (Shield?.ShellActive != null)
@@ -247,7 +247,8 @@
                 else return;
                 _matrix = Shield.ShieldShapeMatrix;
 
-                if (Session.Instance.Settings.ClientConfig.ShowHitRings && impactPos != Vector3D.NegativeInfinity && impactPos != Vector3D.PositiveInfinity)
+                var newImpactReady = Session.Instance.Settings.ClientConfig.ShowHitRings && Session.Instance.ActiveShieldRings < Session.Instance.Settings.ClientConfig.MaxHitRings * 2.5;
+                if (newImpactReady && sphereOnCamera && impactPos != Vector3D.NegativeInfinity && impactPos != Vector3D.PositiveInfinity)
                 {
                     CreateImpactRing(shield, impactPos, _lod);
                 }
@@ -350,18 +351,18 @@
                         }
                     }
 
-                    if (_impactRings.Count >= Session.Instance.Settings.ClientConfig.MaxHitRings)
+                    if (ImpactRings.Count >= Session.Instance.Settings.ClientConfig.MaxHitRings)
                     {
                         int indexInside = -1;
                         double maxInsideSq = double.MaxValue;
                         int indexOutside = -1;
                         double maxOutsideSq = double.MaxValue;
                         
-                        for (int i = 0; i < _impactRings.Count; i++)
+                        for (int i = 0; i < ImpactRings.Count; i++)
                         {
-                            double lengthSq = (_impactRings[i].ImpactPosition - impactPosition).LengthSquared();
+                            double lengthSq = (ImpactRings[i].ImpactPosition - impactPosition).LengthSquared();
                             
-                            if (_impactRings[i].ImpactMaxDistance * _impactRings[i].ImpactMaxDistance >= lengthSq)
+                            if (ImpactRings[i].ImpactMaxDistance * ImpactRings[i].ImpactMaxDistance >= lengthSq)
                             {
                                 if (lengthSq < maxInsideSq)
                                 {
@@ -381,25 +382,26 @@
 
                         if (indexInside > -1)
                         {
-                            ring.AnimationStartClock = Math.Min(_impactRings[indexInside].AnimationStartClock, ImpactRingExpandTicks);
-                            _impactRings[indexInside] = ring;
+                            ring.AnimationStartClock = Math.Min(ImpactRings[indexInside].AnimationStartClock, ImpactRingExpandTicks);
+                            ImpactRings[indexInside] = ring;
                         }
                         else if (indexOutside > -1)
                         {
-                            ring.AnimationStartClock = Math.Min(_impactRings[indexOutside].AnimationStartClock, ImpactRingExpandTicks);
-                            _impactRings[indexOutside] = ring;
+                            ring.AnimationStartClock = Math.Min(ImpactRings[indexOutside].AnimationStartClock, ImpactRingExpandTicks);
+                            ImpactRings[indexOutside] = ring;
                         }
                         else
                         {
                             
-                            int randomIdex = rnd.Next(0, _impactRings.Count);
-                            ring.AnimationStartClock = Math.Min(_impactRings[randomIdex].AnimationStartClock, ImpactRingExpandTicks);
-                            _impactRings[randomIdex] = ring;
+                            int randomIdex = rnd.Next(0, ImpactRings.Count);
+                            ring.AnimationStartClock = Math.Min(ImpactRings[randomIdex].AnimationStartClock, ImpactRingExpandTicks);
+                            ImpactRings[randomIdex] = ring;
                         }
                     }
                     else
                     {
-                        _impactRings.Add(ring);
+                        ImpactRings.Add(ring);
+                        Session.Instance.ActiveShieldRings++;
                     }
                 }
                 catch (Exception ex)
@@ -462,7 +464,7 @@
                 if (!ImpactsFinished) UpdateImpactState();
             }
             
-            internal void Draw(uint renderId, DefenseShields shield)
+            internal void Draw(uint renderId, bool sphereOnCamera, DefenseShields shield)
             {
                 try
                 {
@@ -472,11 +474,11 @@
                     var damageColor = shield.GetModulatorColor();
                     damageColor.W = 0.5f;
 
-                    while (index < _impactRings.Count)
+                    while (index < ImpactRings.Count)
                     {
                         bool retain = false;
 
-                        var impactRingData = _impactRings[index];
+                        var impactRingData = ImpactRings[index];
 
                         float progress;
                         float ringIntesity;
@@ -500,6 +502,7 @@
 
                         impactRingData.AnimationStartClock++;
 
+
                         var v4 = new Vector4
                         {
                             W = damageColor.W,
@@ -510,30 +513,33 @@
 
                         if (impactRingData.LodLevel == _lod)
                         {
-                            for (int x = 0; x < impactRingData.RingTriangles.Count; x++)
+                            if (sphereOnCamera)
                             {
-                                TriangleData triangleData = impactRingData.RingTriangles[x];
+                                for (int x = 0; x < impactRingData.RingTriangles.Count; x++)
+                                {
+                                    TriangleData triangleData = impactRingData.RingTriangles[x];
 
-                                int i = triangleData.TriangleIndex * 3;
+                                    int i = triangleData.TriangleIndex * 3;
 
-                                var i0 = ib[i];
-                                var i1 = ib[i + 1];
-                                var i2 = ib[i + 2];
+                                    var i0 = ib[i];
+                                    var i1 = ib[i + 1];
+                                    var i2 = ib[i + 2];
 
-                                var v0 = _vertexBuffer[i0];
-                                var v1 = _vertexBuffer[i1];
-                                var v2 = _vertexBuffer[i2];
+                                    var v0 = _vertexBuffer[i0];
+                                    var v1 = _vertexBuffer[i1];
+                                    var v2 = _vertexBuffer[i2];
 
-                                var n0 = _normalBuffer[i0];
-                                var n1 = _normalBuffer[i1];
-                                var n2 = _normalBuffer[i2];
-                                MyTransparentGeometry.AddTriangleBillboard(v0, v1, v2,
-                                    n0, n1, n2,
-                                    triangleData.UVInfoV0 * ringSizeCofficient + HalfShift,
-                                    triangleData.UVInfoV1 * ringSizeCofficient + HalfShift,
-                                    triangleData.UVInfoV2 * ringSizeCofficient + HalfShift,
-                                    _impactRingMaterial, renderId, (v0 + v1 + v2) / 3, v4, BlendTypeEnum.PostPP);
+                                    var n0 = _normalBuffer[i0];
+                                    var n1 = _normalBuffer[i1];
+                                    var n2 = _normalBuffer[i2];
+                                    MyTransparentGeometry.AddTriangleBillboard(v0, v1, v2,
+                                        n0, n1, n2,
+                                        triangleData.UVInfoV0 * ringSizeCofficient + HalfShift,
+                                        triangleData.UVInfoV1 * ringSizeCofficient + HalfShift,
+                                        triangleData.UVInfoV2 * ringSizeCofficient + HalfShift,
+                                        _impactRingMaterial, renderId, (v0 + v1 + v2) / 3, v4, BlendTypeEnum.PostPP);
 
+                                }
                             }
 
                             if (impactRingData.AnimationStartClock <= ImpactRingExpandTicks + ImpactRingFadeTicks)
@@ -548,50 +554,13 @@
                         }
                         else
                         {
-                            var last = _impactRings.Count - 1;
-                            var lastData = _impactRings[last];
-                            _impactRings.RemoveAtFast(last);
+                            var last = ImpactRings.Count - 1;
+                            var lastData = ImpactRings[last];
+                            ImpactRings.RemoveAtFast(last);
                             Session.Instance.RingPool.Return(lastData);
-							
-                            //_impactRings[index] = _impactRings[_impactRings.Count - 1];
-							//_impactRings.RemoveAt(_impactRings.Count - 1);
+                            Session.Instance.ActiveShieldRings--;
                         }
                     }
-                    
-                    /* Superseded
-                    if (ImpactsFinished && !_refresh) return;
-                    var ib = _backing.IndexBuffer[_lod];
-                    Vector4 color;
-                    if (!ImpactsFinished)
-                    {
-                        color = _waveColor;
-                        _faceMaterial = _faceWave;
-                    }
-                    else
-                    {
-                        color = _refreshColor;
-                        _faceMaterial = _faceCharge;
-                    }
-                    for (int i = 0, j = 0; i < ib.Length; i += 3, j++)
-                    {
-                        var face = _triColorBuffer[j];
-                        if (face != 1 && face != 2) continue;
-
-                        var i0 = ib[i];
-                        var i1 = ib[i + 1];
-                        var i2 = ib[i + 2];
-
-                        var v0 = _vertexBuffer[i0];
-                        var v1 = _vertexBuffer[i1];
-                        var v2 = _vertexBuffer[i2];
-
-                        var n0 = _normalBuffer[i0];
-                        var n1 = _normalBuffer[i1];
-                        var n2 = _normalBuffer[i2];
-
-                        MyTransparentGeometry.AddTriangleBillboard(v0, v1, v2, n0, n1, n2, _v20, _v21, _v22, _faceMaterial, renderId, (v0 + v1 + v2) / 3, color);
-                    }
-                    */
                 }
                 catch (Exception ex) { Log.Line($"Exception in IcoSphere Draw - renderId {renderId.ToString()}: {ex}"); }
             }

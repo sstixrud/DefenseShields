@@ -27,7 +27,7 @@ namespace DefenseShields
         internal const float ShieldBypassBonus = 0.2f;
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
 
-        internal const int ClientCfgVersion = 10;
+        internal const int ClientCfgVersion = 11;
         internal const string ClientCfgName = "DefenseShieldsClient.cfg";
 
         internal readonly int[] SlotCnt = new int[9];
@@ -283,7 +283,7 @@ namespace DefenseShields
         private readonly List<MyKeys> _pressedKeys = new List<MyKeys>();
 
         internal Task MonitorTask = new Task();
-
+        internal int ActiveShieldRings;
         private int _count = -1;
         private int _lCount;
         private int _eCount;
