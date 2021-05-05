@@ -237,7 +237,7 @@
                 }
             }
 
-            internal void ComputeEffects(DefenseShields shield, Vector3D impactPos, bool sphereOnCamera, int prevLod, float shieldPercent, bool activeVisible)
+            internal void ComputeEffects(DefenseShields shield, Vector3D impactPos, bool sphereOnCamera, int prevLod, float shieldPercent, bool activeVisible, bool hitWave)
             {
                 Shield = shield;
                 if (Shield?.ShellActive != null)
@@ -247,7 +247,7 @@
                 else return;
                 _matrix = Shield.ShieldShapeMatrix;
 
-                if (sphereOnCamera && impactPos != Vector3D.NegativeInfinity && impactPos != Vector3D.PositiveInfinity)
+                if (sphereOnCamera && hitWave && impactPos != Vector3D.NegativeInfinity && impactPos != Vector3D.PositiveInfinity)
                 {
                     var newImpactReady = Session.Instance.Settings.ClientConfig.ShowHitRings && Session.Instance.ActiveShieldRings < Session.Instance.Settings.ClientConfig.MaxHitRings * 2.5;
                     var atLimit = ImpactRings.Count >= Session.Instance.Settings.ClientConfig.MaxHitRings;

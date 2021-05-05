@@ -58,6 +58,7 @@ namespace DefenseShields
             ["GetShieldInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float, float, int>>(TAPI_GetShieldInfo),
             ["GetModulationInfo"] = new Func<MyEntity, MyTuple<bool, bool, float, float>>(TAPI_GetModulationInfo),
             ["GetFaceInfo"] = new Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float, float>>(TAPI_GetFaceInfo),
+            ["GetFacesFast"] = new Func<MyEntity, MyTuple<bool, Vector3I>>(TAPI_GetFacesFast),
             ["AddAttacker"] = new Action<long>(TAPI_AddAttacker),
             ["IsBlockProtected"] = new Func<IMySlimBlock, bool>(TAPI_IsBlockProtected),
 
@@ -268,6 +269,16 @@ namespace DefenseShields
             return hpRemaining * 0.01f;
         }
 
+        private static MyTuple<bool, Vector3I> TAPI_GetFacesFast(MyEntity entity)
+        {
+            ShieldGridComponent c;
+            if (entity != null  && Session.Instance.IdToBus.TryGetValue(entity.EntityId, out c) && c?.DefenseShields != null && c.DefenseShields.DsSet.Settings.SideShunting)
+            {
+                return new MyTuple<bool, Vector3I>(true, c.DefenseShields.ShieldRedirectState);
+            }
+            return new MyTuple<bool, Vector3I>();
+        }
+
         private static MyTuple<bool, int, int, float, float> TAPI_GetFaceInfo(IMyTerminalBlock block, Vector3D pos, bool posMustBeInside = false)
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
@@ -302,10 +313,8 @@ namespace DefenseShields
                 {
                     var dot = intersection.Dot(logic.ShieldShapeMatrix.Forward);
                     var face = dot > 0 ? Session.ShieldSides.Forward: Session.ShieldSides.Backward;
-                    //Log.Line($"face: {logic.RealSideStates[face].Side}({face}) - redirected:{logic.RealSideStates[face].Redirected}");
                     if (logic.RealSideStates[face].Redirected)
                     {
-                        //Log.Line($"hit: {face}");
                         faceHit = (int)face;
                     }
                 }
@@ -318,10 +327,8 @@ namespace DefenseShields
                     var lengDiffSqr = projLeft.LengthSquared() - logic.ShieldShapeMatrix.Left.LengthSquared();
                     var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
 
-                    //Log.Line($"face: {logic.RealSideStates[face].Side}({face}) - redirected:{logic.RealSideStates[face].Redirected}");
                     if (validFace && logic.RealSideStates[face].Redirected)
                     {
-                        //Log.Line($"hit: {face}");
                         faceHit = (int)face;
                     }
 
@@ -336,10 +343,8 @@ namespace DefenseShields
                     var validFace = faceHit == -1 || !MyUtils.IsZero(lengDiffSqr);
 
 
-                    //Log.Line($"face: {logic.RealSideStates[face].Side}({face}) - redirected:{logic.RealSideStates[face].Redirected}");
                     if (validFace && logic.RealSideStates[face].Redirected)
                     {                                                                                 
-                        //Log.Line($"hit: {face}");
                         faceHit = (int)face;
                     }
 

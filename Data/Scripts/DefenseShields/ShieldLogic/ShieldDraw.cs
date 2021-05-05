@@ -62,7 +62,7 @@ namespace DefenseShields
                     Icosphere.CalculateTransform(ShieldShapeMatrix, lod);
                     if (!GridIsMobile) Icosphere.ReturnPhysicsVerts(DetectionMatrix, ShieldComp.PhysicsOutside);
                 }
-                Icosphere.ComputeEffects(this, _localImpactPosition, sphereOnCamera, prevlod, percent, activeVisible);
+                Icosphere.ComputeEffects(this, _localImpactPosition, sphereOnCamera, prevlod, percent, activeVisible, HitWave);
 
             }
             else if (_shapeChanged) _updateRender = true;
@@ -83,7 +83,7 @@ namespace DefenseShields
 
             if (Session.Instance.Settings.ClientConfig.ShowHitRings && Icosphere.ImpactRings.Count > 0)
             {
-                var draw = sphereOnCamera && DsState.State.Online;
+                var draw = sphereOnCamera && DsState.State.Online && !_viewInShield;
                 Icosphere.Draw(renderId, draw, this);
             }
 
