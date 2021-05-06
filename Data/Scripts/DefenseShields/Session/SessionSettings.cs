@@ -52,11 +52,11 @@ namespace DefenseShields
                 switch (value)
                 {
                     case "kinetic":
-                        ActionKey = keyString;
+                        Energy = keyString;
                         uiInput.Kinetic = key;
                         break;
                     case "energy":
-                        ActionKey = keyString;
+                        Energy = keyString;
                         uiInput.Energy = key;
                         break;
                     case "action":
@@ -409,7 +409,7 @@ namespace DefenseShields
                 if (NumPadNumKeyPressed && !BlackListActive2 && !_session.Settings.ClientConfig.DisableKeys)
                     BlackList2(true);
 
-                if (ActionKeyPressed && !_session.Settings.ClientConfig.DisableKeys) {
+                if (ActionKeyPressed && !_session.Settings.ClientConfig.DisableKeys && _session.CanChangeHud) {
 
                     if (!BlackListActive1)
                         BlackList1(true);

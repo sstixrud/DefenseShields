@@ -228,6 +228,11 @@ namespace DefenseShields
                                 MyAPIGateway.Utilities.ShowNotification($"Show hit ring effects: {Settings.ClientConfig.ShowHitRings}", 10000);
                                 Settings.VersionControl.UpdateClientCfgFile();
                                 break;
+                            case "changehud":
+                                CanChangeHud = !CanChangeHud;
+                                somethingUpdated = true;
+                                MyAPIGateway.Utilities.ShowNotification($"Modify Hud set to: {CanChangeHud}", 10000);
+                                break;
                         }
                     }
                 }
@@ -235,15 +240,15 @@ namespace DefenseShields
                 if (!somethingUpdated)
                 {
                     if (message.Length <= 3)
-                        MyAPIGateway.Utilities.ShowNotification("Valid DefenseShield Commands:\n '/ds remap'  -- Remap keys\n '/ds hud'  -- Modify Hud elements\n '/ds info' -- Get general information\n '/ds notices' -- Toggle screen text notices\n  '/ds togglehotkeys' -- Toggles all shield hotkeys\n  '/ds setdefaults' -- Resets shield client configs to default values\n '/ds effects' -- How to report issues\n", 10000, "White");
+                        MyAPIGateway.Utilities.ShowNotification("'/ds remap' -- Remap keys\n'/ds hud' -- Modify Hud elements\n '/ds info' -- Get general information\n'/ds notices' -- Toggle screen text notices\n'/ds togglehotkeys' -- Toggles all shield hotkeys\n'/ds setdefaults' -- Resets shield client configs to default values\n'/ds effects' -- How to report issues\n", 10000, "White");
                     else if (message.StartsWith("/ds hud"))
-                        MyAPIGateway.Utilities.ShowNotification($"Hold Action key ({Settings.ClientConfig.ActionKey}) and use arrow keys to move hud\n Hold Action key ({Settings.ClientConfig.ActionKey}) and use +/- keys to change scale of hud", 10000, "White");
+                        MyAPIGateway.Utilities.ShowNotification($"\nHold Action key ({Settings.ClientConfig.ActionKey}) and use arrow keys to move hud\nHold Action key ({Settings.ClientConfig.ActionKey}) and use +/- keys to change scale of hud\n*NOTE* You must first type '/ds changehud' to enable this functionality", 10000, "White");
                     else if (message.StartsWith("/ds remap"))
-                        MyAPIGateway.Utilities.ShowNotification("'/ds remap action'  -- Remaps Action key (default numpad0)\n '/ds remap noshunt'  -- Remaps NoShunting key (numpad5)\n '/ds remap left'  -- Remaps Left shield key (default numpad4)\n '/ds remap right'  -- Remaps Right shield key (default numpad6)\n '/ds remap front'  -- Remaps Forward shield key (default numpad8)\n '/ds remap back'  -- Remaps Backward shield key (default numpad2)\n '/ds remap up'  -- Remaps Up shield key (default numpad9)\n '/ds remap down'  -- Remaps Down shield key (default numpad1)", 10000, "White");
+                        MyAPIGateway.Utilities.ShowNotification("'/ds remap action' -- Remaps Action key (default numpad0)\n'/ds remap noshunt'  -- Remaps NoShunting key (numpad5)\n'/ds remap left'  -- Remaps Left shield key (default numpad4)\n'/ds remap right'  -- Remaps Right shield key (default numpad6)\n'/ds remap front'  -- Remaps Forward shield key (default numpad8)\n'/ds remap back'  -- Remaps Backward shield key (default numpad2)\n'/ds remap up'  -- Remaps Up shield key (default numpad9)\n'/ds remap down'  -- Remaps Down shield key (default numpad1)", 10000, "White");
                     else if (message.StartsWith("/ds info"))
-                        MyAPIGateway.Utilities.ShowNotification("Short key presses toggle shunting state for that direction only\n Long presses toggles shunting for all directions", 10000, "White");
+                        MyAPIGateway.Utilities.ShowNotification("Short key presses toggle shunting state for that direction only\nLong presses toggles shunting for all directions\nYou can move the Hud icon, see '/ds hud' for more info", 10000, "White");
                     else if (message.StartsWith("/ds effects"))
-                        MyAPIGateway.Utilities.ShowNotification("'/ds showrings'  -- Toggle show hit effect rings, color is based on shield modulation\n '/ds maxrings'  -- Sets the max number of hit rings to show\n ", 10000, "White");
+                        MyAPIGateway.Utilities.ShowNotification("'/ds showrings' -- Toggle show hit effect rings, color is based on shield modulation\n'/ds maxrings' -- Sets the max number of hit rings to show\n", 10000, "White");
                 }
                 sendToOthers = false;
             }

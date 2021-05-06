@@ -272,6 +272,7 @@ namespace DefenseShields
         internal ulong MultiplayerId;
         internal long PlayerId;
         internal bool PlayersLoaded;
+        internal bool CanChangeHud;
 
         internal readonly ApiBackend Api = new ApiBackend();
         internal ShieldSettings Settings;
