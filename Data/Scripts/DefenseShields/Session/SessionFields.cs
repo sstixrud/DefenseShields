@@ -29,7 +29,7 @@ namespace DefenseShields
 
         internal static readonly MyConcurrentPool<MyProtectors> ProtSets = new MyConcurrentPool<MyProtectors>(150, null, 1000);
 
-        internal const int ClientCfgVersion = 11;
+        internal const int ClientCfgVersion = 12;
         internal const string ClientCfgName = "DefenseShieldsClient.cfg";
 
         internal readonly int[] SlotCnt = new int[9];

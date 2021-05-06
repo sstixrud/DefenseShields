@@ -273,75 +273,7 @@ namespace DefenseShields
             _prevLod = lod;
             return lod;
         }
-        /*
-        private void HitParticleStart(Vector3D pos, bool intersected)
-        {
-            var scale = 0.0075;
-            var logOfPlayerDist = Math.Log(Vector3D.Distance(MyAPIGateway.Session.Camera.Position, pos));
-            int radius;
-            var size = ImpactSize <= 7500 ? ImpactSize : 7500;
-            var baseScaler = size / 30;
-            scale = scale * Math.Max(Math.Log(baseScaler), 1);
 
-            var mainParticle = !intersected ? 1657 : 6667;
-            var multiple = EnergyHit== HitType.Energy;
-
-            Vector4 color;
-            float mainAdjust = 1;
-            if (EnergyHit == HitType.Energy)
-            {
-                var scaler = 8;
-                if (_viewInShield && DsSet.Settings.DimShieldHits)
-                {
-                    multiple = false;
-                    scaler = 3;
-                }
-                else mainAdjust = 0.4f;
-                radius = (int)(logOfPlayerDist * scaler);
-                color = new Vector4(255, 10, 0, 1f);
-            }
-            else
-            {
-                var scaler = 8;
-                if (_viewInShield && DsSet.Settings.DimShieldHits)
-                {
-                    scaler = 3;
-                }
-                radius = (int)(logOfPlayerDist * scaler);
-                color = new Vector4(255, 255, 255, 0.01f);
-            }
-            var vel = MyGrid.Physics.LinearVelocity;
-            var matrix = MatrixD.CreateTranslation(pos);
-            MyParticlesManager.TryCreateParticleEffect(mainParticle, out _effect1, ref matrix, ref pos, _shieldEntRendId, true);
-            if (_effect1 == null) return;
-            var directedMatrix = _effect1.WorldMatrix;
-            var shieldCenter = ShieldEnt.PositionComp.WorldAABB.Center;
-            directedMatrix.Forward = Vector3D.Normalize(MyAPIGateway.Session.Camera.Position - shieldCenter);
-            directedMatrix.Left = Vector3D.CalculatePerpendicularVector(directedMatrix.Forward);
-            directedMatrix.Up = Vector3D.Cross(directedMatrix.Forward, directedMatrix.Left);
-            
-
-            //_effect1.UserColorMultiplier = color; 
-            _effect1.UserRadiusMultiplier = radius * mainAdjust;
-            _effect1.UserScale = (float)scale;
-            _effect1.Velocity = vel;
-            if (EnergyHit == HitType.Kinetic) _effect1.WorldMatrix = directedMatrix;
-            _effect1.Play();
-
-            var magic = ((radius * 0.1f) - 2.5f);
-            if (multiple)
-            {
-                MyParticlesManager.TryCreateParticleEffect(1657, out _effect2, ref matrix, ref pos, _shieldEntRendId, true);
-                if (_effect2 == null) return;
-                //_effect2.UserColorMultiplier = color;
-                _effect2.UserRadiusMultiplier = 2f + magic;
-                _effect2.UserScale = 1f;
-                _effect2.Velocity = vel;
-                _effect2.WorldMatrix = directedMatrix;
-                _effect2.Play();
-            }
-        }
-        */
         public void HudCheck()
         {
             var playerEnt = MyAPIGateway.Session.ControlledObject?.Entity as MyEntity;
@@ -384,28 +316,24 @@ namespace DefenseShields
         {
 
             var camera = MyAPIGateway.Session.Camera;
-            var cameraMatrix = camera.WorldMatrix;
-            var cameraPos = cameraMatrix.Translation;
             var newFov = camera.FovWithZoom;
-
             var aspectRatio = camera.ViewportSize.X / camera.ViewportSize.Y;
-            var aspectRatioInv = camera.ViewportSize.Y / camera.ViewportSize.X;
 
             if (Session.Instance.Tick180 || Session.Instance.Tick20 && _toggle2)
                 _toggle2 = !_toggle2;
 
-            var scaleFov = Math.Tan(newFov * 0.5);
-            var scale = 0.075 * scaleFov;
-            var position = new Vector3D(Session.Instance.Settings.ClientConfig.ShieldIconPos.X, Session.Instance.Settings.ClientConfig.ShieldIconPos.Y, 0);
-            position.X *= scale * aspectRatio;
-            position.Y *= scale;
+            var fov = Math.Tan(newFov * 0.5);
+            var scaleFov = 0.1 * fov;
+            var offset = new Vector2D(Session.Instance.Settings.ClientConfig.ShieldIconPos.X, Session.Instance.Settings.ClientConfig.ShieldIconPos.Y);
+            offset.X *= scaleFov * aspectRatio;
+            offset.Y *= scaleFov;
             var cameraWorldMatrix = MyAPIGateway.Session.Camera.WorldMatrix;
-            position = Vector3D.Transform(new Vector3D(position.X, position.Y, -.1), cameraWorldMatrix);
+            var position = Vector3D.Transform(new Vector3D(offset.X, offset.Y, -.1), cameraWorldMatrix);
 
             var origin = position;
             var left = cameraWorldMatrix.Left;
             var up = cameraWorldMatrix.Up;
-            scale = 0.125 * scale;
+            var scale = Session.Instance.Settings.ClientConfig.HudScale * 0.01f;
 
             var percent = DsState.State.ShieldPercent;
             var icon2FSelect = percent < 99 ? GetIconMeterfloat() : 0;
@@ -419,11 +347,9 @@ namespace DefenseShields
             if (reInforce) color = Color.Green;
             else color = GetDamageTypeColor();
 
-            scale *= Session.Instance.Settings.ClientConfig.HudScale;
-
-            MyTransparentGeometry.AddBillboardOriented(icon1, color, origin, left, up, (float)scale, BlendTypeEnum.PostPP); 
-            if (showIcon2 && icon2 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon2, Color.White, origin, left, up, (float)scale, BlendTypeEnum.PostPP);
-            if (icon3 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon3, Color.White, origin, left, up, (float)scale, BlendTypeEnum.PostPP);
+            MyTransparentGeometry.AddBillboardOriented(icon1, color, origin, left, up, scale, BlendTypeEnum.PostPP); 
+            if (showIcon2 && icon2 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon2, Color.White, origin, left, up, scale, BlendTypeEnum.PostPP);
+            if (icon3 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon3, Color.White, origin, left, up, scale, BlendTypeEnum.PostPP);
 
             if (DsSet.Settings.SideShunting)
             {
@@ -433,7 +359,7 @@ namespace DefenseShields
                     var icon = pair.Value;
                     var sideColor = !shunted ? new Vector4(1f,1f,1f,1f) : _toggle2 ? new Vector4(1, 0, 0, 1) : new Vector4(0.01f, 0.01f, 0.01f, 0.01f);
 
-                    MyTransparentGeometry.AddBillboardOriented(icon, sideColor, origin, left, up, (float)scale, BlendTypeEnum.PostPP);
+                    MyTransparentGeometry.AddBillboardOriented(icon, sideColor, origin, left, up, scale, BlendTypeEnum.PostPP);
                 }
             }
         }

@@ -37,8 +37,8 @@ namespace DefenseShields
             [ProtoMember(7)] public string Down = MyKeys.NumPad3.ToString();
             [ProtoMember(8)] public string Front = MyKeys.NumPad8.ToString();
             [ProtoMember(9)] public string Back = MyKeys.NumPad2.ToString();
-            [ProtoMember(10)] public Vector2D ShieldIconPos = new Vector2D(-0.87, -0.80);
-            [ProtoMember(11)] public float HudScale = 1f;
+            [ProtoMember(10)] public Vector2D ShieldIconPos = new Vector2D(-0.46, -0.85);
+            [ProtoMember(11)] public float HudScale = 0.82f;
             [ProtoMember(12)] public string Kinetic = MyKeys.NumPad7.ToString();
             [ProtoMember(13)] public string Energy = MyKeys.NumPad1.ToString();
             [ProtoMember(14)] public bool Notices = true;
@@ -188,10 +188,10 @@ namespace DefenseShields
             newSettings.MaxHitRings = oldSettings.MaxHitRings;
             newSettings.ShowHitRings = oldSettings.ShowHitRings;
 
-            if (oldSettings.Version <= 10)
+            if (oldSettings.Version <= 11)
             {
-                newSettings.ShowHitRings = true;
-                newSettings.MaxHitRings = 7;
+                newSettings.HudScale = 0.82f;
+                newSettings.ShieldIconPos = new Vector2D(-0.46, -0.85);
             }
         }
 
@@ -409,7 +409,7 @@ namespace DefenseShields
                 if (NumPadNumKeyPressed && !BlackListActive2 && !_session.Settings.ClientConfig.DisableKeys)
                     BlackList2(true);
 
-                if (ActionKeyPressed && !_session.Settings.ClientConfig.DisableKeys && _session.CanChangeHud) {
+                if (ActionKeyPressed && _session.CanChangeHud) {
 
                     if (!BlackListActive1)
                         BlackList1(true);
