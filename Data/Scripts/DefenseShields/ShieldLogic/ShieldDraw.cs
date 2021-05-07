@@ -333,7 +333,7 @@ namespace DefenseShields
             var origin = position;
             var left = cameraWorldMatrix.Left;
             var up = cameraWorldMatrix.Up;
-            var scale = Session.Instance.Settings.ClientConfig.HudScale * 0.01f;
+            var scale = (float)(scaleFov * (Session.Instance.Settings.ClientConfig.HudScale * 0.13f));
 
             var percent = DsState.State.ShieldPercent;
             var icon2FSelect = percent < 99 ? GetIconMeterfloat() : 0;

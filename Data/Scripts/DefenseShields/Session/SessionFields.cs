@@ -23,7 +23,7 @@ namespace DefenseShields
         internal const ushort PACKET_ID = 62520;
         internal const double TickTimeDiv = 0.0625;
         internal const double TwoStep = MyEngineConstants.UPDATE_STEP_SIZE_IN_SECONDS * 2;
-        internal const float ShieldShuntBonus = 0.12f;
+        internal const float ShieldShuntBonus = 0.15f;
         internal const float ShieldBypassBonus = 0.2f;
         internal const int RingOverFlowLimit = 15;
 
