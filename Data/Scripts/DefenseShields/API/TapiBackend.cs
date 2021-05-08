@@ -404,7 +404,7 @@ namespace DefenseShields
                 damage = primaryDamage;
             }
 
-            if (Session.Instance.MpActive) {
+            if (false && Session.Instance.MpActive) {
                 var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
                 logic.AddShieldHit(attackerId, damage, damageType, null, true, pos);
             }

@@ -172,7 +172,7 @@
                 for (int i = 0; i < compCount; i++)
                 {
                     var s = Controllers[i];
-                    var drawSuspended = !s.WarmedUp || !IsServer && !s.ClientInitPacket || s.DsState.State.Lowered || s.DsState.State.Sleeping || s.DsState.State.Suspended || !s.DsState.State.EmitterLos;
+                    var drawSuspended = !s.WarmedUp || !IsServer && !s.ClientInitPacket || s.DsState.State.Sleeping || s.DsState.State.Suspended || !s.DsState.State.EmitterLos;
 
                     if (drawSuspended) continue;
 

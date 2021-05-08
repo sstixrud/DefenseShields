@@ -112,6 +112,7 @@ namespace DefenseShields
         {
             var notFailing = _overLoadLoop == -1 && _empOverLoadLoop == -1 && _reModulationLoop == -1;
             ShieldActive = ShieldRaised() && DsState.State.EmitterLos && notFailing && PowerOnline();
+            StepDamageState();
             if (!ShieldActive) return false;
             var prevOnline = DsState.State.Online;
             if (!prevOnline && GridIsMobile && FieldShapeBlocked()) return false;
@@ -126,7 +127,6 @@ namespace DefenseShields
                 ShieldComp.O2Updated = false;
             }
 
-            StepDamageState();
             return true;
         }
 

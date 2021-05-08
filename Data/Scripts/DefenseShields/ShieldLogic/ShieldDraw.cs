@@ -95,10 +95,16 @@ namespace DefenseShields
             if (_tick % 60 != 0) HudCheck();
             var enemy = false;
             var relation = MyAPIGateway.Session.Player.GetRelationTo(MyCube.OwnerId);
-            if (relation == MyRelationsBetweenPlayerAndBlock.Neutral || relation == MyRelationsBetweenPlayerAndBlock.Enemies) enemy = true;
+            if (relation == MyRelationsBetweenPlayerAndBlock.Neutral || relation == MyRelationsBetweenPlayerAndBlock.Enemies)
+            {
+                enemy = true;
+            }
 
             var config = MyAPIGateway.Session.Config;
-            if (!enemy && DsSet.Settings.SendToHud && !config.MinimalHud && Session.Instance.HudComp == this && !MyAPIGateway.Gui.IsCursorVisible) UpdateIcon(false);
+            if (!enemy && DsSet.Settings.SendToHud && !config.MinimalHud && Session.Instance.HudComp == this && !MyAPIGateway.Gui.IsCursorVisible)
+            {
+                UpdateIcon(false);
+            }
         }
 
         private Vector3D ComputeHandlerImpact()
@@ -341,23 +347,27 @@ namespace DefenseShields
             var icon1 = GetHudIcon1FromFloat(percent);
             var icon2 = GetHudIcon2FromFloat(icon2FSelect);
             var icon3 = GetHudIcon3FromInt(heat, _count < 30);
-            var showIcon2 = DsState.State.Online;
-            Color color;
+            var showIcon2 = DsState.State.Online || DsState.State.Lowered;
 
+            var mainColor = !DsState.State.Lowered ? new Vector4(1f, 1f, 1f, 1f) : new Vector4(0.25f, 0.25f, 0.25f, 0.25f);
+
+            Vector4 color;
             if (reInforce) color = Color.Green;
+            else if (DsState.State.Lowered)
+                color = new Vector4(0.25f, 0.25f, 0.25f, 0.25f);
             else color = GetDamageTypeColor();
 
             MyTransparentGeometry.AddBillboardOriented(icon1, color, origin, left, up, scale, BlendTypeEnum.PostPP); 
-            if (showIcon2 && icon2 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon2, Color.White, origin, left, up, scale, BlendTypeEnum.PostPP);
-            if (icon3 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon3, Color.White, origin, left, up, scale, BlendTypeEnum.PostPP);
+            if (showIcon2 && icon2 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon2, mainColor, origin, left, up, scale, BlendTypeEnum.PostPP);
+            if (icon3 != MyStringId.NullOrEmpty) MyTransparentGeometry.AddBillboardOriented(icon3, mainColor, origin, left, up, scale, BlendTypeEnum.PostPP);
 
-            if (DsSet.Settings.SideShunting)
+            if (DsSet.Settings.SideShunting && DsState.State.Online)
             {
                 foreach (var pair in Session.Instance.ShieldDirectedSidesDraw)
                 {
                     var shunted = IsSideShunted(pair.Key);
                     var icon = pair.Value;
-                    var sideColor = !shunted ? new Vector4(1f,1f,1f,1f) : _toggle2 ? new Vector4(1, 0, 0, 1) : new Vector4(0.01f, 0.01f, 0.01f, 0.01f);
+                    var sideColor = !shunted ? mainColor : _toggle2 ? new Vector4(1, 0, 0, 1) : new Vector4(0.01f, 0.01f, 0.01f, 0.01f);
 
                     MyTransparentGeometry.AddBillboardOriented(icon, sideColor, origin, left, up, scale, BlendTypeEnum.PostPP);
                 }
