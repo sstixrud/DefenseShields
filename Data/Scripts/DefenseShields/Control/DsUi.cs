@@ -98,10 +98,14 @@ namespace DefenseShields
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
-            comp.DsSet.Settings.Fit = (int)Math.Round(newValue);
-            comp.FitChanged = true;
-            comp.SettingsUpdated = true;
-            comp.ClientUiUpdate = true;
+            var checkValue = (int)Math.Round(newValue);
+            if (checkValue != comp.DsSet.Settings.Fit)
+            {
+                comp.DsSet.Settings.Fit = (int)Math.Round(newValue);
+                comp.FitChanged = true;
+                comp.SettingsUpdated = true;
+                comp.ClientUiUpdate = true;
+            }
         }
 
         internal static bool GetSphereFit(IMyTerminalBlock block)

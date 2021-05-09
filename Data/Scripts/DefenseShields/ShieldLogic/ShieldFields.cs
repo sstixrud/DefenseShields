@@ -23,7 +23,7 @@ namespace DefenseShields
 
         internal readonly object SubLock = new object();
 
-        internal readonly int[] ExpChargeReductions = { 1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 };
+        internal readonly int[] ExpChargeReductions = { 1, 2, 3, 5, 8, 10, 12, 14, 16, 18, 20 };
         internal readonly float[] ReserveScaler = { -1f, 0.001f, 1, 1000, 1000000 };
 
         internal readonly List<MyEntity> PruneList = new List<MyEntity>();
@@ -240,6 +240,7 @@ namespace DefenseShields
         private bool _firstSync;
         private bool _adjustShape;
         private bool _updateCap;
+        private bool _forceCap;
         private bool _sendMessage;
 
         private string _modelActive = "\\Models\\Cubes\\ShieldActiveBaseAlt.mwm";

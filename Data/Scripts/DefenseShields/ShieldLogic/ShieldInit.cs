@@ -533,7 +533,13 @@ namespace DefenseShields
                 }
             }
 
+            if (MyUtils.IsZero(ShieldSize)) {
+                _updateCap = true;
+                return;
+            }
+            _forceCap = false;
             Vector3I center = Vector3I.Zero;
+            var sphere = new BoundingSphereD(Vector3D.Zero, ShieldSize.AbsMax() * MyGrid.GridSizeR);
 
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
@@ -548,14 +554,18 @@ namespace DefenseShields
                     var camera = cube as IMyCameraBlock;
                     var light = cube as IMyLightingBlock;
                     var sound = cube as IMySoundBlock;
+                    var lcd = cube as IMyTextPanel;
                     var buttonPanel = term != null && cube.BlockDefinition != null && cube.BlockDefinition.Id.TypeId == typeof(MyObjectBuilder_TerminalBlock);
-                    if (buttonPanel || term == null || sensor != null || sound != null || camera != null || light != null) continue;
+                    if (buttonPanel || term == null || sensor != null || sound != null || camera != null || light != null || lcd != null) continue;
                     Vector3I translatedPos;
 
                     if (!isRootGrid)
                         translatedPos = cube.Position + parentLocalOffset;
                     else 
                         translatedPos = cube.Position;
+
+                    if (sphere.Contains(translatedPos) == ContainmentType.Disjoint)
+                        continue;
 
                     center += translatedPos;
 
@@ -569,10 +579,10 @@ namespace DefenseShields
             var unitLen = MyGrid.GridSize;
 
             center /= totalBlockCnt;
-            var percentile95Th = (int)(totalBlockCnt * 0.12);
+            var percentile88Th = (int)(totalBlockCnt * 0.12);
 
             ShellSort(_capcubeBoxList, center);
-            _capcubeBoxList.RemoveRange(totalBlockCnt - percentile95Th, percentile95Th);
+            _capcubeBoxList.RemoveRange(totalBlockCnt - percentile88Th, percentile88Th);
 
             for (int i = 0; i < _capcubeBoxList.Count; i++) {
 

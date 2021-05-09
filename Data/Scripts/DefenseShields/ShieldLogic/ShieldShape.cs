@@ -142,7 +142,11 @@ namespace DefenseShields
 
         private void CheckExtents()
         {
-            FitChanged = false;
+            if (FitChanged) {
+                _forceCap = _isServer;
+                FitChanged = false;
+            }
+
             _shapeEvent = false;
             if (!_isServer || !GridIsMobile) return;
             CreateHalfExtents(true);
@@ -269,6 +273,9 @@ namespace DefenseShields
             ShieldEnt.PositionComp.SetPosition(DetectionCenter);
             BoundingBoxD.CreateFromSphere(ref WebSphere, out WebBox);
             BoundingBoxD.CreateFromSphere(ref ShieldSphere3K, out ShieldBox3K);
+
+            if (_forceCap)
+                ComputeCap();
         }
 
         private void CreateMobileShape(Vector3D localOffsetMeters)
