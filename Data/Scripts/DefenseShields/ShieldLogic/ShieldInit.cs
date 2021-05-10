@@ -539,8 +539,8 @@ namespace DefenseShields
             }
             _forceCap = false;
             Vector3I center = Vector3I.Zero;
-            var sphere = new BoundingSphereD(Vector3D.Zero, ShieldSize.AbsMax() * MyGrid.GridSizeR);
-
+            //var sphere = new BoundingSphereD(Vector3D.Zero, 1f);
+            var sphere = new BoundingSphereD(MyGrid.WorldToGridInteger(MyGrid.PositionComp.WorldAABB.Center), ShieldSize.AbsMax() * MyGrid.GridSizeR);
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
                 var isRootGrid = sub == MyGrid;
@@ -573,10 +573,12 @@ namespace DefenseShields
                 }
             }
 
-            BoundingBox newBox = BoundingBox.Invalid;
-
             var totalBlockCnt = _capcubeBoxList.Count;
-            var unitLen = MyGrid.GridSize;
+
+            if (totalBlockCnt <= 0) {
+                SetCap(new BoundingBox(Vector3.Zero, Vector3.Zero));
+                return;
+            }
 
             center /= totalBlockCnt;
             var percentile88Th = (int)(totalBlockCnt * 0.12);
@@ -584,6 +586,7 @@ namespace DefenseShields
             ShellSort(_capcubeBoxList, center);
             _capcubeBoxList.RemoveRange(totalBlockCnt - percentile88Th, percentile88Th);
 
+            BoundingBox newBox = BoundingBox.Invalid;
             for (int i = 0; i < _capcubeBoxList.Count; i++) {
 
                 var cap = _capcubeBoxList[i];
@@ -595,11 +598,18 @@ namespace DefenseShields
             newBox.Max *= MyGrid.GridSize;
 
             _capcubeBoxList.Clear();
+         
+            SetCap(newBox);
+        }
 
-            var boxsArea = newBox.SurfaceArea();
-
-            if (boxsArea < 1)
-                boxsArea = (float)UtilsStatic.SurfaceAreaCuboid(totalBlockCnt * unitLen, unitLen, unitLen);
+        private void SetCap(BoundingBox box)
+        {
+            var newExtAbsMax = box.HalfExtents.AbsMax();
+            var minHalfExtAbsMin = ShieldAabbScaled.HalfExtents.AbsMin() / 4;
+            var useMin = minHalfExtAbsMin > newExtAbsMax;
+            var vScale = (ShieldAabbScaled.HalfExtents.AbsMin() * 0.5f) * Vector3.One;
+            var minBox = new BoundingBox(-vScale, vScale);
+            var boxsArea = useMin ? minBox.SurfaceArea() : box.SurfaceArea();
 
             var surfaceArea = (float)Math.Sqrt(boxsArea);
             DsState.State.GridIntegrity = (surfaceArea * MagicCapRatio);
