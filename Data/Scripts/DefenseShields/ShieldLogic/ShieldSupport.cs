@@ -228,8 +228,6 @@ namespace DefenseShields
 
             RealSideStates[(Session.ShieldSides)orientation.Left] = new Session.ShieldInfo { Side = Session.ShieldSides.Left, Redirected = IsSideShunted(Session.ShieldSides.Left) };
             RealSideStates[(Session.ShieldSides)leftReverse] = new Session.ShieldInfo { Side = Session.ShieldSides.Right, Redirected = IsSideShunted(Session.ShieldSides.Right) };
-
-            //foreach (var pair in RealSideStates) Log.CleanLine($"RealSide:{pair.Key} - UserSide:{pair.Value.Side} - Redirected:{pair.Value.Redirected}");
         }
 
 
@@ -313,9 +311,7 @@ namespace DefenseShields
                 {
                     if (enabled)
                     {
-                        //part.Render.UpdateRenderObject(false);
                         part.Render.Transparency = _pulseCounter * 0.1f;
-                        //part.Render.UpdateRenderObject(true);
                         part.Render.UpdateTransparency();
                     }
                 }

@@ -540,7 +540,7 @@ namespace DefenseShields
             _forceCap = false;
             Vector3I center = Vector3I.Zero;
             //var sphere = new BoundingSphereD(Vector3D.Zero, 1f);
-            var sphere = new BoundingSphereD(MyGrid.WorldToGridInteger(MyGrid.PositionComp.WorldAABB.Center), ShieldSize.AbsMax() * MyGrid.GridSizeR);
+            var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
                 var isRootGrid = sub == MyGrid;

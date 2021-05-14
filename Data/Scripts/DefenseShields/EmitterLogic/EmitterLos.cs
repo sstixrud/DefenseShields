@@ -90,9 +90,17 @@ namespace DefenseShields
             {
                 if (valid)
                 {
-                    var hit = MyGrid.RayCastBlocks(LosScaledCloud[i], testCenter);
+                    var vec = LosScaledCloud[i];
+                    var allClear = true;
+                    foreach (var sub in ShieldComp.LinkedGrids.Keys)
+                    {
+                        var hit = sub.RayCastBlocks(vec, testCenter);
 
-                    if (hit.HasValue && MyGrid.GetCubeBlock(hit.Value) != MyCube.SlimBlock)
+                        if (hit.HasValue && sub.GetCubeBlock(hit.Value) != MyCube.SlimBlock)
+                            allClear = false;
+                    }
+
+                    if (!allClear)
                         _blocksLos[i] = false;
                 }
                 else

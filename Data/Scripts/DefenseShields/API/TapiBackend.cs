@@ -92,10 +92,16 @@ namespace DefenseShields
             ["GetClosestShieldPoint"] = new Func<Sandbox.ModAPI.Ingame.IMyTerminalBlock, Vector3D, Vector3D?>(TAPI_GetClosestShieldPoint),
         };
 
+
+        internal readonly Dictionary<string, Delegate> Retired = new Dictionary<string, Delegate>()
+        {
+        };
+
+
         internal void Init()
         {
             var mod = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsAPI");
-            mod.Getter = (b) => ModApiMethods;
+            mod.Getter = (b) => Retired;
             MyAPIGateway.TerminalControls.AddControl<IMyUpgradeModule>(mod);
 
             var pb = MyAPIGateway.TerminalControls.CreateProperty<Dictionary<string, Delegate>, IMyTerminalBlock>("DefenseSystemsPbAPI");
