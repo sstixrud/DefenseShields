@@ -248,8 +248,15 @@ namespace DefenseShields
 
         private Vector3D _localImpactPosition;
         private Vector3D _oldGridHalfExtents;
-        internal uint _redirectUpdateTime;
+        internal uint RedirectUpdateTime;
         internal Quaternion SQuaternion;
+        internal int LastIndex;
+        internal long LastAttackerId = -1;
+        internal readonly float[] AttackerDamage = new float[100];
+        internal readonly uint[] AttackerTimes = new uint[100];
+        internal readonly Queue<long> AttackerLast = new Queue<long>(100);
+        internal readonly Dictionary<long, int> AttackerLookupCache = new Dictionary<long, int>();
+
         private Color _oldPercentColor = Color.Transparent;
 
         private MyResourceSinkInfo _resourceInfo;

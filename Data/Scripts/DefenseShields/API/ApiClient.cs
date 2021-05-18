@@ -52,7 +52,7 @@ namespace DefenseShields
         private Func<IMyTerminalBlock, Vector3D, bool, MyTuple<bool, int, int, float, float>> _getFaceInfo;
         private Func<IMySlimBlock, bool> _isBlockProtected;
         private Func<MyEntity, MyTuple<bool, Vector3I>> _getFacesFast;
-
+        private Action<MyEntity, ICollection<MyTuple<long, float, uint>>> _getLastAttackers;
 
         private Action<long> _addAtacker;
 
@@ -137,6 +137,8 @@ namespace DefenseShields
             _addAtacker = (Action<long>)delegates["AddAttacker"];
             _isBlockProtected = (Func<IMySlimBlock, bool>)delegates["IsBlockProtected"];
             _getFacesFast = (Func<MyEntity, MyTuple<bool, Vector3I>>)delegates["GetFacesFast"];
+            _getLastAttackers = (Action<MyEntity, ICollection<MyTuple<long, float, uint>>>)delegates["GetLastAttackers"];
+            
         }
 
         public Vector3D? RayAttackShield(IMyTerminalBlock block, RayD ray, long attackerId, float damage, bool energy, bool drawParticle) =>
@@ -185,5 +187,6 @@ namespace DefenseShields
         public void AddAttacker(long attacker) => _addAtacker?.Invoke(attacker);
         public bool IsBlockProtected(IMySlimBlock block) => _isBlockProtected?.Invoke(block) ?? false;
         public MyTuple<bool, Vector3I> GetFacesFast(MyEntity entity) => _getFacesFast?.Invoke(entity) ?? new MyTuple<bool, Vector3I>();
+        public void GetLastAttackers(MyEntity entity, ICollection<MyTuple<long, float, uint>> collection) => _getLastAttackers?.Invoke(entity, collection);
     }
 }

@@ -121,7 +121,7 @@ namespace DefenseShields
             if (!Session.Instance.DedicatedServer && (Session.Instance.UiInput.AnyKeyPressed || Session.Instance.UiInput.KeyPrevPressed))
                 ShieldHotKeys();
             
-            if (ShieldRedirectState != DsSet.Settings.ShieldRedirects && Session.Instance.Tick >= _redirectUpdateTime)
+            if (ShieldRedirectState != DsSet.Settings.ShieldRedirects && Session.Instance.Tick >= RedirectUpdateTime)
                 UpdateRedirectState();
 
             if (Session.Instance.Tick180 && MyGrid.MainCockpit != null && LastCockpit != MyGrid.MainCockpit)

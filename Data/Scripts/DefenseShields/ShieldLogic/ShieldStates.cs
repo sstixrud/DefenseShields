@@ -424,7 +424,7 @@ namespace DefenseShields
 
         internal void StartRedirectTimer()
         {
-            _redirectUpdateTime = Session.Instance.Tick + 120;
+            RedirectUpdateTime = Session.Instance.Tick + 120;
         }
 
         private void UpdateRedirectState()
@@ -451,7 +451,7 @@ namespace DefenseShields
                 SettingsUpdated = true;
                 if (newShape) FitChanged = true;
 
-                if (_redirectUpdateTime <= Session.Instance.Tick && ShieldRedirectState != newSettings.ShieldRedirects)
+                if (RedirectUpdateTime <= Session.Instance.Tick && ShieldRedirectState != newSettings.ShieldRedirects)
                     StartRedirectTimer();
             }
         }

@@ -61,7 +61,7 @@ namespace DefenseShields
             ["GetFacesFast"] = new Func<MyEntity, MyTuple<bool, Vector3I>>(TAPI_GetFacesFast),
             ["AddAttacker"] = new Action<long>(TAPI_AddAttacker),
             ["IsBlockProtected"] = new Func<IMySlimBlock, bool>(TAPI_IsBlockProtected),
-
+            ["GetLastAttackers"] = new Action<MyEntity, ICollection<MyTuple<long, float, uint>>>(TAPI_GetLastAttackers),
         };
 
         private readonly Dictionary<string, Delegate> _terminalPbApiMethods = new Dictionary<string, Delegate>()
@@ -115,41 +115,16 @@ namespace DefenseShields
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
             if (logic == null) return null;
 
-            float? intersectDist;
-            intersectDist = CustomCollision.IntersectEllipsoid(logic.DetectMatrixOutsideInv, logic.DetectMatrixOutside, ray);
+            var intersectDist = CustomCollision.IntersectEllipsoid(logic.DetectMatrixOutsideInv, logic.DetectMatrixOutside, ray);
 
             if (!intersectDist.HasValue) return null;
             var ellipsoid = intersectDist ?? 0;
-            var hitPos = ray.Position + (ray.Direction * ellipsoid);
+            var pos = ray.Position + (ray.Direction * ellipsoid);
 
-            if (energy) damage *= logic.DsState.State.ModulateKinetic;
-            else damage *= logic.DsState.State.ModulateEnergy;
+            var result = TAPI_DamageShield(logic, pos, energy, damage, drawParticle);
+            UpdateLastAttackers(logic, attackerId, result);
 
-            if (Session.Instance.MpActive)
-            {
-                var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
-                logic.AddShieldHit(attackerId, damage, damageType, null, true, hitPos);
-            }
-            else
-            {
-                logic.HitWave = drawParticle;
-                if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
-                else logic.EnergyHit = DefenseShields.HitType.Kinetic;
-
-                logic.ImpactSize = damage;
-                logic.WorldImpactPosition = hitPos;
-            }
-
-            if (energy)
-                logic.EnergyDamage += damage;
-            else
-                logic.KineticDamage += damage;
-
-            logic.WebDamage = true;
-            logic.Absorb += damage;
-
-
-            return hitPos;
+            return pos;
         }
 
         private static Vector3D? TAPI_LineAttackShield(IMyTerminalBlock block, LineD line, long attackerId, float damage, bool energy, bool drawParticle)
@@ -164,35 +139,12 @@ namespace DefenseShields
             var ellipsoid = intersectDist ?? 0;
             if (ellipsoid > line.Length) return null;
 
-            var hitPos = ray.Position + (ray.Direction * ellipsoid);
+            var pos = ray.Position + (ray.Direction * ellipsoid);
 
-            if (energy) damage *= logic.DsState.State.ModulateKinetic;
-            else damage *= logic.DsState.State.ModulateEnergy;
+            var result = TAPI_DamageShield(logic, pos, energy, damage, drawParticle);
+            UpdateLastAttackers(logic, attackerId, result);
 
-            if (Session.Instance.MpActive)
-            {
-                var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
-                logic.AddShieldHit(attackerId, damage, damageType, null, true, hitPos);
-            }
-            else
-            {
-                logic.HitWave = drawParticle;
-                if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
-                else logic.EnergyHit = DefenseShields.HitType.Kinetic;
-
-                logic.ImpactSize = damage;
-                logic.WorldImpactPosition = hitPos;
-            }
-
-            if (energy)
-                logic.EnergyDamage += damage;
-            else
-                logic.KineticDamage += damage;
-
-            logic.WebDamage = true;
-            logic.Absorb += damage;
-
-            return hitPos;
+            return pos;
         }
 
         private static bool TAPI_PointAttackShield(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, bool energy, bool drawParticle, bool posMustBeInside = false)
@@ -202,31 +154,8 @@ namespace DefenseShields
             if (posMustBeInside)
                 if (!CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) return false;
 
-            if (energy) damage *= logic.DsState.State.ModulateKinetic;
-            else damage *= logic.DsState.State.ModulateEnergy;
-
-            if (Session.Instance.MpActive)
-            {
-                var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
-                logic.AddShieldHit(attackerId, damage, damageType, null, true, pos);
-            }
-            else
-            {
-                logic.ImpactSize = damage;
-                logic.WorldImpactPosition = pos;
-            }
-
-            logic.HitWave = drawParticle;
-            if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
-            else logic.EnergyHit = DefenseShields.HitType.Kinetic;
-
-            if (energy)
-                logic.EnergyDamage += damage;
-            else
-                logic.KineticDamage += damage;
-
-            logic.WebDamage = true;
-            logic.Absorb += damage;
+            var result = TAPI_DamageShield(logic, pos, energy, damage, drawParticle);
+            UpdateLastAttackers(logic, attackerId, result);
 
             return true;
         }
@@ -238,27 +167,30 @@ namespace DefenseShields
             if (posMustBeInside)
                 if (!CustomCollision.PointInShield(pos, logic.DetectMatrixOutsideInv)) return null;
 
+            var result = TAPI_DamageShield(logic, pos, energy, damage, drawParticle);
+            UpdateLastAttackers(logic, attackerId, result);
+            return result;
+        }
+
+        private static float TAPI_DamageShield(DefenseShields logic, Vector3D pos, bool energy, float damage, bool drawParticle)
+        {
             float hpRemaining;
             var pendingDamage = logic.Absorb > 0 ? logic.Absorb : 0;
 
             var shieldHp = logic.DsState.State.Charge * DefenseShields.ConvToHp;
-            if (energy) {
+            if (energy)
+            {
                 damage *= logic.DsState.State.ModulateKinetic;
                 hpRemaining = ((shieldHp - pendingDamage) - damage) / logic.DsState.State.ModulateEnergy;
             }
-            else {
+            else
+            {
                 damage *= logic.DsState.State.ModulateEnergy;
                 hpRemaining = ((shieldHp - pendingDamage) - damage) / logic.DsState.State.ModulateKinetic;
             }
 
-            if (Session.Instance.MpActive) {
-                var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
-                logic.AddShieldHit(attackerId, damage, damageType, null, true, pos);
-            }
-            else {
-                logic.ImpactSize = damage;
-                logic.WorldImpactPosition = pos;
-            }
+            logic.ImpactSize = damage;
+            logic.WorldImpactPosition = pos;
 
             logic.HitWave = drawParticle;
             if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
@@ -273,6 +205,39 @@ namespace DefenseShields
             logic.Absorb += damage;
 
             return hpRemaining * 0.01f;
+        }
+
+        private static void UpdateLastAttackers(DefenseShields ds, long attackerId, float damage)
+        {
+            var index = ds.LastIndex;
+            var newAttacker = ds.LastAttackerId != attackerId && !ds.AttackerLookupCache.TryGetValue(attackerId, out index);
+
+            if (!newAttacker) {
+                ds.AttackerDamage[index] += damage;
+                ds.AttackerTimes[index] = Session.Instance.Tick;
+            }
+            else {
+
+                ds.LastAttackerId = attackerId;
+
+                if (++ds.LastIndex < 10) {
+                    ds.AttackerLookupCache[ds.LastAttackerId] = ds.LastIndex;
+                    ds.AttackerDamage[ds.LastIndex] = damage;
+                    ds.AttackerTimes[ds.LastIndex] = Session.Instance.Tick;
+
+                }
+                else {
+                    ds.LastIndex = 0;
+                    ds.AttackerLookupCache[ds.LastAttackerId] = ds.LastIndex;
+                    ds.AttackerDamage[ds.LastIndex] = damage;
+                    ds.AttackerTimes[ds.LastIndex] = Session.Instance.Tick;
+                }
+
+                if (ds.AttackerLast.Count >= 10)
+                    ds.AttackerLookupCache.Remove(ds.AttackerLast.Dequeue());
+
+                ds.AttackerLast.Enqueue(attackerId);
+            }
         }
 
         private static MyTuple<bool, Vector3I> TAPI_GetFacesFast(MyEntity entity)
@@ -366,7 +331,7 @@ namespace DefenseShields
             return new MyTuple<bool, int, int, float, float>();
         }
 
-        private static float? TAPI_PointAttackShieldCon(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, float secondaryDamage, bool energy, bool drawParticle, bool posMustBeInside = false)
+        private static float? TAPI_PointAttackShieldCon(IMyTerminalBlock block, Vector3D pos, long attackerId, float damage, float secondaryDamage, bool energy, bool drawParticle, bool posMustBeInside = false) //inlined for performance
         {
             var logic = block?.GameLogic?.GetAs<DefenseShields>()?.ShieldComp?.DefenseShields;
             if (logic == null)
@@ -410,14 +375,39 @@ namespace DefenseShields
                 damage = primaryDamage;
             }
 
-            if (false && Session.Instance.MpActive) {
-                var damageType = energy ? Session.Instance.MPEnergy : Session.Instance.MPKinetic;
-                logic.AddShieldHit(attackerId, damage, damageType, null, true, pos);
+            var index = logic.LastIndex;
+            var newAttacker = logic.LastAttackerId != attackerId && !logic.AttackerLookupCache.TryGetValue(attackerId, out index);
+
+            if (!newAttacker) {
+                logic.AttackerDamage[index] += damage;
+                logic.AttackerTimes[index] = Session.Instance.Tick;
             }
             else {
-                logic.ImpactSize = damage;
-                logic.WorldImpactPosition = pos;
+
+                logic.LastAttackerId = attackerId;
+
+                if (++logic.LastIndex < 100) {
+                    logic.AttackerLookupCache[logic.LastAttackerId] = logic.LastIndex;
+                    logic.AttackerDamage[logic.LastIndex] = damage;
+                    logic.AttackerTimes[logic.LastIndex] = Session.Instance.Tick;
+
+                }
+                else {
+                    logic.LastIndex = 0;
+                    logic.AttackerLookupCache[logic.LastAttackerId] = logic.LastIndex;
+                    logic.AttackerDamage[logic.LastIndex] = damage;
+                    logic.AttackerTimes[logic.LastIndex] = Session.Instance.Tick;
+                }
+
+                if (logic.AttackerLast.Count >= 100)
+                    logic.AttackerLookupCache.Remove(logic.AttackerLast.Dequeue());
+
+                logic.AttackerLast.Enqueue(attackerId);
+
             }
+
+            logic.ImpactSize = damage;
+            logic.WorldImpactPosition = pos;
 
             logic.HitWave = drawParticle;
             if (energy) logic.EnergyHit = DefenseShields.HitType.Energy;
@@ -950,6 +940,19 @@ namespace DefenseShields
                 return pointInShield;
             }
             return false;
+        }
+
+        private static void TAPI_GetLastAttackers(MyEntity entity, ICollection<MyTuple<long, float, uint>> collection)
+        {
+            collection.Clear();
+            if (entity == null) return;
+            ShieldGridComponent c;
+            if (Session.Instance.IdToBus.TryGetValue(entity.EntityId, out c) && c?.DefenseShields != null) {
+
+                var s = c.DefenseShields;
+                foreach (var pair in s.AttackerLookupCache)
+                    collection.Add(new MyTuple<long, float, uint>(pair.Key, s.AttackerDamage[pair.Value], s.AttackerTimes[pair.Value]));
+            }
         }
 
         // PB overloads
