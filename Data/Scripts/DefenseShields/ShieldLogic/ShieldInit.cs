@@ -1,6 +1,7 @@
 ﻿
 
 using SpaceEngineers.Game.ModAPI;
+using VRage;
 using VRage.Collections;
 using VRage.Game.ModAPI;
 
@@ -276,6 +277,7 @@ namespace DefenseShields
                 ComputeCap();
                 ShieldChangeState();
             }
+
             if (Session.Enforced.Debug == 3) Log.Line($"ResetEntity: ShieldId [{Shield.EntityId}]");
         }
 
@@ -344,6 +346,11 @@ namespace DefenseShields
                 }
             }
             catch (Exception ex) { Log.Line($"Exception in StorageSetup: {ex}"); }
+        }
+
+        private void ResetDistributor()
+        {
+            MyResourceDist = FakeController.GridResourceDistributor;
         }
 
         private void PowerPreInit()
@@ -443,7 +450,6 @@ namespace DefenseShields
                     _updateMobileShape = true;
                     break;
                 case ShieldType.SmallGrid:
-                    //_modelActive = "\\Models\\Cubes\\ShieldActiveBase_LOD4.mwm";
                     _updateMobileShape = true;
                     break;
             }
@@ -523,7 +529,6 @@ namespace DefenseShields
         private void ComputeCap()
         {
             _updateCap = false;
-
             if (ShieldComp.SubGrids.Count == 0) {
 
                 UpdateSubGrids();
@@ -539,7 +544,6 @@ namespace DefenseShields
             }
             _forceCap = false;
             Vector3I center = Vector3I.Zero;
-            //var sphere = new BoundingSphereD(Vector3D.Zero, 1f);
             var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
@@ -606,7 +610,8 @@ namespace DefenseShields
         {
             var newExtAbsMax = box.HalfExtents.AbsMax();
             var minHalfExtAbsMin = ShieldAabbScaled.HalfExtents.AbsMin() / 4;
-            var useMin = minHalfExtAbsMin > newExtAbsMax;
+            var boxSurface = box.SurfaceArea(); 
+            var useMin = minHalfExtAbsMin > newExtAbsMax || boxSurface  < 1;
             var vScale = (ShieldAabbScaled.HalfExtents.AbsMin() * 0.5f) * Vector3.One;
             var minBox = new BoundingBox(-vScale, vScale);
             var boxsArea = useMin ? minBox.SurfaceArea() : box.SurfaceArea();

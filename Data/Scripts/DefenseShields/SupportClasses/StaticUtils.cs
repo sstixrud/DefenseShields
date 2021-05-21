@@ -25,7 +25,7 @@ namespace DefenseShields.Support
         public static void PrepConfigFile()
         {
             const int BaseScaler = 175;
-            const float HeatScaler = 0.004f;
+            const float HeatScaler = 0.002f;
             const float Unused = 0f;
             const int StationRatio = 100;
             const int LargeShipRate = 100;
@@ -34,7 +34,7 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 79;
+            const int Version = 80;
             const float CapScaler = 1f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
@@ -77,9 +77,9 @@ namespace DefenseShields.Support
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
                 Session.Enforced.OverloadTime = !unPackedData.OverloadTime.Equals(-1) ? unPackedData.OverloadTime : OverloadTime;
 
-                if (unPackedData.Version <= 78)
+                if (unPackedData.Version <= 79)
                 {
-                    Session.Enforced.OverloadTime = 2700;
+                    Session.Enforced.HeatScaler = 0.002f;
                 }
                 Session.Enforced.Version = Version;
                 UpdateConfigFile(unPackCfg);

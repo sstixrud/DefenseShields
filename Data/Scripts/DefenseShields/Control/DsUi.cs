@@ -209,7 +209,7 @@ namespace DefenseShields
         internal static float GetOffsetWidth(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            return comp?.DsSet.Settings.ShieldOffset.X ?? 0;
+            return comp?.DsSet.Settings.ShieldOffset.Y ?? 0;
         }
 
         internal static void SetOffsetWidth(IMyTerminalBlock block, float newValue)
@@ -217,7 +217,7 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            comp.DsSet.Settings.ShieldOffset.X = (int)newValue;
+            comp.DsSet.Settings.ShieldOffset.Y = (int)newValue;
             comp.UpdateDimensions = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;
@@ -228,7 +228,7 @@ namespace DefenseShields
         internal static float GetOffsetHeight(IMyTerminalBlock block)
         {
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
-            return comp?.DsSet.Settings.ShieldOffset.Y ?? 0;
+            return comp?.DsSet.Settings.ShieldOffset.X ?? 0;
         }
 
         internal static void SetOffsetHeight(IMyTerminalBlock block, float newValue)
@@ -236,7 +236,7 @@ namespace DefenseShields
             var comp = block?.GameLogic?.GetAs<DefenseShields>();
             if (comp == null) return;
 
-            comp.DsSet.Settings.ShieldOffset.Y = (int)newValue;
+            comp.DsSet.Settings.ShieldOffset.X = (int)newValue;
             comp.UpdateDimensions = true;
             comp.SettingsUpdated = true;
             comp.ClientUiUpdate = true;

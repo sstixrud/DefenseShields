@@ -1,5 +1,6 @@
 ﻿using ParallelTasks;
 using ProtoBuf;
+using Sandbox.ModAPI;
 using VRage.Input;
 
 namespace DefenseShields
@@ -76,6 +77,7 @@ namespace DefenseShields
         internal readonly Dictionary<MyCubeGrid, uint> CheckForSplits = new Dictionary<MyCubeGrid, uint>();
         internal readonly ConcurrentDictionary<MyCubeGrid, ParentGrid> GetParentGrid = new ConcurrentDictionary<MyCubeGrid, ParentGrid>();
         internal readonly ConcurrentDictionary<long, byte> ManagedAttackers = new ConcurrentDictionary<long, byte>();
+        internal readonly ConcurrentDictionary<MyCubeGrid, ConcurrentCachingList<MyBatteryBlock>> GridBatteryMap = new ConcurrentDictionary<MyCubeGrid, ConcurrentCachingList<MyBatteryBlock>>();
 
         internal readonly HashSet<MyCubeGrid> WatchForSplits = new HashSet<MyCubeGrid>();
 
@@ -104,6 +106,8 @@ namespace DefenseShields
         internal readonly MyConcurrentPool<VoxelCollisionDmgThreadEvent> VoxelCollisionDmgPool = new MyConcurrentPool<VoxelCollisionDmgThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<VoxelCollisionPhysicsThreadEvent> VoxelCollisionPhysicsPool = new MyConcurrentPool<VoxelCollisionPhysicsThreadEvent>(25, info => info.Clean());
         internal readonly MyConcurrentPool<ForceDataThreadEvent> ForceDataPool = new MyConcurrentPool<ForceDataThreadEvent>(100, info => info.Clean());
+        internal readonly MyConcurrentPool<ConcurrentCachingList<MyBatteryBlock>> BatteryListPool = new MyConcurrentPool<ConcurrentCachingList<MyBatteryBlock>>(100);
+
         internal ControlQuery ControlRequest;
         internal enum ControlQuery
         {

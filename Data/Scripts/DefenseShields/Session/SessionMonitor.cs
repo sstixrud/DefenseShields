@@ -512,7 +512,6 @@ namespace DefenseShields
                         continue;
                     }
 
-                    if (!DedicatedServer && Tick20 && s.EffectsDirty) s.ResetDamageEffects();
                     if (Tick600) s.CleanWebEnts();
                     else if (Tick60) s.ProtectClean();
 

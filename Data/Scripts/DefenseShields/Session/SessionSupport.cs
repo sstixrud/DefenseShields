@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ParallelTasks;
+using VRage.Collections;
 using VRage.Input;
 using VRage.Utils;
 using VRageMath;
@@ -375,6 +376,50 @@ namespace DefenseShields
                     }
                     EntRefreshQueue.Enqueue(myEntity);
                 }
+            }
+        }
+
+        private void OnEntityCreate(MyEntity myEntity)
+        {
+
+            var battery = myEntity as MyBatteryBlock;
+            if (battery != null)
+            {
+                ConcurrentCachingList<MyBatteryBlock> batteries;
+                if (GridBatteryMap.TryGetValue(battery.CubeGrid, out batteries)) {
+                    Log.Line($"add battery to existing grid");
+                    batteries.Add(battery);
+                    batteries.ApplyAdditions();
+                }
+                else {
+                    Log.Line($"add battery to new grid");
+                    battery.CubeGrid.OnFatBlockRemoved += OnFatBlockRemoved;
+                    batteries = BatteryListPool.Get();
+                    batteries.Add(battery);
+                    batteries.ApplyAdditions();
+                    GridBatteryMap[battery.CubeGrid] = batteries;
+
+                }
+            }
+        }
+
+        private void OnFatBlockRemoved(MyCubeBlock cube)
+        {
+            var battery = cube as MyBatteryBlock;
+            if (battery != null) {
+
+                ConcurrentCachingList<MyBatteryBlock> batteries;
+                if (GridBatteryMap.TryGetValue(battery.CubeGrid, out batteries)) {
+                    Log.Line($"battery remove");
+                    batteries.Remove(battery, true);
+
+                    if (batteries.IsEmpty) {
+                        Log.Line($"empty");
+                        battery.CubeGrid.OnFatBlockRemoved -= OnFatBlockRemoved;
+                        BatteryListPool.Return(batteries);
+                    }
+                }
+                else Log.Line($"no grid map to remove battery from");
             }
         }
 

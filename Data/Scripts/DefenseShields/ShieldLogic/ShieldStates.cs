@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VRage;
 using VRage.Utils;
 
 namespace DefenseShields
@@ -113,9 +114,12 @@ namespace DefenseShields
             var notFailing = _overLoadLoop == -1 && _empOverLoadLoop == -1 && _reModulationLoop == -1;
             ShieldActive = ShieldRaised() && DsState.State.EmitterLos && notFailing && PowerOnline();
             StepDamageState();
-            if (!ShieldActive) return false;
+            if (!ShieldActive)
+                return false;
+
             var prevOnline = DsState.State.Online;
-            if (!prevOnline && GridIsMobile && FieldShapeBlocked()) return false;
+            if (!prevOnline && GridIsMobile && FieldShapeBlocked())
+                return false;
 
             _comingOnline = !prevOnline || _firstLoop;
 
@@ -154,7 +158,6 @@ namespace DefenseShields
                 TerminalRefresh();
                 if (Session.Enforced.Debug == 3) Log.Line($"StateUpdate: ComingOnlineSetup - ShieldId [{Shield.EntityId}]");
             }
-            if (!_isDedicated) ResetDamageEffects();
             Session.Instance.ActiveShields[this] = byte.MaxValue;
             UpdateSubGrids();
         }
@@ -296,9 +299,17 @@ namespace DefenseShields
             var wrongRole = notStation || notShip || unKnown;
             if (!nullShield && !myShield || !MyCube.IsFunctional || primeMode || betaMode || wrongOwner || wrongRole)
             {
-                if (!DsState.State.Suspended) Suspend();
+
+                if (!DsState.State.Suspended) {
+                    Suspend();
+
+                    if (!wrongRole && ShieldMode != ShieldType.Station && !myShield && DsState.State.Charge > 0)
+                        DsState.State.Charge = 0;
+                }
+
                 if (myShield) ShieldComp.DefenseShields = null;
                 if (wrongRole) SetShieldType(true);
+    
                 return true;
             }
 

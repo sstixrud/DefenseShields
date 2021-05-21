@@ -224,6 +224,8 @@
             ApiServer.Load();
             MyAPIGateway.Gui.GuiControlCreated += MenuOpened;
             MyAPIGateway.Gui.GuiControlRemoved += MenuClosed;
+            MyEntities.OnEntityCreate += OnEntityCreate;
+
         }
 
         protected override void UnloadData()
@@ -242,6 +244,8 @@
             MyAPIGateway.Gui.GuiControlCreated -= MenuOpened;
             MyAPIGateway.Gui.GuiControlRemoved -= MenuClosed;
             MyEntities.OnEntityRemove -= OnEntityRemove;
+            MyEntities.OnEntityCreate -= OnEntityCreate;
+
             MyAPIGateway.Session.OnSessionReady -= OnSessionReady;
 
             if (!DedicatedServer) MyAPIGateway.TerminalControls.CustomControlGetter -= CustomControls;

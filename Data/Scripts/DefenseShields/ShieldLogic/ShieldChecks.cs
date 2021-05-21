@@ -122,7 +122,7 @@ namespace DefenseShields
             _linkedGridCount = ShieldComp.LinkedGrids.Count;
             _blockChanged = true;
             _functionalChanged = true;
-            _updateGridDistributor = true;
+            //_updateGridDistributor = true;
             _subTick = _tick;
         }
 
@@ -170,26 +170,29 @@ namespace DefenseShields
             if (_isServer && (_updateCap || forceCap))
                 ComputeCap();
 
-            if (backGround) FuncTask = MyAPIGateway.Parallel.StartBackground(BackGroundChecks);
-            else BackGroundChecks();
+            //if (backGround) FuncTask = MyAPIGateway.Parallel.StartBackground(BackGroundChecks);
+            //else BackGroundChecks();
             _functionalEvent = false;
         }
 
         private void BackGroundChecks()
         {
-            var gridDistNeedUpdate = _updateGridDistributor || MyResourceDist?.SourcesEnabled == MyMultipleEnabledEnum.NoObjects;
-            _updateGridDistributor = false;
+            //var gridDistNeedUpdate = _updateGridDistributor || MyResourceDist?.SourcesEnabled == MyMultipleEnabledEnum.NoObjects;
+            //_updateGridDistributor = false;
             lock (SubLock)
             {
-                _powerSources.Clear();
-                _functionalBlocks.Clear();
+                //_powerSources.Clear();
                 _batteryBlocks.Clear();
 
                 foreach (var grid in ShieldComp.LinkedGrids.Keys)
                 {
-                    var mechanical = ShieldComp.SubGrids.ContainsKey(grid);
+                    //var mechanical = ShieldComp.SubGrids.ContainsKey(grid);
                     foreach (var block in grid.GetFatBlocks())
                     {
+                        var battery = block as IMyBatteryBlock;
+                        if (battery != null) _batteryBlocks.Add(battery);
+
+                        /*
                         if (mechanical)
                         {
                             if (gridDistNeedUpdate)
@@ -208,12 +211,6 @@ namespace DefenseShields
                             }
                         }
 
-                        if (!_isDedicated)
-                            _functionalBlocks.Add(block);
-
-                        var battery = block as IMyBatteryBlock;
-                        if (battery != null) _batteryBlocks.Add(battery);
-
                         var source = block.Components.Get<MyResourceSourceComponent>();
                         if (source == null) continue;
 
@@ -223,6 +220,7 @@ namespace DefenseShields
                             _powerSources.Add(source);
                             break;
                         }
+                        */
                     }
                 }
             }

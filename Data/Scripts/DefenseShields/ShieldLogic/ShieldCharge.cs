@@ -2,8 +2,10 @@
 using System;
 using System.Diagnostics.Eventing.Reader;
 using DefenseShields.Support;
+using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
 using VRage;
+using VRage.Collections;
 using VRage.Utils;
 
 namespace DefenseShields
@@ -155,7 +157,6 @@ namespace DefenseShields
                 UpdateHeatRate();
             else 
                 _expChargeReduction = 0;
-
             if (_count == 29 && DsState.State.Charge < ShieldMaxCharge) {
                 DsState.State.Charge += ShieldChargeRate;
             }
@@ -184,7 +185,6 @@ namespace DefenseShields
             var cleanPower = ShieldAvailablePower + ShieldCurrentPower;
             _otherPower = ShieldMaxPower - cleanPower;
             var powerForShield = (cleanPower * 0.9f) - _shieldMaintaintPower;
-
             var rawMaxChargeRate = powerForShield > 0 ? powerForShield : 0f;
             _shieldMaxChargeRate = rawMaxChargeRate;
             _shieldPeakRate = (_shieldMaxChargeRate * hpsEfficiency);
@@ -209,6 +209,7 @@ namespace DefenseShields
             }
 
             _powerNeeded = _shieldMaintaintPower + _shieldConsumptionRate + _otherPower;
+
             return powerForShield;
         }
 
@@ -273,6 +274,14 @@ namespace DefenseShields
             _batteryMaxPower = 0;
             _batteryCurrentOutput = 0;
             _batteryCurrentInput = 0;
+
+            if (MyResourceDist == null || MyResourceDist.SourcesEnabled == MyMultipleEnabledEnum.NoObjects)
+                ResetDistributor();
+
+            GridMaxPower = MyResourceDist.MaxAvailableResourceByType(GId);
+            GridCurrentPower = MyResourceDist.TotalRequiredInputByType(GId);
+            if (!DsSet.Settings.UseBatteries) CalculateBatteryInput();
+            /*
             lock (SubLock)
             {
                 if (MyResourceDist != null && FuncTask.IsComplete && !_functionalEvent)
@@ -293,6 +302,7 @@ namespace DefenseShields
                 }
                 else FallBackPowerCalc();
             }
+            */
             GridAvailablePower = GridMaxPower - GridCurrentPower;
 
             if (!DsSet.Settings.UseBatteries)
@@ -310,7 +320,7 @@ namespace DefenseShields
 
             _shieldPowered = ShieldMaxPower > 0;
         }
-
+        /*
         private void FallBackPowerCalc(bool reportOnly = false)
         {
             var batteries = !DsSet.Settings.UseBatteries;
@@ -403,29 +413,61 @@ namespace DefenseShields
                 GridCurrentPower += _batteryCurrentOutput;
             }
         }
-
+        */
         private void CalculateBatteryInput()
         {
-            for (int i = 0; i < _batteryBlocks.Count; i++)
+            foreach (var sub in ShieldComp.LinkedGrids.Keys)
             {
+                ConcurrentCachingList<MyBatteryBlock> batteries;
+                if (Session.Instance.GridBatteryMap.TryGetValue(sub, out batteries))
+                {
+                    for (int i = 0; i < batteries.Count; i++)
+                    {
 
-                var battery = _batteryBlocks[i];
-                if (!battery.IsWorking) continue;
-                var currentInput = battery.CurrentInput;
-                var currentOutput = battery.CurrentOutput;
-                var maxOutput = battery.MaxOutput;
+                        var battery = batteries[i];
+                        if (!battery.IsWorking) continue;
+                        var currentInput = battery.CurrentInput;
+                        var currentOutput = battery.CurrentOutput;
+                        var maxOutput = battery.MaxOutput;
 
-                if (currentInput > 0)
+                        if (currentInput > 0)
+                        {
+
+                            _batteryCurrentInput += currentInput;
+                            if (battery.IsCharging) _batteryCurrentOutput -= currentInput;
+                            else _batteryCurrentOutput -= currentInput;
+                        }
+
+                        _batteryMaxPower += maxOutput;
+                        _batteryCurrentOutput += currentOutput;
+                    }
+                }
+            }
+            /*
+            lock (SubLock)
+            {
+                for (int i = 0; i < _batteryBlocks.Count; i++)
                 {
 
-                    _batteryCurrentInput += currentInput;
-                    if (battery.IsCharging) _batteryCurrentOutput -= currentInput;
-                    else _batteryCurrentOutput -= currentInput;
-                }
+                    var battery = _batteryBlocks[i];
+                    if (!battery.IsWorking) continue;
+                    var currentInput = battery.CurrentInput;
+                    var currentOutput = battery.CurrentOutput;
+                    var maxOutput = battery.MaxOutput;
 
-                _batteryMaxPower += maxOutput;
-                _batteryCurrentOutput += currentOutput;
+                    if (currentInput > 0)
+                    {
+
+                        _batteryCurrentInput += currentInput;
+                        if (battery.IsCharging) _batteryCurrentOutput -= currentInput;
+                        else _batteryCurrentOutput -= currentInput;
+                    }
+
+                    _batteryMaxPower += maxOutput;
+                    _batteryCurrentOutput += currentOutput;
+                }
             }
+            */
         }
     }
 }

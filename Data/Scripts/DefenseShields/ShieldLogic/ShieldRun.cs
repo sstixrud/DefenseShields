@@ -1,4 +1,5 @@
-﻿using VRage.Utils;
+﻿using VRage;
+using VRage.Utils;
 using VRageMath;
 
 namespace DefenseShields
@@ -23,7 +24,7 @@ namespace DefenseShields
                 PowerPreInit();
                 NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
                 NeedsUpdate |= MyEntityUpdateEnum.EACH_FRAME;
-                Shield = (IMyUpgradeModule)Entity;
+
                 _containerInited = true;
             }
 
@@ -33,6 +34,9 @@ namespace DefenseShields
         public override void Init(MyObjectBuilder_EntityBase objectBuilder)
         {
             base.Init(objectBuilder);
+            Shield = (IMyUpgradeModule)Entity;
+            MyCube = (MyCubeBlock)Entity;
+            FakeController.SlimBlock = MyCube.SlimBlock;
             StorageSetup();
         }
 
@@ -41,8 +45,8 @@ namespace DefenseShields
             try
             {
                 if (Session.Enforced.Debug == 3) Log.Line($"OnAddedToScene: GridId:{Shield.CubeGrid.EntityId} - ShieldId [{Shield.EntityId}]");
-                MyGrid = (MyCubeGrid)Shield.CubeGrid;
-                MyCube = Shield as MyCubeBlock;
+
+                MyGrid = MyCube.CubeGrid;
                 RegisterEvents();
                 AssignSlots();
                 _resetEntity = true;

@@ -356,22 +356,6 @@ namespace DefenseShields
             return false;
         }
 
-
-        public void ResetDamageEffects()
-        {
-            if (DsState.State.Online && !DsState.State.Lowered)
-            {
-                lock (SubLock)
-                {
-                    foreach (var funcBlock in _functionalBlocks)
-                    {
-                        if (funcBlock == null) continue;
-                        if (funcBlock.IsFunctional) funcBlock.SetDamageEffect(false);
-                    }
-                }
-            }
-        }
-
         internal void AddShieldHit(long attackerId, float amount, MyStringHash damageType, IMySlimBlock block, bool reset, Vector3D? hitPos = null)
         {
             lock (ShieldHit)

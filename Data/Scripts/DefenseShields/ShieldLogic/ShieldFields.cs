@@ -38,7 +38,8 @@ namespace DefenseShields
         internal readonly HashSet<MyEntity> FriendlyMissileCache = new HashSet<MyEntity>();
 
         internal readonly ConcurrentDictionary<MyEntity, ProtectCache> ProtectedEntCache = new ConcurrentDictionary<MyEntity, ProtectCache>();
-        
+        internal readonly MyShipController FakeController = new MyShipController();
+
         internal readonly ConcurrentDictionary<MyEntity, EntIntersectInfo> WebEnts = new ConcurrentDictionary<MyEntity, EntIntersectInfo>();
         internal readonly ConcurrentDictionary<MyEntity, MoverInfo> EntsByMe = new ConcurrentDictionary<MyEntity, MoverInfo>();
         internal readonly ConcurrentDictionary<MyVoxelBase, int> VoxelsToIntersect = new ConcurrentDictionary<MyVoxelBase, int>();
@@ -126,8 +127,7 @@ namespace DefenseShields
         private const string ModelOrange = "\\Models\\Cubes\\ShieldPassive04.mwm";
         private const string ModelCyan = "\\Models\\Cubes\\ShieldPassive03.mwm";
 
-        private readonly List<MyResourceSourceComponent> _powerSources = new List<MyResourceSourceComponent>();
-        private readonly List<MyCubeBlock> _functionalBlocks = new List<MyCubeBlock>();
+        //private readonly List<MyResourceSourceComponent> _powerSources = new List<MyResourceSourceComponent>();
         private readonly List<IMyBatteryBlock> _batteryBlocks = new List<IMyBatteryBlock>();
         private readonly RunningAverage _dpsAvg = new RunningAverage(2);
         private readonly RunningAverage _hpsAvg = new RunningAverage(2);
@@ -213,7 +213,7 @@ namespace DefenseShields
         private bool _isServer;
         private bool _shieldPowered;
         private bool _subUpdate;
-        private bool _updateGridDistributor;
+        //private bool _updateGridDistributor;
         private bool _hideShield;
         private bool _hideColor;
         private bool _supressedColor;

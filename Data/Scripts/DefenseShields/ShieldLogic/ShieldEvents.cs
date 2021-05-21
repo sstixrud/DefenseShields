@@ -155,12 +155,14 @@
             {
                 _functionalAdded = true;
                 _functionalChanged = true;
+                /*
                 if (MyResourceDist == null)
                 {
                     var controller = myCubeBlock as MyShipController;
                     if (controller != null)
                         if (controller.GridResourceDistributor.SourcesEnabled != MyMultipleEnabledEnum.NoObjects) _updateGridDistributor = true;
                 }
+                */
             }
             catch (Exception ex) { Log.Line($"Exception in Controller FatBlockAdded: {ex}"); }
         }
