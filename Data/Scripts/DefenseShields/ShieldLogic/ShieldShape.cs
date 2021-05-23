@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using Sandbox.Game.Entities;
+﻿using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
 
 namespace DefenseShields

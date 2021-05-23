@@ -1,9 +1,5 @@
 ﻿
-
 using SpaceEngineers.Game.ModAPI;
-using VRage;
-using VRage.Collections;
-using VRage.Game.ModAPI;
 
 namespace DefenseShields
 {
@@ -66,13 +62,6 @@ namespace DefenseShields
                 else if (!GridIsMobile && ShieldComp.StationEmitter != null && !ShieldComp.StationEmitter.EmiState.State.Los) _sendMessage = true;
                 if (Session.Enforced.Debug >= 3) Log.Line($"EmitterEvent: no emitter is working, shield mode: {ShieldMode} - WarmedUp:{WarmedUp} - MaxPower:{ShieldMaxPower} - Radius:{ShieldSphere.Radius} - Broadcast:{_sendMessage} - ShieldId [{Shield.EntityId}]");
             }
-        }
-
-        internal void ForceLowReflectiveNoColor()
-        {
-            _modelPassive = ModelLowReflective;
-            _hideColor = false;
-            _supressedColor = false;
         }
 
         internal void SelectPassiveShell()
@@ -183,7 +172,6 @@ namespace DefenseShields
 			Session.Instance.FunctionalShields[this] = false;
             Session.Instance.Controllers.Add(this);
 			
-            //if (MyAPIGateway.Session.CreativeMode) CreativeModeWarning();
             NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
             InitTick = Session.Instance.Tick;
             _bTime = 1;

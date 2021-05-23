@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DefenseShields.Support;
 using Sandbox.Game.Entities;
-using Sandbox.Game.EntityComponents;
 using Sandbox.ModAPI;
-using VRage;
 using VRage.Game;
 using VRage.Game.ModAPI;
 using VRage.ModAPI;
@@ -52,16 +49,6 @@ namespace DefenseShields
 
             if (!_isDedicated) MyAPIGateway.Utilities.ShowNotification(message, 28800);
             else Log.Line(message);
-        }
-
-        private static void CreativeModeWarning()
-        {
-            if (Session.Instance.CreativeWarn || Session.Instance.Tick < 600) return;
-            Session.Instance.CreativeWarn = true;
-            const string message = "DefenseShields is not fully supported in\n" +
-                                   "Creative Mode, due to unlimited power and \n" +
-                                   "it will not operate as designed.\n";
-            MyAPIGateway.Utilities.ShowNotification(message, 6720);
         }
 
         private readonly List<IMyCubeGrid> _tempSubGridList = new List<IMyCubeGrid>();
@@ -122,7 +109,6 @@ namespace DefenseShields
             _linkedGridCount = ShieldComp.LinkedGrids.Count;
             _blockChanged = true;
             _functionalChanged = true;
-            //_updateGridDistributor = true;
             _subTick = _tick;
         }
 
@@ -170,61 +156,9 @@ namespace DefenseShields
             if (_isServer && (_updateCap || forceCap))
                 ComputeCap();
 
-            //if (backGround) FuncTask = MyAPIGateway.Parallel.StartBackground(BackGroundChecks);
-            //else BackGroundChecks();
             _functionalEvent = false;
         }
 
-        private void BackGroundChecks()
-        {
-            //var gridDistNeedUpdate = _updateGridDistributor || MyResourceDist?.SourcesEnabled == MyMultipleEnabledEnum.NoObjects;
-            //_updateGridDistributor = false;
-            lock (SubLock)
-            {
-                //_powerSources.Clear();
-                _batteryBlocks.Clear();
-
-                foreach (var grid in ShieldComp.LinkedGrids.Keys)
-                {
-                    //var mechanical = ShieldComp.SubGrids.ContainsKey(grid);
-                    foreach (var block in grid.GetFatBlocks())
-                    {
-                        var battery = block as IMyBatteryBlock;
-                        if (battery != null) _batteryBlocks.Add(battery);
-
-                        /*
-                        if (mechanical)
-                        {
-                            if (gridDistNeedUpdate)
-                            {
-                                var controller = block as MyShipController;
-                                if (controller != null)
-                                {
-                                    var distributor = controller.GridResourceDistributor;
-                                    if (distributor.SourcesEnabled != MyMultipleEnabledEnum.NoObjects)
-                                    {
-                                        if (Session.Enforced.Debug == 3) Log.Line($"Found MyGridDistributor from type:{block.BlockDefinition} - ShieldId [{Shield.EntityId}]");
-                                        MyResourceDist = controller.GridResourceDistributor;
-                                        gridDistNeedUpdate = false;
-                                    }
-                                }
-                            }
-                        }
-
-                        var source = block.Components.Get<MyResourceSourceComponent>();
-                        if (source == null) continue;
-
-                        foreach (var type in source.ResourceTypes)
-                        {
-                            if (type != MyResourceDistributorComponent.ElectricityId) continue;
-                            _powerSources.Add(source);
-                            break;
-                        }
-                        */
-                    }
-                }
-            }
-        }
 
         private void GridOwnsController()
         {

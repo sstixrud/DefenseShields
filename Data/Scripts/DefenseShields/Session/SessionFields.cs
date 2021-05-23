@@ -1,6 +1,4 @@
 ﻿using ParallelTasks;
-using ProtoBuf;
-using Sandbox.ModAPI;
 using VRage.Input;
 
 namespace DefenseShields

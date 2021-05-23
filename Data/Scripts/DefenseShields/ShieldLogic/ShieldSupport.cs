@@ -438,10 +438,7 @@ namespace DefenseShields
                     Absorb += damage;
 
                     UtilsStatic.CreateFakeSmallExplosion(WorldImpactPosition);
-                    if (hit.Attacker != null)
-                    {
-                        ((IMyDestroyableObject) hit.Attacker).DoDamage(1, Session.Instance.MPKinetic, false, null, ShieldEnt.EntityId);
-                    }
+                    ((IMyDestroyableObject) hit.Attacker)?.DoDamage(1, Session.Instance.MPKinetic, false, null, ShieldEnt.EntityId);
                     continue;
                 }
                 if (damageType == Session.Instance.MPKinetic)
