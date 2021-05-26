@@ -98,6 +98,13 @@ namespace DefenseShields
             LastWokenTick = _tick;
         }
 
+        internal void ForceShapeAndCapUpdate()
+        {
+            _forceCap = true;
+            if (GridIsMobile) _updateMobileShape = true;
+            else UpdateDimensions = true;
+        }
+
         internal void TerminalRefresh(bool update = true)
         {
             Shield.RefreshCustomInfo();

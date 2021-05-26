@@ -144,6 +144,7 @@ namespace DefenseShields
             
             if (_isServer)
             {
+                ForceShapeAndCapUpdate();
                 CleanWebEnts();
                 ShieldChangeState();
                 if (Session.Enforced.Debug == 3) Log.Line($"StateUpdate: ComingOnlineSetup - ShieldId [{Shield.EntityId}]");
@@ -245,6 +246,9 @@ namespace DefenseShields
                     ShieldComp.O2Updated = false;
                 }
                 DsState.State.Lowered = false;
+                
+                ForceShapeAndCapUpdate();
+
                 if (!_isDedicated) 
                     ShellVisibility();
                 if (_isServer)
