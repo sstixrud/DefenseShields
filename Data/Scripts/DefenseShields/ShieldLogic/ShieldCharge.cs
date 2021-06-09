@@ -80,7 +80,6 @@ namespace DefenseShields
 
         private void CalculatePowerCharge()
         {
-            var capScaler = Session.Enforced.CapScaler;
             var hpsEfficiency = Session.Enforced.HpsEfficiency;
             var baseScaler = Session.Enforced.BaseScaler;
             var maintenanceCost = Session.Enforced.MaintenanceCost;

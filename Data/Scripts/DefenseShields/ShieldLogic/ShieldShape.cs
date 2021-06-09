@@ -241,8 +241,7 @@ namespace DefenseShields
 
                 _ellipsoidSurfaceArea = _ellipsoidSa.Surface;
                 EllipsoidVolume = 1.333333 * Math.PI * DetectMatrixOutside.Scale.X * DetectMatrixOutside.Scale.Y * DetectMatrixOutside.Scale.Z;
-
-                var magicMod = DsState.State.Enhancer && ShieldMode == ShieldType.Station ? 100f : DsState.State.Enhancer && DsSet.Settings.FortifyShield ? 10f : 1f;
+                var magicMod = DsState.State.Enhancer && ShieldMode == ShieldType.Station ? 100f : DsState.State.Enhancer && DsSet.Settings.FortifyShield ? 5f + Math.Sqrt(DsSet.Settings.Fit) : 1f;
                 var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio * magicMod);
                 _sizeScaler = (float)Math.Sqrt(ellipsoidMagic);
 

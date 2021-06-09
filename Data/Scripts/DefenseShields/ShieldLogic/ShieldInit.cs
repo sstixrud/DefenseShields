@@ -534,11 +534,12 @@ namespace DefenseShields
             }
 
             _forceCap = false;
-            _density = 0;
+            _blockDensity = 0;
 
             //var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
             var size = 0;
             var maxSize = 0d;
+            var powerCount = 0d;
 
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
@@ -559,15 +560,26 @@ namespace DefenseShields
                         //continue;
 
                     var span = max + 1 - min;
-                    size += (span.X * span.Y * span.Z);
+                    var value = (span.X * span.Y * span.Z);
+                    size += value;
+                    if (slim.FatBlock is IMyPowerProducer)
+                    {
+                        powerCount += value;
+                    }
                 }
             }
-            var result = (float)(size / maxSize);
-            _density = MathHelper.Clamp(result / DensityLimit, 0.001f, 1);
             _capcubeBoxList.Clear();
 
-            DsState.State.CapModifier = _density;
-            _shieldCapped = _density < 1;
+            var blockResult = (float)(size / maxSize);
+            var blockLimit = MathHelper.Clamp(BlockDensityLimit / Session.Enforced.BlockScaler, 0.000001f, 1);
+            _blockDensity = MathHelper.Clamp(blockResult / blockLimit, 0.001f, 1);
+
+            var powerResult = (float)(powerCount / size);
+            var powerLimit = MathHelper.Clamp(PowerDensityLimit * Session.Enforced.PowerScaler, 0.000001f, 1);
+            _powerDensity = MathHelper.Clamp(powerLimit / powerResult, 0.001f, 1);
+
+            DsState.State.CapModifier = MathHelper.Clamp(_powerDensity * _blockDensity, 0.000001f, 1);
+            _shieldCapped = DsState.State.CapModifier < 1;
         }
         #endregion
     }

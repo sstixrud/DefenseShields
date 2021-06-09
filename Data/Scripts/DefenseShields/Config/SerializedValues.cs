@@ -20,13 +20,13 @@
         [ProtoMember(10), DefaultValue(-1)] public int SuperWeapons = 1;
         [ProtoMember(11), DefaultValue(-1)] public int Version = -1;
         [ProtoMember(12)] public ulong SenderId = 0;
-        [ProtoMember(13), DefaultValue(-1)] public float CapScaler = -1f;
+        [ProtoMember(13), DefaultValue(-1)] public float BlockScaler = -1f;
         [ProtoMember(14), DefaultValue(-1)] public float HpsEfficiency = -1f;
         [ProtoMember(15), DefaultValue(-1)] public float MaintenanceCost = -1f;
         [ProtoMember(16), DefaultValue(-1)] public int DisableBlockDamage = -1;
         [ProtoMember(17), DefaultValue(-1)] public int DisableLineOfSight = -1;
         [ProtoMember(18), DefaultValue(-1)] public int OverloadTime = -1;
-
+        [ProtoMember(19), DefaultValue(-1)] public float PowerScaler = -1f;
     }
 
     [ProtoContract]

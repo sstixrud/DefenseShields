@@ -113,7 +113,8 @@ namespace DefenseShields
         private const int FallBackStep = 10;
         private const float MagicCapRatio = 2000;
         private const float MagicEllipsoidRatio = 1000;
-        private const float DensityLimit = 0.045f;
+        private const float BlockDensityLimit = 0.035f;
+        private const float PowerDensityLimit = 0.125f;
 
         private const int SyncCount = 60;
 
@@ -166,7 +167,9 @@ namespace DefenseShields
         private float _sizeScaler;
         private float _shieldTypeRatio = 100f;
         private float _damageTypeBalance;
-        private float _density;
+        private float _blockDensity;
+        private float _powerDensity;
+
         private double _oldEllipsoidAdjust;
         private double _ellipsoidSurfaceArea;
 

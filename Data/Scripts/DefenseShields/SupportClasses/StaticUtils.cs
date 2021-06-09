@@ -34,8 +34,9 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 80;
-            const float CapScaler = 1f;
+            const int Version = 81;
+            const float BlockScaler = 1f;
+            const float PowerScaler = 1f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
             const int DisableBlockDamage = 0;
@@ -70,13 +71,19 @@ namespace DefenseShields.Support
                 Session.Enforced.DisableEntityBarrier = !unPackedData.DisableEntityBarrier.Equals(-1) ? unPackedData.DisableEntityBarrier : DisableEntityBarrier;
                 Session.Enforced.Debug = !unPackedData.Debug.Equals(-1) ? unPackedData.Debug : Debug;
                 Session.Enforced.SuperWeapons = !unPackedData.SuperWeapons.Equals(-1) ? unPackedData.SuperWeapons : SuperWeapons;
-                Session.Enforced.CapScaler = !unPackedData.CapScaler.Equals(-1f) ? unPackedData.CapScaler : CapScaler;
+                Session.Enforced.BlockScaler = !unPackedData.BlockScaler.Equals(-1f) ? unPackedData.BlockScaler : BlockScaler;
+                Session.Enforced.PowerScaler = !unPackedData.PowerScaler.Equals(-1f) ? unPackedData.PowerScaler : PowerScaler;
+
                 Session.Enforced.HpsEfficiency = !unPackedData.HpsEfficiency.Equals(-1f) ? unPackedData.HpsEfficiency : HpsEfficiency;
                 Session.Enforced.MaintenanceCost = !unPackedData.MaintenanceCost.Equals(-1f) ? unPackedData.MaintenanceCost : MaintenanceCost;
                 Session.Enforced.DisableBlockDamage = !unPackedData.DisableBlockDamage.Equals(-1) ? unPackedData.DisableBlockDamage : DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
                 Session.Enforced.OverloadTime = !unPackedData.OverloadTime.Equals(-1) ? unPackedData.OverloadTime : OverloadTime;
 
+                if (unPackedData.Version <= 80)
+                {
+                    Session.Enforced.PowerScaler = 1f;
+                }
                 if (unPackedData.Version <= 79)
                 {
                     Session.Enforced.HeatScaler = 0.002f;
@@ -88,7 +95,7 @@ namespace DefenseShields.Support
                     Session.Enforced.StationRatio = StationRatio;
                     Session.Enforced.LargeShipRatio = LargeShipRate;
                     Session.Enforced.SmallShipRatio = SmallShipRatio;
-                    Session.Enforced.CapScaler = CapScaler;
+                    Session.Enforced.BlockScaler = BlockScaler;
                     Session.Enforced.HpsEfficiency = HpsEfficiency;
                     Session.Enforced.MaintenanceCost = BaseScaler;
                 }
@@ -107,7 +114,7 @@ namespace DefenseShields.Support
                 Session.Enforced.DisableEntityBarrier = DisableEntityBarrier;
                 Session.Enforced.Debug = Debug;
                 Session.Enforced.SuperWeapons = SuperWeapons;
-                Session.Enforced.CapScaler = CapScaler;
+                Session.Enforced.BlockScaler = BlockScaler;
                 Session.Enforced.HpsEfficiency = HpsEfficiency;
                 Session.Enforced.MaintenanceCost = MaintenanceCost;
                 Session.Enforced.Version = Version;
