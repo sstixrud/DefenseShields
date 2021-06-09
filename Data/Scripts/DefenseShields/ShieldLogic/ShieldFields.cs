@@ -82,6 +82,7 @@ namespace DefenseShields
         internal int LostPings;
         internal Vector3I ShieldRedirectState;
 
+        internal BoundingBoxD ConstructAaab;
         internal BoundingBoxD WebBox = new BoundingBoxD();
         internal MatrixD OldShieldMatrix;
         internal ShieldGridComponent ShieldComp;
@@ -112,6 +113,7 @@ namespace DefenseShields
         private const int FallBackStep = 10;
         private const float MagicCapRatio = 2000;
         private const float MagicEllipsoidRatio = 1000;
+        private const float DensityLimit = 0.045f;
 
         private const int SyncCount = 60;
 
@@ -164,6 +166,7 @@ namespace DefenseShields
         private float _sizeScaler;
         private float _shieldTypeRatio = 100f;
         private float _damageTypeBalance;
+        private float _density;
         private double _oldEllipsoidAdjust;
         private double _ellipsoidSurfaceArea;
 

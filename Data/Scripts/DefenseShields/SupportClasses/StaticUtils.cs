@@ -81,6 +81,17 @@ namespace DefenseShields.Support
                 {
                     Session.Enforced.HeatScaler = 0.002f;
                 }
+                if (Session.Enforced.BaseScaler == 10 || unPackedData.Version <= 78)
+                {
+                    Session.Enforced.BaseScaler = BaseScaler;
+                    Session.Enforced.HeatScaler = HeatScaler;
+                    Session.Enforced.StationRatio = StationRatio;
+                    Session.Enforced.LargeShipRatio = LargeShipRate;
+                    Session.Enforced.SmallShipRatio = SmallShipRatio;
+                    Session.Enforced.CapScaler = CapScaler;
+                    Session.Enforced.HpsEfficiency = HpsEfficiency;
+                    Session.Enforced.MaintenanceCost = BaseScaler;
+                }
                 Session.Enforced.Version = Version;
                 UpdateConfigFile(unPackCfg);
             }

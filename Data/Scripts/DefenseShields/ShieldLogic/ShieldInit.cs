@@ -1,5 +1,7 @@
 ﻿
+using System.Linq;
 using SpaceEngineers.Game.ModAPI;
+using VRage.Game.ModAPI;
 
 namespace DefenseShields
 {
@@ -530,103 +532,42 @@ namespace DefenseShields
                 _updateCap = true;
                 return;
             }
+
             _forceCap = false;
-            Vector3I center = Vector3I.Zero;
-            var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
+            _density = 0;
+
+            //var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
+            var size = 0;
+            var maxSize = 0d;
+
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
-                var isRootGrid = sub == MyGrid;
-                var subWorldCenter = sub.GridIntegerToWorld(Vector3I.Zero);
-                var parentLocalOffset = MyGrid.WorldToGridInteger(subWorldCenter);
+                //var subWorldCenter = sub.GridIntegerToWorld(Vector3I.Zero);
+                //var parentLocalOffset = MyGrid.WorldToGridInteger(subWorldCenter);
 
-                foreach (var cube in sub.GetFatBlocks()) {
+                var xCount = MyGrid.PositionComp.LocalAABB.Extents.X / MyGrid.GridSize;
+                var yCount = MyGrid.PositionComp.LocalAABB.Extents.Y / MyGrid.GridSize;
+                var zCount = MyGrid.PositionComp.LocalAABB.Extents.Z / MyGrid.GridSize;
+                var maxCubes = Math.Round(xCount * yCount * zCount, 0);
+                maxSize += maxCubes;
+                foreach (IMySlimBlock slim in sub.CubeBlocks) {
 
-                    var term = cube as IMyTerminalBlock;
-                    var sensor = cube as IMySensorBlock;
-                    var camera = cube as IMyCameraBlock;
-                    var light = cube as IMyLightingBlock;
-                    var sound = cube as IMySoundBlock;
-                    var lcd = cube as IMyTextPanel;
-                    var buttonPanel = term != null && cube.BlockDefinition != null && cube.BlockDefinition.Id.TypeId == typeof(MyObjectBuilder_TerminalBlock);
-                    if (buttonPanel || term == null || sensor != null || sound != null || camera != null || light != null || lcd != null) continue;
-                    Vector3I translatedPos;
+                    var min = slim.Min;
+                    var max = slim.Max;
 
-                    if (!isRootGrid)
-                        translatedPos = cube.Position + parentLocalOffset;
-                    else 
-                        translatedPos = cube.Position;
+                    //if (sphere.Contains(new BoundingBoxI(min + parentLocalOffset, max + parentLocalOffset)) != ContainmentType.Contains)
+                        //continue;
 
-                    if (sphere.Contains(translatedPos) == ContainmentType.Disjoint)
-                        continue;
-
-                    center += translatedPos;
-
-                    _capcubeBoxList.Add(new CapCube {Cube = cube, Position = translatedPos});
+                    var span = max + 1 - min;
+                    size += (span.X * span.Y * span.Z);
                 }
             }
-
-            var totalBlockCnt = _capcubeBoxList.Count;
-
-            if (totalBlockCnt <= 0) {
-                SetCap(new BoundingBox(Vector3.Zero, Vector3.Zero));
-                return;
-            }
-
-            center /= totalBlockCnt;
-            var percentile88Th = (int)(totalBlockCnt * 0.12);
-
-            ShellSort(_capcubeBoxList, center);
-            _capcubeBoxList.RemoveRange(totalBlockCnt - percentile88Th, percentile88Th);
-
-            BoundingBox newBox = BoundingBox.Invalid;
-            for (int i = 0; i < _capcubeBoxList.Count; i++) {
-
-                var cap = _capcubeBoxList[i];
-                newBox.Min = Vector3.Min(newBox.Min, cap.Cube.Min);
-                newBox.Max = Vector3.Max(newBox.Max, cap.Cube.Max);
-            }
-
-            newBox.Min *= MyGrid.GridSize;
-            newBox.Max *= MyGrid.GridSize;
-
+            var result = (float)(size / maxSize);
+            _density = MathHelper.Clamp(result / DensityLimit, 0.001f, 1);
             _capcubeBoxList.Clear();
-         
-            SetCap(newBox);
-        }
 
-        private void SetCap(BoundingBox box)
-        {
-            var newExtAbsMax = box.HalfExtents.AbsMax();
-            var minHalfExtAbsMin = ShieldAabbScaled.HalfExtents.AbsMin() / 4;
-            var boxSurface = box.SurfaceArea(); 
-            var useMin = minHalfExtAbsMin > newExtAbsMax || boxSurface  < 1;
-            var vScale = (ShieldAabbScaled.HalfExtents.AbsMin() * 0.5f) * Vector3.One;
-            var minBox = new BoundingBox(-vScale, vScale);
-            var boxsArea = useMin ? minBox.SurfaceArea() : box.SurfaceArea();
-
-            var surfaceArea = (float)Math.Sqrt(boxsArea);
-            DsState.State.GridIntegrity = (surfaceArea * MagicCapRatio);
-        }
-
-        static void ShellSort(List<CapCube> list, Vector3I center)
-        {
-            int length = list.Count;
-            for (int h = length / 2; h > 0; h /= 2)
-            {
-                for (int i = h; i < length; i += 1)
-                {
-                    var tempValue = list[i];
-                    var dist = Vector3.DistanceSquared(list[i].Position, center);
-
-                    int j;
-                    for (j = i; j >= h && Vector3.DistanceSquared(list[j - h].Position, center) > dist; j -= h)
-                    {
-                        list[j] = list[j - h];
-                    }
-
-                    list[j] = tempValue;
-                }
-            }
+            DsState.State.CapModifier = _density;
+            _shieldCapped = _density < 1;
         }
         #endregion
     }

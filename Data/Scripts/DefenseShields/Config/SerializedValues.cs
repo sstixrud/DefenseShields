@@ -61,7 +61,7 @@
         [ProtoMember(27), DefaultValue(-1)] public float ShieldPercent;
         [ProtoMember(28)] public bool EmpOverLoad = false;
         [ProtoMember(29)] public bool EwarProtection = false;
-        [ProtoMember(30)] public float GridIntegrity;
+        [ProtoMember(30)] public float CapModifier;
         [ProtoMember(31)] public bool ReInforce = false;
         [ProtoMember(32)] public long ActiveEmitterId;
         [ProtoMember(33)] public uint MId;

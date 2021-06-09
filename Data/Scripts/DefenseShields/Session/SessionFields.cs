@@ -267,7 +267,6 @@ namespace DefenseShields
 
         private const int EntCleanCycle = 3600;
         private const int EntMaxTickAge = 36000;
-
         private static int _entSlotAssigner;
         internal bool InMenu;
 

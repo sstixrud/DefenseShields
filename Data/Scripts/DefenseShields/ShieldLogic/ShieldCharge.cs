@@ -96,24 +96,22 @@ namespace DefenseShields
             var bufferMaxScaler = (baseScaler * shieldTypeRatio) / _sizeScaler;
 
             ShieldMaxHpBase = ShieldMaxPower * bufferMaxScaler;
-            var powerCap = DsState.State.GridIntegrity;
-            if (capScaler > 0) {
+            var bonus = 0f;
 
-                if (ShieldMode == ShieldType.Station) 
-                    capScaler *= 3.5f;
+            if (DsState.State.CapModifier < 1) {
+                var diff = 1 - DsState.State.CapModifier;
+                if (ShieldMode == ShieldType.Station) {
+                    bonus = 1 - (diff / 2) / 2;
+                }
                 else if (fortify)
-                    capScaler *= 2f;
-
-                powerCap *= capScaler;
+                    bonus = (diff / 2);
             }
 
+            var maxHpScaler = DsState.State.CapModifier + bonus;
             shieldMaintainPercent = shieldMaintainPercent * DsState.State.EnhancerPowerMulti * (DsState.State.ShieldPercent * ConvToDec);
             
             if (DsState.State.Lowered) 
                 shieldMaintainPercent *= 0.25f;
-
-            _shieldCapped = ShieldMaxHpBase > powerCap;
-            var maxHpScaler = _shieldCapped ? powerCap / ShieldMaxHpBase : 1f;
 
             _shieldMaintaintPower = ShieldMaxPower * maxHpScaler * shieldMaintainPercent;
 

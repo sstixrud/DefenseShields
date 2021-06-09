@@ -387,12 +387,10 @@ namespace DefenseShields
             {
                 ConcurrentCachingList<MyBatteryBlock> batteries;
                 if (GridBatteryMap.TryGetValue(battery.CubeGrid, out batteries)) {
-                    Log.Line($"add battery to existing grid");
                     batteries.Add(battery);
                     batteries.ApplyAdditions();
                 }
                 else {
-                    Log.Line($"add battery to new grid");
                     battery.CubeGrid.OnFatBlockRemoved += OnFatBlockRemoved;
                     batteries = BatteryListPool.Get();
                     batteries.Add(battery);
@@ -410,16 +408,13 @@ namespace DefenseShields
 
                 ConcurrentCachingList<MyBatteryBlock> batteries;
                 if (GridBatteryMap.TryGetValue(battery.CubeGrid, out batteries)) {
-                    Log.Line($"battery remove");
                     batteries.Remove(battery, true);
 
                     if (batteries.IsEmpty) {
-                        Log.Line($"empty");
                         battery.CubeGrid.OnFatBlockRemoved -= OnFatBlockRemoved;
                         BatteryListPool.Return(batteries);
                     }
                 }
-                else Log.Line($"no grid map to remove battery from");
             }
         }
 

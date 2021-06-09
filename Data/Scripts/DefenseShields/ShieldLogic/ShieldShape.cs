@@ -68,6 +68,7 @@ namespace DefenseShields
         {
             UpdateDimensions = false;
             _shapeChanged = true;
+            _forceCap = _isServer;
             CreateShieldShape();
         }
 
@@ -93,7 +94,7 @@ namespace DefenseShields
                     }
                 }
             }
-
+            ConstructAaab = expandedAabb;
             if (DsSet.Settings.SphereFit || DsSet.Settings.FortifyShield)
             {
                 var fortify = DsSet.Settings.FortifyShield ? 3 : 1;
@@ -112,7 +113,7 @@ namespace DefenseShields
             }
             else
             {
-                var offset = MyGrid.GridSize * 0.01;
+                var offset = MyGrid.GridSize * 0.5;
                 DsState.State.ShieldFudge = 0f;
                 var extentsDiff = DsState.State.GridHalfExtents.Length() - expandedAabb.HalfExtents.Length();
                 var overThreshold = extentsDiff < -offset || extentsDiff > offset || forceUpdate; //first grow, second shrink
@@ -123,6 +124,7 @@ namespace DefenseShields
             if (_halfExtentsChanged || SettingsUpdated)
             {
                 _adjustShape = true;
+                _forceCap = _isServer;
             }
         }
 
@@ -141,14 +143,12 @@ namespace DefenseShields
 
         private void CheckExtents()
         {
-            if (FitChanged) {
-                _forceCap = _isServer;
-                FitChanged = false;
-            }
-
+            var force = FitChanged || _shapeEvent;
+            FitChanged = false;
             _shapeEvent = false;
+
             if (!_isServer || !GridIsMobile) return;
-            CreateHalfExtents(true);
+            CreateHalfExtents(force);
         }
 
         internal void CreateShieldShape()
@@ -236,7 +236,6 @@ namespace DefenseShields
                 ShieldAabbScaled.Max = -ShieldSize;
                 _ellipsoidSa.Update(DetectMatrixOutside.Scale.X, DetectMatrixOutside.Scale.Y, DetectMatrixOutside.Scale.Z);
                 BoundingRange = ShieldSize.AbsMax();
-
                 ShieldSphere3K.Radius = BoundingRange + 3000;
                 WebSphere.Radius = BoundingRange + 7;
 
