@@ -167,8 +167,8 @@ namespace DefenseShields
         private float _sizeScaler;
         private float _shieldTypeRatio = 100f;
         private float _damageTypeBalance;
-        private float _blockDensity;
-        private float _powerDensity;
+        private float _blockCapMulti;
+        private float _powerCapMulti;
 
         private double _oldEllipsoidAdjust;
         private double _ellipsoidSurfaceArea;
