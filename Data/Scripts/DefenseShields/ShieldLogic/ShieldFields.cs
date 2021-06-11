@@ -144,6 +144,7 @@ namespace DefenseShields
         private uint _funcTick;
         private uint _shapeTick;
         private uint _capacitorTick;
+        private uint _delayedCapTick = uint.MaxValue;
         private uint _heatVentingTick = uint.MaxValue;
         private uint _lastSendDamageTick = uint.MaxValue;
         private uint _subUpdatedTick = uint.MaxValue;
@@ -395,7 +396,6 @@ namespace DefenseShields
 
         internal MatrixD OffsetEmitterWMatrix { get; set; }
 
-        internal Task FuncTask { get; set; }
         internal float ImpactSize { get; set; } = 9f;
         internal float Absorb { get; set; }
 

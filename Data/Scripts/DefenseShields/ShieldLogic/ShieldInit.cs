@@ -298,7 +298,12 @@ namespace DefenseShields
             _functionalChanged = true;
             ResetShape(false);
             ResetShape(false, true);
-            if (refreshBlocks) BlockChanged(false, true);
+            if (refreshBlocks)
+            {
+                BlockChanged(false);
+                if (_isServer) 
+                    ComputeCap();
+            }
             _updateRender = true;
         }
 
@@ -534,6 +539,7 @@ namespace DefenseShields
             }
 
             _forceCap = false;
+            _delayedCapTick = uint.MaxValue;
 
             //var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
             var size = 0;

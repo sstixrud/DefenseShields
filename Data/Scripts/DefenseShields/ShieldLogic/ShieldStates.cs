@@ -26,22 +26,39 @@ namespace DefenseShields
             MyGrid = MyCube.CubeGrid;
             if (MyGrid?.Physics == null) return false;
 
-            if (_resetEntity) ResetEntity();
-            if (!_firstSync && _readyToSync) SaveAndSendAll();
-            if (!_isDedicated && _count == 29 && InControlPanel && InThisTerminal) TerminalRefresh();
+            if (_resetEntity) 
+                ResetEntity();
+
+            if (!_firstSync && _readyToSync) 
+                SaveAndSendAll();
+
+            if (!_isDedicated && _count == 29 && InControlPanel && InThisTerminal) 
+                TerminalRefresh();
 
             if (wait || (!_allInited && !PostInit())) return false;
 
-            if (_tick1800 && Session.Enforced.Debug > 0) Debug();
+            if (_tick1800 && Session.Enforced.Debug > 0) 
+                Debug();
 
             IsStatic = MyGrid.IsStatic;
 
-            if (!Warming) WarmUpSequence();
+            if (!Warming) 
+                WarmUpSequence();
 
-            if (_subUpdate && !DsState.State.Suspended) UpdateSubGrids();
-            if (_blockEvent && _tick >= _funcTick) BlockChanged(true);
-            if (_blockChanged) BlockMonitor();
-            if (ClientUiUpdate || SettingsUpdated) UpdateSettings();
+            if (_subUpdate && !DsState.State.Suspended) 
+                UpdateSubGrids();
+
+            if (_blockEvent && _tick >= _funcTick) 
+                BlockChanged(true);
+
+            if (_blockChanged) 
+                BlockMonitor();
+            
+            if (_isServer && (_updateCap || _tick >= _delayedCapTick ))
+                ComputeCap();
+
+            if (ClientUiUpdate || SettingsUpdated) 
+                UpdateSettings();
 
             if (_mpActive)
             {

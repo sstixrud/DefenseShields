@@ -243,7 +243,11 @@ namespace DefenseShields
                 EllipsoidVolume = 1.333333 * Math.PI * DetectMatrixOutside.Scale.X * DetectMatrixOutside.Scale.Y * DetectMatrixOutside.Scale.Z;
                 var magicMod = DsState.State.Enhancer && ShieldMode == ShieldType.Station ? 100f : DsState.State.Enhancer && DsSet.Settings.FortifyShield ? 5f + Math.Sqrt(DsSet.Settings.Fit) : 1f;
                 var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio * magicMod);
-                _sizeScaler = (float)Math.Sqrt(ellipsoidMagic);
+               
+                var rawScaler = Math.Sqrt(ellipsoidMagic);
+                var adjustment = rawScaler > 100 ? 25 : rawScaler > 10 ? 2.5 : rawScaler > 1 ? 0.25 : rawScaler;
+                
+                _sizeScaler = (float)(Math.Round(rawScaler / adjustment) * adjustment);
 
                 if (_isServer) {
                     ShieldChangeState();

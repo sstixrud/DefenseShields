@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DefenseShields.Support;
 using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
@@ -119,6 +120,10 @@ namespace DefenseShields
                 _blockEvent = true;
                 _shapeEvent = true;
                 LosCheckTick = _tick + 1800;
+
+                if (_isServer && _delayedCapTick == uint.MaxValue)
+                    _delayedCapTick = _tick + 600;
+
                 if (_blockAdded) _shapeTick = _tick + 300;
                 else _shapeTick = _tick + 1800;
             }
@@ -126,7 +131,6 @@ namespace DefenseShields
 
             if (_functionalAdded || _functionalRemoved)
             {
-                _updateCap = true;
                 _functionalAdded = false;
                 _functionalRemoved = false;
             }
@@ -138,25 +142,17 @@ namespace DefenseShields
             _blockAdded = false;
         }
 
-        private void BlockChanged(bool backGround, bool forceCap = false)
+        private void BlockChanged(bool backGround)
         {
             if (_blockEvent)
             {
-                var notReady = !FuncTask.IsComplete || DsState.State.Sleeping || DsState.State.Suspended;
-                if (notReady) return;
-                if (Session.Enforced.Debug == 3) Log.Line($"BlockChanged: functional:{_functionalEvent} - funcComplete:{FuncTask.IsComplete} - Sleeping:{DsState.State.Sleeping} - Suspend:{DsState.State.Suspended} - ShieldId [{Shield.EntityId}]");
-                if (_functionalEvent) FunctionalChanged(backGround, forceCap);
+                if (DsState.State.Sleeping || DsState.State.Suspended) return;
+
+                _functionalEvent = false;
+
                 _blockEvent = false;
                 _funcTick = _tick + 60;
             }
-        }
-
-        private void FunctionalChanged(bool backGround, bool forceCap)
-        {
-            if (_isServer && (_updateCap || forceCap))
-                ComputeCap();
-
-            _functionalEvent = false;
         }
 
 
