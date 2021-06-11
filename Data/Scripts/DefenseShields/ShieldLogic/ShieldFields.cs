@@ -246,7 +246,6 @@ namespace DefenseShields
         private bool _firstSync;
         private bool _adjustShape;
         private bool _updateCap;
-        private bool _forceCap;
         private bool _sendMessage;
 
         private string _modelActive = "\\Models\\Cubes\\ShieldActiveBaseAlt.mwm";

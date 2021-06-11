@@ -1,5 +1,6 @@
 ﻿using Sandbox.Game.Entities;
 using Sandbox.ModAPI;
+using VRage.Utils;
 
 namespace DefenseShields
 {
@@ -68,7 +69,6 @@ namespace DefenseShields
         {
             UpdateDimensions = false;
             _shapeChanged = true;
-            _forceCap = _isServer;
             CreateShieldShape();
         }
 
@@ -94,6 +94,10 @@ namespace DefenseShields
                     }
                 }
             }
+
+            if (_delayedCapTick == uint.MaxValue && _isServer && !MyUtils.IsEqual(ConstructAaab.HalfExtents, expandedAabb.HalfExtents))
+                _delayedCapTick = _tick + 600;
+
             ConstructAaab = expandedAabb;
             if (DsSet.Settings.SphereFit || DsSet.Settings.FortifyShield)
             {
@@ -101,7 +105,6 @@ namespace DefenseShields
                 var fit = (float)UtilsStatic.GetFit(DsSet.Settings.Fit) * 0.5f;
                 var scaler = 4f;
                 if (shieldGrid.GridSizeEnum == MyCubeSize.Small && DsSet.Settings.Fit < 15) scaler = 5;
-
 
                 var size = (expandedAabb.HalfExtents.Max() * fortify) * fit;
                 var vectorSize = new Vector3D(size, size, size);
@@ -119,12 +122,12 @@ namespace DefenseShields
                 var overThreshold = extentsDiff < -offset || extentsDiff > offset || forceUpdate; //first grow, second shrink
                 if (overThreshold || DsState.State.GridHalfExtents == Vector3D.Zero) DsState.State.GridHalfExtents = expandedAabb.HalfExtents;
             }
-            _halfExtentsChanged = !DsState.State.GridHalfExtents.Equals(_oldGridHalfExtents) || (DsSet.Settings.SphereFit || DsSet.Settings.FortifyShield) && SettingsUpdated;
+            
+            _halfExtentsChanged = !MyUtils.IsEqual(DsState.State.GridHalfExtents, _oldGridHalfExtents) || (DsSet.Settings.SphereFit || DsSet.Settings.FortifyShield) && SettingsUpdated;
 
             if (_halfExtentsChanged || SettingsUpdated)
             {
                 _adjustShape = true;
-                _forceCap = _isServer;
             }
         }
 
@@ -245,7 +248,7 @@ namespace DefenseShields
                 var ellipsoidMagic = _ellipsoidSurfaceArea / (MagicEllipsoidRatio * magicMod);
                
                 var rawScaler = Math.Sqrt(ellipsoidMagic);
-                var adjustment = rawScaler > 100 ? 25 : rawScaler > 10 ? 2.5 : rawScaler > 1 ? 0.25 : rawScaler;
+                var adjustment = rawScaler > 100 ? Session.Enforced.SizeScaler : rawScaler > 10 ? Session.Enforced.SizeScaler / 10 : rawScaler > 1 ? Session.Enforced.SizeScaler / 100 : rawScaler;
                 
                 _sizeScaler = (float)(Math.Round(rawScaler / adjustment) * adjustment);
 
@@ -274,9 +277,6 @@ namespace DefenseShields
             ShieldEnt.PositionComp.SetPosition(DetectionCenter);
             BoundingBoxD.CreateFromSphere(ref WebSphere, out WebBox);
             BoundingBoxD.CreateFromSphere(ref ShieldSphere3K, out ShieldBox3K);
-
-            if (_forceCap)
-                ComputeCap();
         }
 
         private void CreateMobileShape(Vector3D localOffsetMeters)

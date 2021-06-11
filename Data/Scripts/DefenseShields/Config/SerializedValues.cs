@@ -27,6 +27,7 @@
         [ProtoMember(17), DefaultValue(-1)] public int DisableLineOfSight = -1;
         [ProtoMember(18), DefaultValue(-1)] public int OverloadTime = -1;
         [ProtoMember(19), DefaultValue(-1)] public float PowerScaler = -1f;
+        [ProtoMember(20), DefaultValue(-1)] public float SizeScaler = -1f;
     }
 
     [ProtoContract]

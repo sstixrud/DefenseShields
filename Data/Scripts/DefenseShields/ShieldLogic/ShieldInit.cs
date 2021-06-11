@@ -538,7 +538,6 @@ namespace DefenseShields
                 return;
             }
 
-            _forceCap = false;
             _delayedCapTick = uint.MaxValue;
 
             //var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
@@ -592,6 +591,9 @@ namespace DefenseShields
 
             DsState.State.CapModifier = MathHelper.Clamp(powerCapMultiClamp * blockCapMultiClamp, 0.000001f, 1);
             _shieldCapped = DsState.State.CapModifier < 1;
+            _updateMobileShape = true;
+            UpdateDimensions = true;
+            Asleep = false;
         }
         #endregion
     }
