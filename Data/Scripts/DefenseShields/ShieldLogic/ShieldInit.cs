@@ -590,7 +590,6 @@ namespace DefenseShields
             var powerCapMultiClamp = MathHelper.Clamp(_powerCapMulti, 0.001f, 1);
 
             DsState.State.CapModifier = MathHelper.Clamp(powerCapMultiClamp * blockCapMultiClamp, 0.000001f, 1);
-            _shieldCapped = DsState.State.CapModifier < 1;
             _updateMobileShape = true;
             UpdateDimensions = true;
             Asleep = false;

@@ -215,6 +215,7 @@
                 if (WarmedUp) initStage = 4;
                 else if (Warming) initStage = 3;
                 else if (_allInited) initStage = 2;
+
                 var  maxString = _shieldCapped ? CapString : MaxString;
                 var hpValue = (ShieldMaxCharge * ConvToHp);
 
@@ -236,7 +237,8 @@
                                          "\n[Shield Power]: " + ShieldCurrentPower.ToString("0.0") + " Mw" +
                                          "\n[Power Use]: " + powerUsage.ToString("0.0") + " (" + GridMaxPower.ToString("0.0") + ")Mw" +
                                          "\n[Power Density]: " + _powerCapMulti +
-                                         "\n[Block Density]: " + _blockCapMulti);
+                                         "\n[Block Density]: " + _blockCapMulti +
+                                         "\n[Density Total]: " + DsState.State.CapModifier);
                 }
                 else {
 

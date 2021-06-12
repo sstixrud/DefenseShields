@@ -86,6 +86,7 @@ namespace DefenseShields
             var fortify = DsSet.Settings.FortifyShield && DsState.State.Enhancer;
             var shieldTypeRatio = _shieldTypeRatio / 100f;
             var shieldMaintainPercent = maintenanceCost / 100;
+            _shieldCapped = DsState.State.CapModifier < 1;
 
             if (ShieldMode == ShieldType.Station && DsState.State.Enhancer)
                 hpsEfficiency *= 3.5f;
