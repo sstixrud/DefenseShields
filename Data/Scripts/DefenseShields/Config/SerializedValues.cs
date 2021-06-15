@@ -93,7 +93,7 @@
         [ProtoMember(19)] public uint MId;
         [ProtoMember(20)] public long PowerScale = 0;
         [ProtoMember(21), DefaultValue(-1)] public int PowerWatts = 999;
-        [ProtoMember(22), DefaultValue(2)] public int Fit = 15;
+        [ProtoMember(22), DefaultValue(-1)] public int Fit = 15;
         [ProtoMember(23)] public Vector3I ShieldRedirects = Vector3I.Zero;
         [ProtoMember(24)] public bool ShowRedirect;
     }

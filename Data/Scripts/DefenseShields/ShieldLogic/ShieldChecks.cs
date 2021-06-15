@@ -214,7 +214,12 @@ namespace DefenseShields
                     if ((!IsStatic && ds.IsStatic) || mySize < otherSize || MyUtils.IsEqual(mySize, otherSize) && myEntityId < otherEntityId)
                     {
                         _slavedToGrid = ds.MyGrid;
-                        if (_slavedToGrid != null) return true;
+                        if (_slavedToGrid != null)
+                        {
+                            if (_isServer && !ds.IsStatic && DsState.State.Charge > 0)
+                                DsState.State.Charge = 0;
+                            return true;
+                        }
                     }
                 }
             }
@@ -222,7 +227,9 @@ namespace DefenseShields
             if (_slavedToGrid != null) {
 
                 if (_slavedToGrid.IsInSameLogicalGroupAs(MyGrid))
+                {
                     ResetEntityTick = _tick + 1800;
+                }
             }
             _slavedToGrid = null;
             return false;
