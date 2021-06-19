@@ -30,7 +30,7 @@
                 if (grid != null)
                 {
                     var checkSphere = WebSphere;
-                    checkSphere.Radius += 7.5;
+                    checkSphere.Radius += 10;
                     GetBlocksInsideSphereFast(grid, ref checkSphere, true, entInfo.CacheBlockList);
                 }
             }
@@ -150,7 +150,7 @@
             if (entInfo == null) return;
 
             var bOriBBoxD = MyOrientedBoundingBoxD.CreateFromBoundingBox(grid.PositionComp.WorldAABB);
-            if (entInfo.Relation != Ent.EnemyGrid && EntInside(grid, bOriBBoxD)) return;
+            if (entInfo.Relation != Ent.EnemyGrid && entInfo.WasInside && EntInside(grid, bOriBBoxD)) return;
             BlockIntersect(grid, bOriBBoxD, ref entInfo);
         }
 

@@ -351,6 +351,7 @@ namespace DefenseShields
         internal uint TicksWithNoActivity { get; set; }
         internal uint EffectsCleanTick { get; set; }
         internal uint InitTick { get; set; }
+        internal uint ShapeChangeTick { get; set; }
 
         internal float ShieldChargeRate { get; set; }
         internal float ShieldMaxCharge { get; set; }

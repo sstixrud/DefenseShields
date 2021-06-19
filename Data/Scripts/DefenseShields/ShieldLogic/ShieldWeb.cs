@@ -122,7 +122,7 @@ namespace DefenseShields
             var voxelFound = false;
             var shieldFound = false;
             var entChanged = false;
-            var iMoving = ShieldComp.GridIsMoving;
+            var iMoving = ShieldComp.GridIsMoving || _tick - ShapeChangeTick < 60;
             var tick = Session.Instance.Tick;
 
             _enablePhysics = false;
@@ -170,7 +170,12 @@ namespace DefenseShields
                         if (refreshInfo || entInfo.RefreshNow)
                         {
                             entInfo.RefreshTick = tick;
-                            entInfo.Relation = EntType(ent);
+                            var newRelation = EntType(ent);
+                            if (!(newRelation == Ent.Protected && !entInfo.WasInside && (entInfo.Relation == Ent.NobodyGrid || entInfo.Relation == Ent.EnemyGrid)))
+                            {
+                                entInfo.Relation = newRelation == Ent.Protected && !entInfo.WasInside && (entInfo.Relation == Ent.NobodyGrid || entInfo.Relation == Ent.EnemyGrid) ? entInfo.Relation : newRelation;
+                                entInfo.WasInside = CustomCollision.PointInShield(ent.PositionComp.WorldAABB.Center, DetectMatrixOutsideInv);
+                            }
                         }
                         relation = entInfo.Relation;
                         
@@ -285,7 +290,7 @@ namespace DefenseShields
                             Session.Instance.ProtectCachePool.Return(protect);
 
                         var entIntersectInfo = Session.Instance.EntIntersectInfoPool.Get();
-                        entIntersectInfo.Init(false, ent.PositionComp.LocalAABB, tick, tick, tick, relation);
+                        entIntersectInfo.Init(false, ent.PositionComp.LocalAABB, tick, tick, tick, relation, CustomCollision.PointInShield(ent.PositionComp.WorldAABB.Center, DetectMatrixOutsideInv));
                         WebEnts.TryAdd(ent, entIntersectInfo);
                     }
 

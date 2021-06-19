@@ -237,11 +237,12 @@ namespace DefenseShields.Support
         public List<CubeAccel> CacheBlockList = new List<CubeAccel>();
         public bool RefreshNow;
         public bool EnemySafeInside;
+        public bool WasInside;
         public volatile bool Touched;
         public volatile uint LastCollision;
         public int ConsecutiveCollisions;
 
-        public void Init(bool touched, BoundingBox box, uint firstTick, uint lastTick, uint refreshTick, DefenseShields.Ent relation)
+        public void Init(bool touched, BoundingBox box, uint firstTick, uint lastTick, uint refreshTick, DefenseShields.Ent relation, bool wasInside)
         {
             Touched = touched;
             Box = box;
@@ -250,6 +251,7 @@ namespace DefenseShields.Support
             RefreshTick = refreshTick;
             Relation = relation;
             RefreshNow = true;
+            WasInside = wasInside;
             if (relation == DefenseShields.Ent.EnemyInside) EnemySafeInside = true;
         }
 

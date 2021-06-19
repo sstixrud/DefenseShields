@@ -62,7 +62,6 @@ namespace DefenseShields
                                 if (trueAttacker is MyVoxelBase) isVoxelBase = true;
                             }
                             else trueAttacker = grid;
-
                             protectors.LastAttackerWasInside = true;
                             Vector3D originHit;
                             block.ComputeWorldCenter(out originHit);

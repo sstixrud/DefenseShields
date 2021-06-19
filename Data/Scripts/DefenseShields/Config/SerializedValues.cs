@@ -28,6 +28,7 @@
         [ProtoMember(18), DefaultValue(-1)] public int OverloadTime = -1;
         [ProtoMember(19), DefaultValue(-1)] public float PowerScaler = -1f;
         [ProtoMember(20), DefaultValue(-1)] public float SizeScaler = -1f;
+        [ProtoMember(21), DefaultValue(-1)] public float MwPerCell = -1f;
     }
 
     [ProtoContract]

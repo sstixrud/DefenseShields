@@ -34,10 +34,11 @@ namespace DefenseShields.Support
             const int DisableEntityBarrier = 0;
             const int Debug = 1;
             const int SuperWeapons = 1;
-            const int Version = 83;
+            const int Version = 84;
             const float BlockScaler = 1f;
             const float PowerScaler = 1f;
             const float SizeScaler = 7.5f;
+            const float PowerCellMw = 30f;
             const float HpsEfficiency = 0.25f;
             const float MaintenanceCost = 0.5f;
             const int DisableBlockDamage = 0;
@@ -75,12 +76,17 @@ namespace DefenseShields.Support
                 Session.Enforced.BlockScaler = !unPackedData.BlockScaler.Equals(-1f) ? unPackedData.BlockScaler : BlockScaler;
                 Session.Enforced.PowerScaler = !unPackedData.PowerScaler.Equals(-1f) ? unPackedData.PowerScaler : PowerScaler;
                 Session.Enforced.SizeScaler = !unPackedData.SizeScaler.Equals(-1f) ? unPackedData.SizeScaler : SizeScaler;
+                Session.Enforced.MwPerCell = !unPackedData.MwPerCell.Equals(-1f) ? unPackedData.MwPerCell : PowerCellMw;
 
                 Session.Enforced.HpsEfficiency = !unPackedData.HpsEfficiency.Equals(-1f) ? unPackedData.HpsEfficiency : HpsEfficiency;
                 Session.Enforced.MaintenanceCost = !unPackedData.MaintenanceCost.Equals(-1f) ? unPackedData.MaintenanceCost : MaintenanceCost;
                 Session.Enforced.DisableBlockDamage = !unPackedData.DisableBlockDamage.Equals(-1) ? unPackedData.DisableBlockDamage : DisableBlockDamage;
                 Session.Enforced.DisableLineOfSight = !unPackedData.DisableLineOfSight.Equals(-1) ? unPackedData.DisableLineOfSight : DisableLineOfSight;
                 Session.Enforced.OverloadTime = !unPackedData.OverloadTime.Equals(-1) ? unPackedData.OverloadTime : OverloadTime;
+                if (unPackedData.Version <= 83)
+                {
+                    Session.Enforced.MwPerCell = 30f;
+                }
                 if (unPackedData.Version <= 82)
                 {
                     Session.Enforced.SizeScaler = 7.5f;
@@ -125,6 +131,7 @@ namespace DefenseShields.Support
                 Session.Enforced.OverloadTime = OverloadTime;
                 Session.Enforced.SizeScaler = SizeScaler;
                 Session.Enforced.PowerScaler = PowerScaler;
+                Session.Enforced.MwPerCell = PowerCellMw;
 
                 WriteNewConfigFile();
 

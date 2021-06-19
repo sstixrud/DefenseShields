@@ -540,15 +540,12 @@ namespace DefenseShields
 
             _delayedCapTick = uint.MaxValue;
 
-            //var sphere = new BoundingSphereD(Vector3I.Round(MyGrid.PositionComp.LocalAABB.Center * MyGrid.GridSizeR), ShieldSize.AbsMax() * MyGrid.GridSizeR);
             var size = 0;
             var maxSize = 0d;
             var powerCount = 0d;
 
             foreach (var sub in ShieldComp.SubGrids.Keys) {
 
-                //var subWorldCenter = sub.GridIntegerToWorld(Vector3I.Zero);
-                //var parentLocalOffset = MyGrid.WorldToGridInteger(subWorldCenter);
 
                 var xCount = MyGrid.PositionComp.LocalAABB.Extents.X / MyGrid.GridSize;
                 var yCount = MyGrid.PositionComp.LocalAABB.Extents.Y / MyGrid.GridSize;
@@ -560,15 +557,18 @@ namespace DefenseShields
                     var min = slim.Min;
                     var max = slim.Max;
 
-                    //if (sphere.Contains(new BoundingBoxI(min + parentLocalOffset, max + parentLocalOffset)) != ContainmentType.Contains)
-                        //continue;
-
                     var span = max + 1 - min;
                     var value = (span.X * span.Y * span.Z);
                     size += value;
-                    if (slim.FatBlock is IMyPowerProducer)
-                    {
-                        powerCount += value;
+                    var power = slim.FatBlock as IMyPowerProducer;
+
+                    if (power != null) {
+
+                        var maxPower = power.MaxOutput;
+                        var powerDensity = maxPower / value;
+                        var powerCellScale = Session.Enforced.MwPerCell > 0 && powerDensity > Session.Enforced.MwPerCell ? powerDensity / Session.Enforced.MwPerCell : 1f;
+
+                        powerCount += (value * powerCellScale);
                     }
                 }
             }
